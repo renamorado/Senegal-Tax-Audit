@@ -109,7 +109,7 @@ egen total_void_audits = rowtotal(void_audit*)
 **Main variable: share of bad algo cases
 gen share_void_algo = void_audit1_algo/total_n_implemented
 
-kdensity share_void_algo
+kdensity share_void_algo if total_n_implemented >0 
 
 *Computing shares
 *Shares with respect to implemented cases
@@ -126,7 +126,8 @@ drop total_started_audits
 rename max_total_started_audits total_started_audits
 replace total_started_audits =0 if total_started_audits ==.
 
-
+*Try with different definitions of bad audit share_void_totalgo
+s
 reshape wide y2, i(verificateur1 void_audit bad_algo_case n total_assigned_audits total_started_audits) j(n)
 
 *Bad cases by inspector 
