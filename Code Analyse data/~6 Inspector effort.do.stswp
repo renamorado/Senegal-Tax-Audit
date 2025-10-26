@@ -13,6 +13,7 @@
 set more off
 clear all 
 
+global check  1 // to save outside official replication folder
 *****************
 ** DIRECTORIES **
 *****************
@@ -26,6 +27,11 @@ clear all
 	
 	if strpos("`c(username)'","wb648862") { 										// Roldan's computer
 		global rootdir "C:\Users\wb648862\Dropbox\Senegal tax audits"
+	}
+	
+	
+	if $check == 1 {
+	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
 	}
 	
 /*	
@@ -65,6 +71,8 @@ keep if x2==0
 cap drop earliestdate earliestdate2 
 cap drop earliestnotification
 
+
+** setting earliest date as in 
 gen earliestdate = datededemarrage 
 
 foreach v in datedemanderenseignement datedavisdatededemandede ///
@@ -79,50 +87,81 @@ duration_investigation  {
 	*replace has_
 	}
 
-*Count how many audits have valid duration information
-gen has_initfinaldate = has_earliestdate  & (has_dateconfirmation==1 | has_datenotification==1)
-tab has_duration has_initfinaldate if y2==1 
 
-*** Generate table with stats of availability of date and method
-/*
-
-has_durati |
-on_investi |   has_initfinaldate
-    gation |         0          1 |     Total
------------+----------------------+----------
-         0 |       702         27 |       729 
-         1 |         0        282 |       282 
------------+----------------------+----------
-     Total |       702        309 |     1,011 
-
-*/	
 	
-** only 282 audits have date and could be in an event study sample?
+*Count how many audits have valid duration information
+gen has_initfinaldate = has_earliestdate==1  & (has_dateconfirmation==1 ///
+| has_datenotification==1)
+
+gen has_confnot = (has_dateconfirmation==1 | has_datenotification==1)
+gen has_confnotonly = (has_earliestdate==0) & (has_datenotification==1 ///
+| has_dateconfirmation==1)
+
+gen n=1 /// just a count
+
+*labeling variables
+label var has_initfinaldate "Initial and final date Avail."
+label var has_duration "Valid Duration stat available "
+label var has_confnotonly "Has either Conf. or Notif. date"
+label var n "Total Executed Cases"
+
+  
+
+* Methods in columns; variables as rows
+eststo clear
+estpost tabstat n has_initfinaldate has_duration_investigation has_confnotonly if y2==1, by(method) stat(sum) column(stats)
+
+ 
+
+* 2) Show methods as columns, variables as rows
+*"using "$output\date_availability_stats.tex", replace booktabs"
+esttab . using "$output\date_availability_stats",  replace  booktabs ///
+    cells("sum(fmt(0))") unstack ///
+    collabels(none) /// suppress stat-label row
+    noobs nomtitles nonumber label nonotes ///
+    eqlabels("Algorithm" "Inspectors" "Random" "Total") ///
+    title("Table: stats per method")
+
+* only 282 audits have date and could be in an event study sample?
 *Idea, make (january 2, selectionyear) the start date ? 
 *for cases with audit with notification but no early (valid) date
-**
+*
 
-********************************************************************************
-**
+***
 **# Generate inspector level data on n audits 
-** Generate void_audit to flag bad cases
+*** 
+
+*Generate void_audit to flag bad cases
 gen void_audit =  (y4==0 & y2==1)
-tab method
-tab method x2 if y2==1
 replace void_audit=. if y2==0 
+
 label var void_audit "Executed audit without detected evasion"
+label define vaudit 0 "No"  1 "Yes"
+label values void_audit vaudit
+
+*** Table with stats on void cases per method 
+eststo clear
+eststo vauds: estpost tab void_audit method if y2==1, 
+
+* Now export: two columns side-by-side with your headers
+esttab vauds,  cell(b(fmt(%3.0fc))) noobs  unstack nonumber ///
+nomtitle collabels(none)  eqlabels(, lhs("Void Audit"))
+
+
+
+
+*** Analisis will focus on executed audits 
+keep if y2==1 
+
+preserve
+collapse (sum) has_duration void_audit (count) total_executed = has_duration , by(verificateur1)
+
+count if (has_duration == total_executed) & void_audit>0 
+**Inspector level audit case stats
+bys verificateur1: gen case_count = _N
+bys verificateur1: egen total_valid_cases = total(has_duration)
 s
-
-
-gen bad_algo_case = (method=="Algorithm" & void_audit==1)
-tab method void_audit
-tab bad_algo_case
-
-tab method void_audit if y2==1 
-gen n=1 // count cases 
-keep if y2==1
-**# Executed audit date check
-
+** Collapse (mean) by inspector, void audit (yes no), 
 collapse (sum) n void_audit , by(verificateur1 method y2 )
 encode method, gen(method2)
 drop method
