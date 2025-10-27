@@ -9,7 +9,7 @@
 *****************
 
 *This script creates summary statistics
-set scheme s1color
+set scheme stcolor
 set more off
 clear all 
 
@@ -47,7 +47,7 @@ global check = 1 // to save outside official replication folder
 		global output "$rootdir\Analysis all data\replication_package\Output"
 		
 		if $check == 1 {
-	global output "C:\Users\User\OneDrive\World Bank\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
 	}
 	di "$output"
 
@@ -183,10 +183,9 @@ foreach met in Algorithm Inspectors Random {
 *Number of inspectors with positve N of algo executed algo cases
 
 foreach met in Algorithm Inspectors Random {
-	gen has_executed_`met' = (total_executed`met'>0)
+	gen has_executed_`met' = (total_executed`met'>0 & total_executed`met'!=.)
 	replace share_v_`met' = . if has_executed_`met' == 0
-	
-}
+	}
 
 *gen has_executed_algo = (total_executedAlgorithm>0)
 *** Kdensity to evaluate distribution of void audit cases by inspector 
@@ -206,18 +205,72 @@ twoway (kdensity share_v_Algorithm if has_executed_Algorithm==1 , lc(eltblue)) |
 xline(`avg_Algorithm', lc(eltblue) lp(-)) ///
 xline(`avg_Inspectors', lc(dkorange) lp(-))  ///
 xline(`avg_Random',  lc(gray) lp(-))  ///
-	text(0.08 `text_pos'  "Average algorithm-selected void audit rate: `avg_Algorithm'%, N inspectors: `count_Algorithm'", ///
+	text(0.05 `text_pos'  "{bf:Algorithm}-selected average void audit rate: `avg_Algorithm'%, N inspectors: `count_Algorithm'", ///
 	just(left) place(e) size(vsmall) color(eltblue)) ///
-	text(0.075 `text_pos'  "Average inspector-selected void audit rate: `avg_Inspectors'%, N inspectors: `count_Inspectors'", ///
+	text(0.045 `text_pos'  "{bf:Inspector}-selected average void audit rate: `avg_Inspectors'%, N inspectors: `count_Inspectors'", ///
 	just(left) place(e) size(vsmall) color(dkorange)) ///
-	text(0.07 `text_pos'  "Average randomly selected void audit rate: `avg_Random'%, N inspectors: `count_Random'", ///
+	text(0.04 `text_pos'  "{bf:Randomly}-selected average void audit rate: `avg_Random'%, N inspectors: `count_Random'", ///
 	just(left) place(e) size(vsmall) color(gray)) ///
 xtitle("Share of void audits over total execution") ///
-ytitle("Density") legend(label(1 "Algorithm") label(2 "Inspectors") label(3 "Random") cols(3))
+ytitle("Density") legend(off)
 graph export "$output\kdensity_void_audit_rate.pdf", replace
 
 
+
+
 **Statistics on inspectors
+eststo tab_assigned: estpost tabstat total_assignedAlgorithm total_assignedInspectors total_assignedRandom total_assigned_audits, stat(mean sd N) column(variables)
+
+eststo tab_executed: estpost tabstat total_executedAlgorithm total_executedInspectors total_executedRandom total_executed_audits, stat(mean sd N) columns(variables)
+
+eststo tab_share_execution: estpost tabstat share_exec_Algorithm share_exec_Inspectors share_exec_Random, stat(mean sd N) columns(variables)
+
+eststo tab_share_vauds: estpost tabstat share_v_Algorithm share_v_Inspectors share_v_Random, stat(mean sd N) columns(variables)
+
+*Assigned panel
+esttab tab_assigned using "$output\inspector_stats", replace fragment booktabs cell("total_assignedAlgorithm total_assignedInspectors total_assignedRandom total_assigned_audits") unstack nostar nomtitle nonum  noobs nonote  ///
+collabels("Algorithm" ///
+        "Inspectors" ///
+        "Random" ///
+		"Total") ///
+		prehead("\begin{tabular}{l*{4}{c}} \hline")  ///
+		posthead("\hline \multicolumn{@span}{l}{\textbf{Panel A: No. assigned cases}} \\") ///
+		postfoot("\hline")
+
+
+*Execution panel
+esttab tab_executed using  "$output\inspector_stats", fragment booktabs append cell("total_executedAlgorithm total_executedInspectors total_executedRandom total_executed_audits") unstack nostar nomtitle noobs nonum nonote ///
+collabels("Algorithm" ///
+        "Inspectors" ///
+        "Random" ///
+		"Total") ///
+		posthead("\hline \multicolumn{@span}{l}{\textbf{Panel B: No. executed cases}} \\") ///
+		postfoot("\hline \end{tabular}")
+
+		
+		
+
+
+*Share Execution panel
+esttab tab_share_execution using  "$output\inspector_shares_stats", replace fragment booktabs cell("share_exec_Algorithm share_exec_Inspectors share_exec_Random") unstack nostar nomtitle noobs  nonum nonote  ///
+collabels("Algorithm" ///
+        "Inspectors" ///
+        "Random") ///
+		prehead("\begin{tabular}{l*{4}{c}} \hline") ///
+		posthead("\hline \multicolumn{@span}{l}{\textbf{Panel A: Share Execution  over implementation}} \\") ///
+		postfoot("\hline") 
+
+*Share Execution panel
+
+esttab tab_share_vauds using  "$output\inspector_shares_stats", booktabs fragment append cell("share_v_Algorithm share_v_Inspectors share_v_Random") unstack nostar nomtitle nonum nonote noobs onecell ///
+collabels("Algorithm" ///
+        "Inspectors" ///
+        "Random") ///
+		posthead("\hline \multicolumn{@span}{l}{\textbf{Panel B: Share void audit over implementation}} \\") ///
+		postfoot("\hline \end{tabular}") 
+
+s
+
 *Valid sample?
 *Number of inspectors that have duration stats for all executed audit
 
@@ -251,7 +304,7 @@ varlabels(share_v_Algorithm  "Algorithm" ///
 tab has_audits
 
 ****
-
+s
 
 *restore
 ********************************************************************************
