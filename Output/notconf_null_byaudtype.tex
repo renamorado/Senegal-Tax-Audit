@@ -1,0 +1,26 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{6}{c}}
+\toprule
+            &\multicolumn{3}{c}{Desk audits}                                  &\multicolumn{3}{c}{Full audits}                                  \\
+            &Evasion Detected         &No evasion detected         &       Total         &Evasion Detected         &No evasion detected         &       Total         \\
+\midrule
+Only Notified&         286         &           4         &         290         &         151         &          18         &         169         \\
+            &                     &                     &                     &                     &                     &                     \\
+\addlinespace
+Only Confirmed&          53         &           4         &          57         &          39         &           0         &          39         \\
+            &                     &                     &                     &                     &                     &                     \\
+\addlinespace
+Notified and Confirmed&         408         &           2         &         410         &         267         &           2         &         269         \\
+            &                     &                     &                     &                     &                     &                     \\
+\addlinespace
+Neither     &           0         &         254         &         254         &           0         &          31         &          31         \\
+            &                     &                     &                     &                     &                     &                     \\
+\addlinespace
+Total       &         747         &         264         &        1011         &         457         &          51         &         508         \\
+            &                     &                     &                     &                     &                     &                     \\
+\midrule
+\(N\)       &        1011         &                     &                     &         508         &                     &                     \\
+\bottomrule
+\end{tabular}
+}

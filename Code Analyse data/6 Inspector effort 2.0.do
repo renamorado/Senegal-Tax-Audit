@@ -8,7 +8,8 @@
 ** DESCRIPTION   **
 *****************
 
-*This script creates summary statistics
+*Goal assess changes in inspector effort once they discover that a bad algorithm selected audit case
+
 set scheme stcolor
 set more off
 clear all 
@@ -63,7 +64,7 @@ use "$analysisdata/datasetforanalysis.dta", clear
 estimates drop  _all
 
 *****************************
-*Select sample
+**# Select general sample
 *****************************
 
 *Restrict sample to selected cases
@@ -78,8 +79,11 @@ label values x2 audittype
 cap drop earliestdate earliestdate2 
 cap drop earliestnotification
 
+*********************************************
+**# Defining date and void audit variables
+*********************************************
 
-** setting earliest date as in 
+** Opening date: start of an audit
 gen openingdate = datededemarrage 
 
 foreach v in datedemanderenseignement datedavisdatededemandede ///
@@ -87,12 +91,13 @@ s_date_demande_information dateavis s_date_avis  {
 	replace openingdate  = `v' if openingdate == . 
 }
 
+** Closing date: end of an audit 
 egen closingdate = rowmin(datenotification dateconfirmation)
 tab closingdate y2
 
+format closingdate openingdate %td
 
-
-** data availability on dates
+** Data availability on dates
 foreach date of varlist openingdate dateconfirmation datenotification ///
 duration_investigation closingdate {
 	gen	has_`date' = `date'!=.
@@ -110,26 +115,330 @@ label values date_avail dv
 **Generating table with date availability stats	
 eststo dateavail: estpost tab date_avail x2  if y2==1
 
-*Exporting table 
+*Exporting table to LaTex
 esttab dateavail using "$output\date_avail_by_type",  replace  booktabs ///
 nostar unstack nomtitle nonum nonote noobs 
 
+*****
+**#  Void audit definition
+*****
+keep if y2==1 // keeping only executed audits 
+
 **# Void audit var generation
 *definitions of void audit 
-gen null_evasion = (y4==0 & y2==1)
+gen null_evasion = (y4==0)
 replace null_evasion=. if y2==0 
 
-tab notification null_evasion if y2==1, missing
-s
+*Using notification and confirmation 
+foreach audit_outcome of varlist notification confirmation {
+	gen no_`audit_outcome' = (`audit_outcome'==0)
+}
+
+* was either notified or confirmed? 
+gen notconf =. 
+replace notconf = 1 if notification ==1 & confirmation==0
+replace notconf = 2 if notification ==0 & confirmation==1
+replace notconf = 3 if notification ==1 & confirmation==1
+replace notconf = 4 if notification ==0 & confirmation==0
+label values notconf nc 
+label define nc 1 "Only Notified" 2 "Only Confirmed" 3 "Notified and Confirmed" 4 "Neither"
+
+bys x2: tab notconf y3
+** Some checks on the evasion values definition
+di "Positive evasion cases:"
+bys x2: tab notification confirmation if y3==1
+di "Null evasion cases:"
+bys x2: tab notification confirmation if y3==0
+tab notconf null_evasion // audit has null evasion than their shouln't be notification or confirmation.
+
+
+
+**# Defining void audit cases 
 *Generate void_audit to flag bad cases
 gen void_audit =  (y4==0 & y2==1)
 replace void_audit=. if y2==0 
 
+
 label var void_audit "Executed audit without detected evasion"
-label define vaudit 0 ""  1 "Yes"
+label define vaudit 0 "Evasion Detected"  1 "No evasion detected"
 label values void_audit vaudit
 
+label values null_evasion vaudit 
+
+forval i =0/1 {
+	eststo notconf_null_x`i': estpost tab notconf null_evasion if x2==`i' 
+}
+
+*Checking if null cases were notified or confirmed 
+esttab notconf_null_x0 notconf_null_x1 using "$output\notconf_null_byaudtype", ///
+replace booktabs mtitle("Desk audits" "Full audits") unstack nonum nonotes ///
+
+
+
+**Some tabs to check if null evasion relationship with notification and confirmation 
+bys x2: tab no_notification null_evasion 
+bys x2: tab notification null_evasion 
+tab notification x2 if null_evasion==0 & confirmation==0 
+br if no_notification ==0
+bys x2:  tab date_avail notification 
+
+tab date_avail null_evasion
+
+tab y4 if null_evasion==1 & date_avail==4
+*check separately to avoid confusion
+
+*******************
+**# Date definition
+******************
+
+ 
+**# checking if the selection year = missing start date
+preserve 
+collapse (sum) y2, by (openingdate selectionyear)
+format openingdate %td
+format selectionyear %ty
+
+twoway (bar y2 openingdate if selectionyear==2018 & y2<150,  color(eltblue) tline(01jan2018, lc(eltblue)) tline(31dec2018, lc(eltblue))) || ///
+(bar y2 openingdate if selectionyear==2019 & y2<150, color(dkorange) tline(01jan2019, lc(dkorange)) tline(31dec2019, lc(dkorange))) || ///
+(bar y2 openingdate if selectionyear==2020 & y2<150, color(gray) tline(01jan2020, lc(gray)) tline(31dec2020, lc(gray))), ///
+legend(label(1 "2018") label(2 "2019") label(3 "2020") pos(6) row(1) subtitle("Selection year",size(small))) ///
+ytitle("Number of executed Audit cases") 
+graph export "$output\selection_year_opening_dates.pdf", replace
+restore
+
+
+preserve 
+collapse (sum) y2, by (openingdate anneeduchrono)
+format openingdate %td
+format anneeduchrono %ty
+
+twoway (bar y2 openingdate if anneeduchrono==2018 & y2<100,  color(eltblue) tline(01jan2018, lc(eltblue)) tline(31dec2018, lc(eltblue))) || ///
+(bar y2 openingdate if anneeduchrono==2019 & y2<100, color(dkorange) tline(01jan2019, lc(dkorange)) tline(31dec2019, lc(dkorange))) || ///
+(bar y2 openingdate if anneeduchrono==2020 & y2<100, color(gray) tline(01jan2020, lc(gray)) tline(31dec2020, lc(gray))), ///
+legend(label(1 "2018") label(2 "2019") label(3 "2020") pos(6) row(1) subtitle("Annee du chrono year",size(small))) ///
+ytitle("Number of executed Audit cases")
+restore
+
+**#Imputing missing dates 
+* Option 1: Imputing closing date = start date + 1 month 
+bys x2: tab date_avail null_evasion // null evasion cases mostly have only opening date available.
+
+*Would imply imputing for 70% of audit cases
+
+clonevar closingdate2 = closingdate
+replace closingdate2  = openingdate  + 30 if closingdate2==. 
+
+br openingdate  closingdate2 if closingdate==. 
+
+tab closingdate2
+gen has_closingdate2 = (closingdate2!=.)
+tab  date_avail x2
+
+
+clonevar openingdate2 = openingdate
+replace openingdate2 = closingdate - 30 if openingdate==. & closingdate!=.
+
+bys x2: ttest duration_investigation, by(null_evasion)
+
+
+*average evasion 
+bys x2: tabstat duration_investigation, by(null_evasion) stat(mean p25  p50 p75 sd N )
+
+*There seems to be positive relationship with evasion size and duration 
+*It would make sense to think that void audits would be shorter than non-void audits
+scatter duration_investigation y4  if x2==0 & y4>0 || ///
+lfit duration_investigation y4 if x2==0 & y4>0,  legend(pos(6))
+
+/*
+
+
+*Option 2: using the average duration of a void_audit
+
+forval i = 0/1 {
+	eststo vaud_dur_x`i': estpost tabstat duration_investigation if x2==`i', ///
+	stat(mean min p25 p50 p75 max sd)  by(null_evasion)
+}
+
+esttab vaud_dur_x0 , cell(e(fmt(%3.0fc))) noobs  unstack nonumber
+
+s
+
+twoway (kdensity duration_investigation if null_evasion==1 & x2==1)  || ///
+(kdensity duration_investigation if null_evasion==0 & x2==1)
+
+*Option 3: average duration of each inspector
+bys verificateur1: egen mean()
+*/
+
+
+****#
+**# New approaches 1: Scatter plot inspector level analysis 
+****
+* compare shares of algo + random cases in year 1 versus year 2 
+
+** Desk audits for now
+
+
+*Scatter plot - Inspector level analysis
 *** Table with stats on void cases per method 
+** Focus on desk audits for now 
+
+use "$analysisdata/datasetforanalysis.dta", clear
+
+estimates drop  _all
+
+**# Select general sample
+
+*Restrict sample to selected cases
+keep if selection == 1  
+drop if safeties == 1
+
+keep if x2==0 // Focus on desk audits 
+
+gen null_evasion = (y4==0)
+replace null_evasion=. if y2==0 
+
+*generate start
+
+*generate a count number 
+gen n=1 
+*collapse data at the inspector - year - bureau - selectionmethod level
+* focus on 2018 -2019
+rename y2 total_executed
+rename n total_assigned
+
+*Create set of conditions 
+local cond1 "if selectionyear==2018 | selectionyear==2019"
+local cond2 "if selectionyear==2019 | selectionyear==2020"
+local cond3 ""
+
+
+forval sample = 1/3 {
+preserve	
+*collapse (sum) total_assigned total_executed null_evasion 
+collapse (sum) total_assigned total_executed null_evasion `cond`sample'', by(method groupbureau verificateur1 selectionyear) 
+reshape wide total_assigned total_executed null_evasion, i(verificateur1 groupbureau selectionyear) j(method, string)
+
+mvencode _all, mv(0) override
+*tagging inspectors
+egen tag_verificateur = tag(verificateur1)
+
+** Tagging inspectors that are observed for two or more consecutive years in the same bureau
+egen tag_verifbureau = tag(verificateur1 groupbureau)
+bys verificateur1 groupbureau: gen verif_bureau_consecutive = _n
+
+*check if verificateur didn't changed from office
+
+
+bys verificateur1: egen sum_tags = total(tag_verifbureau)
+tab sum_tags if tag_verificateur==1  // 92 out of 123 have didn't changed from bureau
+
+gen unchanged_bureau = (sum_tags==1)
+tab unchanged_bureau if tag_verificateur==1
+
+*check if verificateur is observable for consecutive years
+egen tag_years = tag(selectionyear)
+
+
+bys verificateur1: gen verif_n = _n
+bys verificateur1: egen max_verif_n = max(verif_n) 
+
+*Only 20 inspectors were observed in the same 
+tab max_verif_n if tag_verificateur==1 & sum_tags==1 
+
+sum tag_years, d
+di "`r(sum)'"
+gen insp_consec = (max_verif_n==`r(sum)')
+
+gen final_sample = insp_consec==1 & unchanged_bureau==1 
+
+*save sample stats table for later
+eststo tab_sample_`sample': estpost tabstat tag_verificateur unchanged_bureau insp_consec final_sample if tag_verificateur==1, stat(sum) column(statistics) 
+
+keep if final_sample==1
+
+** Generating total
+egen total_executed_audits = rowtotal(total_executed*)
+egen total_assigned_audits = rowtotal(total_assigned*)
+egen total_null_evasion = rowtotal(null_evasion*)
+
+** Generating shares of void audits 
+***Revise this!!!!!!!!!!!
+foreach met in Algorithm Inspectors Random {
+	gen share_v_`met' = (null_evasion`met'/total_executed_audits)*100  if total_executed`met'!=0 // void audit rate
+	gen share_exec_`met' = (total_executed`met'/total_executed_audits)*100 if total_executed`met'!=0 // void audit rate
+}
+
+
+
+*alternative void measure
+egen share_v_algorandom =  rowtotal(share_v_Algorithm share_exec_Random), missing
+
+tabstat share_v_Algorithm, by(selectionyear) stat(mean N)
+
+*make the scatter plot 
+*keep if sum_tags==1 & max_verif_n==2
+count if tag_verificateur==1
+
+* add algo + random
+egen s_exec_algorandom = rowtotal(share_exec_Algorithm share_exec_Random)
+keep verificateur1 selectionyear share_v_Algorithm share_v_algorandom s_exec_algorandom 
+reshape wide share_v_Algorithm share_v_algorandom s_exec_algorandom, i(verificateur1) j(selectionyear)
+
+
+	if `sample'==1  {
+		local vars "share_v_algorandom2018 s_exec_algorandom2019"
+		local t_1 "s_exec_algorandom2018"
+		local var1 "share_v_algorandom2018"
+		local var2 "s_exec_algorandom2019"
+	}
+	if `sample'==2  {
+		local vars "share_v_algorandom2019 s_exec_algorandom2020"
+		local t_1 "s_exec_algorandom2019"
+		local var1 "share_v_algorandom2019"
+		local var2 "s_exec_algorandom2020"
+	}
+	
+	if `sample'==3  {
+		egen s_avg_algorand_execution =rowmean(s_exec_algorandom2019 s_exec_algorandom2020)
+		local vars "share_v_algorandom2018 s_avg_algorand_execution"
+		local t_1 "s_exec_algorandom2018"
+		local var1 "share_v_algorandom2018"
+		local var2 "s_avg_algorand_execution"
+ 	}
+	
+cap label var share_v_algorandom2018 "Share of void evasion Algo + Rand cases 2018"
+cap label var s_exec_algorandom2019 "Share of executed Algo + Rand cases 2019"
+cap	label var share_v_algorandom2019 "Share of void evasion Algo + Rand cases 2019"
+cap	label var s_exec_algorandom2020 "Share of executed Algo + Rand cases 2020"
+cap	label var s_avg_algorand_execution "Share of executed Algo + Rand cases 2018"
+
+count if  !missing(`var1', `var2') & `t_1'!=0
+local samp = `r(N)' 
+
+
+twoway (scatter `vars' if `t_1'!=0), legend(off) note("N = `samp'", pos(6)) 
+
+
+graph export "$output\v_exec_`sample'.pdf", replace
+restore
+}
+
+
+*** Generate some stats
+*Number of inspectors with positve N of algo executed algo cases
+
+foreach met in Algorithm Inspectors Random {
+	gen has_executed_`met' = (total_executed`met'>0 & total_executed`met'!=.)
+	replace share_v_`met' = . if has_executed_`met' == 0
+	}
+
+
+
+
+order verificateur1 selectionyear, first
+reshape wide n, i(verificateur1 groupbureau selectionyear) j(method, string)
+
 eststo clear
 eststo vauds: estpost tab void_audit method if y2==1, 
 
@@ -138,12 +447,22 @@ esttab vauds using "$output\void_audit_stats",  replace booktabs cell(b(fmt(%3.0
 nomtitle collabels(none)  eqlabels(, lhs("Void Audit"))
 
 
+***** Some other stats
+
+use "$analysisdata/datasetforanalysis.dta", clear
+
+estimates drop  _all
+
+**# Select general sample
 
 
+*Restrict sample to selected cases
+keep if selection == 1  
+drop if safeties == 1
 
-** Focus on desk audits for now 
-keep if x2==0
-esttab 
+keep if x2==0 // Focus on desk audits 
+
+
 
 
 *Count how many audits have valid duration information
@@ -187,9 +506,6 @@ esttab . using "$output\date_availability_stats",  replace  booktabs ///
 ***
 **# Generate inspector level data on n audits 
 *** 
-
-
-
 
 *** Analisis will focus on executed audits 
 ** Void audit rate by inspector and method
