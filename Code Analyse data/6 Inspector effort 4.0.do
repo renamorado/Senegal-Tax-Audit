@@ -129,15 +129,15 @@ local cond3 ""
 
 
 
-forval sample = 1/3 {
-	preserve	
+*forval sample = 1/3 {
+	*preserve	
 		*collapse (sum) total_assigned total_executed null_evasion `cond1'
 		*collapse (sum) total_assigned total_executed null_evasion `cond`sample''
-		*local sample = 1
-		*collapse (sum) total_assigned total_executed null_evasion `cond1', by(method groupbureau verificateur1 selectionyear) 
+		local sample = 1
+		collapse (sum) total_assigned total_executed null_evasion , by(method groupbureau verificateur1 selectionyear) 
 		
 		*Collapsing at the inspector - bureau - selectionyear level
-		collapse (sum) total_assigned total_executed null_evasion `cond`sample'', ///
+		*collapse (sum) total_assigned total_executed null_evasion `cond`sample'', ///
 		by(method groupbureau verificateur1 selectionyear) 
 		
 		*reshaping to obtain the audit numbers (method as columns)
@@ -147,9 +147,13 @@ forval sample = 1/3 {
 		*encoding all missings to zero at this stage	
 		mvencode _all, mv(0) override
 		
+		***********
 		**# Creating the sample 
-		*tagging inspectors
+		************
+		
+		*tagging inspectors that changed from bureau
 		egen tag_verificateur = tag(verificateur1)
+		s
 
 		** Tagging inspectors that are observed for two or more consecutive years in the same bureau
 		egen tag_verifbureau = tag(verificateur1 groupbureau)
@@ -165,8 +169,7 @@ forval sample = 1/3 {
 		
 		*check if verificateur is observable for consecutive years
 		egen tag_years = tag(selectionyear)
-		
-		
+			
 
 		bys verificateur1: gen verif_n = _n
 		bys verificateur1: egen max_verif_n = max(verif_n) 
@@ -381,5 +384,5 @@ forval sample = 1/3 {
 					graph export "$output\scatter_`share'_`t'_`t1'.pdf", replace
 				}
 			}
-	restore
-}
+*	restore
+*}
