@@ -1,0 +1,22 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{Top 1}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}\\
+\midrule
+\textbf{Dependent variable}: `Share cases cases in bottom 20\% predicted evasion&                     &                     &                     &                     \\
+\addlinespace
+High potential evasion case in list =1&       0.104\sym{*}  &       0.186\sym{***}&       0.183\sym{***}&       0.170\sym{***}\\
+            &     (0.059)         &     (0.053)         &     (0.059)         &     (0.059)         \\
+\addlinespace
+Low potential evasion case in list =1&       0.251\sym{***}&       0.344\sym{***}&       0.269\sym{***}&       0.322\sym{***}\\
+            &     (0.062)         &     (0.062)         &     (0.061)         &     (0.066)         \\
+\midrule
+Selection Year FE&         Yes         &         Yes         &         Yes         &         Yes         \\
+Bureau FE   &         Yes         &         Yes         &         Yes         &         Yes         \\
+Observations&         116         &         116         &         116         &         116         \\
+R-squared   &       0.362         &       0.426         &       0.374         &       0.396         \\
+\bottomrule
+\end{tabular}
+}

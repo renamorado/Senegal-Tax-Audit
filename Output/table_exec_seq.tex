@@ -1,0 +1,33 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{9}{c}}
+\toprule
+                &\multicolumn{3}{c}{Sequence}                            &\multicolumn{3}{c}{Rank/ Total assigned ratio}          &\multicolumn{3}{c}{Top 5 in sequence=1}                 \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+                &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}&\multicolumn{1}{c}{(8)}&\multicolumn{1}{c}{(9)}\\
+                &\multicolumn{1}{c}{Full audits}&\multicolumn{1}{c}{Desk audits}&\multicolumn{1}{c}{Desk audits}&\multicolumn{1}{c}{Full audits}&\multicolumn{1}{c}{Desk audits }&\multicolumn{1}{c}{Desk audits}&\multicolumn{1}{c}{Full audits}&\multicolumn{1}{c}{Desk audits }&\multicolumn{1}{c}{Desk audits}\\
+\midrule
+Rank in list (seq)&   -0.002\sym{**} &   -0.001         &   -0.001         &                  &                  &                  &                  &                  &                  \\
+                &  (0.001)         &  (0.001)         &  (0.001)         &                  &                  &                  &                  &                  &                  \\
+\addlinespace
+Rank / total assigned&                  &                  &                  &   -0.109\sym{**} &   -0.029         &   -0.032         &                  &                  &                  \\
+                &                  &                  &                  &  (0.049)         &  (0.033)         &  (0.032)         &                  &                  &                  \\
+\addlinespace
+Seq $\le$ 5=1   &                  &                  &                  &                  &                  &                  &    0.057         &    0.011         &    0.008         \\
+                &                  &                  &                  &                  &                  &                  &  (0.042)         &  (0.019)         &  (0.018)         \\
+\addlinespace
+Algorithm       &   -0.168\sym{***}&   -0.045\sym{**} &   -0.043\sym{**} &   -0.167\sym{***}&   -0.046\sym{**} &   -0.044\sym{**} &   -0.169\sym{***}&   -0.046\sym{**} &   -0.044\sym{**} \\
+                &  (0.030)         &  (0.018)         &  (0.017)         &  (0.030)         &  (0.018)         &  (0.017)         &  (0.030)         &  (0.018)         &  (0.017)         \\
+\addlinespace
+Overlap         &    0.157\sym{**} &    0.049         &    0.047         &    0.156\sym{**} &    0.049         &    0.048         &    0.152\sym{**} &    0.049         &    0.047         \\
+                &  (0.067)         &  (0.035)         &  (0.036)         &  (0.068)         &  (0.035)         &  (0.036)         &  (0.068)         &  (0.035)         &  (0.036)         \\
+\addlinespace
+Random          &                  &   -0.001         &   -0.000         &                  &   -0.001         &   -0.000         &                  &   -0.001         &   -0.000         \\
+                &                  &  (0.029)         &  (0.028)         &                  &  (0.029)         &  (0.028)         &                  &  (0.029)         &  (0.028)         \\
+\midrule
+Mean of dep. var.&     0.53         &     0.37         &     0.37         &     0.53         &     0.37         &     0.37         &     0.53         &     0.37         &     0.37         \\
+N               &      944         &     2731         &     2731         &      944         &     2731         &     2731         &      944         &     2731         &     2731         \\
+Tax center × year FE&      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         &      Yes         \\
+Inspector × year FE&       No         &       No         &      Yes         &       No         &       No         &      Yes         &       No         &       No         &      Yes         \\
+\bottomrule
+\end{tabular}
+}

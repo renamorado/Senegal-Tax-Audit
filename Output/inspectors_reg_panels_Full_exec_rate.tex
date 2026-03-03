@@ -1,0 +1,24 @@
+\begin{tabular}{l*{9}{c}} \toprule
+            &\multicolumn{3}{c}{No FE}                                        &\multicolumn{3}{c}{Selection year FE}                            &\multicolumn{3}{c}{Bureau FE}                                    \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+\multicolumn{1}{l}{\textbf{Algorithm execution rate}} & Top 2 & First 10\% seq & First 20\% seq & Top 2 & First 10\% seq & First 20\% seq & Top 2 & First 10\% seq & First 20\% seq \\ \midrule \multicolumn{10}{l}{\textbf{Panel A: Discrete measures}}\\ \addlinespace
+High potential evasion case in list =1&       0.218\sym{*}  &       0.289\sym{**} &       0.207\sym{*}  &       0.176         &       0.224\sym{**} &       0.199\sym{**} &       0.144         &       0.245         &       0.165         \\
+            &     (0.124)         &     (0.123)         &     (0.108)         &     (0.105)         &     (0.102)         &     (0.087)         &     (0.185)         &     (0.173)         &     (0.153)         \\
+\addlinespace
+Low potential evasion case in list =1&      -0.079         &       0.044         &      -0.108         &      -0.079         &      -0.007         &      -0.072         &      -0.067         &       0.085         &      -0.049         \\
+            &     (0.108)         &     (0.112)         &     (0.116)         &     (0.105)         &     (0.110)         &     (0.112)         &     (0.122)         &     (0.127)         &     (0.171)         \\
+\midrule
+Selection Year FE&          No         &          No         &          No         &         Yes         &         Yes         &         Yes         &          No         &          No         &          No         \\
+Bureau FE   &          No         &          No         &          No         &          No         &          No         &          No         &         Yes         &         Yes         &         Yes         \\
+Observations&          29         &          29         &          29         &          29         &          29         &          29         &          29         &          29         &          29         \\
+R-squared   &       0.129         &       0.118         &       0.208         &       0.366         &       0.350         &       0.420         &       0.424         &       0.431         &       0.430         \\
+
+\addlinespace \midrule \multicolumn{10}{l}{\textbf{Panel B: Continuous measure}}\\ \addlinespace
+
+Share of high predicted evasion case at the top&       0.532\sym{**} &       0.530\sym{**} &       0.556\sym{***}&       0.457\sym{**} &       0.403         &       0.481\sym{**} &       0.398         &       0.492         &       0.444         \\
+            &     (0.225)         &     (0.240)         &     (0.187)         &     (0.190)         &     (0.238)         &     (0.216)         &     (0.325)         &     (0.333)         &     (0.310)         \\
+\midrule
+Selection Year FE&          No         &          No         &          No         &         Yes         &         Yes         &         Yes         &          No         &          No         &          No         \\
+Bureau FE   &          No         &          No         &          No         &          No         &          No         &          No         &         Yes         &         Yes         &         Yes         \\
+Observations&          29         &          29         &          29         &          29         &          29         &          29         &          29         &          29         &          29         \\
+R-squared   &       0.112         &       0.076         &       0.097         &       0.350         &       0.313         &       0.343         &       0.416         &       0.422         &       0.417         \\
+\bottomrule \end{tabular}

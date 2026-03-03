@@ -111,7 +111,9 @@ keep if x2==0 // Focus on desk audits
 gen null_evasion = (y4==0)
 replace null_evasion=. if y2==0 
 
-
+***************
+**# Analysis
+***************
 
 *generate a count number 
 gen n=1 
@@ -128,13 +130,14 @@ local cond2 "if selectionyear==2019 | selectionyear==2020"
 local cond3 ""
 
 
-
-*forval sample = 1/3 {
-	*preserve	
+**# loop over samples based on periods 
+forval sample = 1/3 {
+	preserve	
 		*collapse (sum) total_assigned total_executed null_evasion `cond1'
 		*collapse (sum) total_assigned total_executed null_evasion `cond`sample''
-		local sample = 1
-		collapse (sum) total_assigned total_executed null_evasion , by(method groupbureau verificateur1 selectionyear) 
+		*local sample = 1
+		collapse (sum) total_assigned total_executed null_evasion `cond`sample'', by(method groupbureau verificateur1 selectionyear) 
+		
 		
 		*Collapsing at the inspector - bureau - selectionyear level
 		*collapse (sum) total_assigned total_executed null_evasion `cond`sample'', ///
@@ -153,41 +156,72 @@ local cond3 ""
 		
 		*tagging inspectors that changed from bureau
 		egen tag_verificateur = tag(verificateur1)
-		s
+		
 
-		** Tagging inspectors that are observed for two or more consecutive years in the same bureau
+		** Tagging inspectors that are observed in the same bureau 
 		egen tag_verifbureau = tag(verificateur1 groupbureau)
 		bys verificateur1 groupbureau: gen verif_bureau_consecutive = _n
 
 		*check if verificateur didn't changed from office
 
-		bys verificateur1: egen sum_tags = total(tag_verifbureau)
-		tab sum_tags if tag_verificateur==1  // 92 out of 123  didn't changed from bureau
+		bys verificateur1: egen sum_tags = total(tag_verifbureau) // 
+		tab sum_tags if tag_verificateur==1  // 95 out of 123  didn't changed from bureau
 
 		gen unchanged_bureau = (sum_tags==1)
 		tab unchanged_bureau if tag_verificateur==1
 		
-		*check if verificateur is observable for consecutive years
-		egen tag_years = tag(selectionyear)
-			
+		**check if verificateur is observable for two consecutive periods
+	* Ensure proper sort
+	sort verificateur1 selectionyear groupbureau
 
-		bys verificateur1: gen verif_n = _n
-		bys verificateur1: egen max_verif_n = max(verif_n) 
+	* Mark first observation of each inspector-year
+	by verificateur1 selectionyear: gen first_in_year = _n == 1
 
-		*Only 20 inspectors were observed in the same 
-		tab max_verif_n if tag_verificateur==1 & sum_tags==1 
+	* Cumulative sum of "first_in_year" within inspector = year sequence
+	by verificateur1: gen year_seq = sum(first_in_year)
+	
+	*tag inspectors by the max periods they wer observed
+	bys verificateur1: egen max_period = max(year_seq)
+	
+	*Only 20 inspectors were observed in the same 
+	tab max_period if tag_verificateur==1 // check this, does it make sense?
 
-		sum tag_years, d
-		di "`r(sum)'"
-		gen insp_consec = (max_verif_n==`r(sum)')
+	
+		
+		gen insp_consec = (max_period>1)
 
-		gen final_sample = insp_consec==1 & unchanged_bureau==1 
+		gen final_sample = insp_consec==1  // & unchanged_bureau==1 [new analysis now will distinguish between unchanged and changed bureau]
 
-		*save sample stats table for later
-		eststo tab_sample_`sample': estpost tabstat tag_verificateur unchanged_bureau insp_consec final_sample if tag_verificateur==1, stat(sum) column(statistics) 
+		
+	*Summarry stats of inspector sample 
+		* Clear any previous stored estimates
+	
+			* 1) unchanged == 1 // Inspector remained in the same bureau
+			estpost tabstat tag_verificateur insp_consec ///
+				if tag_verificateur == 1 & unchanged_bureau == 1, ///
+				stat(sum) columns(statistics)
+			eststo insp_stats_`sample'_u1
 
-		keep if final_sample==1
+			* 2) unchanged == 0 // Inspector changed bureau
+			estpost tabstat tag_verificateur insp_consec ///
+				if tag_verificateur == 1 & unchanged_bureau == 0, ///
+				stat(sum) columns(statistics)
+			eststo insp_stats_`sample'_u0
 
+			* 3) Total 
+			estpost tabstat tag_verificateur insp_consec ///
+				if  tag_verificateur == 1, ///
+				stat(sum) columns(statistics)
+			eststo insp_stats_`sample'_total
+		
+		
+* Keep elegible inspectors (observable in t AND t+1)
+		keep if final_sample==1 // sample eligible inspectors 
+
+		
+* collapse at the inspector year level		
+	collapse (sum) total_assigned* total_executed* null_evasion* , by(verificateur1 selectionyear unchanged)
+	egen tag_verificateur = tag(verificateur1)
 		** Generating total
 		*Total execution
 		egen total_executed_audits = rowtotal(total_executed*)
@@ -220,9 +254,7 @@ local cond3 ""
 			gen share_exec_`met' = (total_executed`met'/total_assigned`met')*100 
 		}
 
-		* save as tempfile
-		* append obs and create one dataset
-		* do as many figures as you want?
+
 
 		*make the scatter plot 
 
@@ -233,17 +265,15 @@ local cond3 ""
 		cap	label var s_exec_algorandom2020 "Share of executed Algo + Rand cases 2020"
 		cap	label var s_avg_algorand_execution "Share of executed Algo + Rand cases 2018"
 		* add algo + random
-		keep verificateur1 selectionyear share_v_ALG_all share_v_ALG ///  
+		keep verificateur1 selectionyear  unchanged_bureau share_v_ALG_all share_v_ALG ///  
 		share_exec_ALG share_exec_ALG_all share_v_all share_exec_all ///
 		share_v_Inspectors_all share_v_Inspectors share_exec_Inspectors_all share_exec_Inspectors
 
 		reshape wide share_v_ALG_all share_v_ALG ///  
 		share_exec_ALG share_exec_ALG_all share_v_all share_exec_all share_v_Inspectors_all  ///
-		share_v_Inspectors share_exec_Inspectors_all share_exec_Inspectors, i(verificateur1) j(selectionyear)
+		share_v_Inspectors share_exec_Inspectors_all share_exec_Inspectors, i(verificateur1 unchanged_bureau) j(selectionyear)
 
 
-
-				
 			if `sample'==1  {
 				local t "2018"
 				local t1 "2019"
@@ -260,9 +290,11 @@ local cond3 ""
 				local t "2018"
 				local t1 "avg"
 				
-				foreach share in share_exec_all share_exec_ALG share_exec_Inspectors share_v_all share_v_ALG share_v_Inspectors{
-					egen `share'avg =rowmean(`share'2019 `share'2020)
-				}
+				foreach share in share_exec_all share_exec_ALG ///
+				share_exec_Inspectors share_v_all share_v_ALG ///
+				share_v_Inspectors {
+						egen `share'avg =rowmean(`share'2019 `share'2020)
+					}
 				
 				}
 	***cap labelling some vars
@@ -321,68 +353,495 @@ local cond3 ""
 		cap label var share_v_Inspectorsavg          "Share of void cases, Inspectors (2019-2020)"
 		cap label var share_exec_Inspectors_allavg   "Share of executed cases, Inspectors (all,2019-2020)"
 		cap label var share_exec_Inspectorsavg       "Share of executed cases, Inspectors (2019-2020)"
-			
-			
-			
+    
+		*------------------------------------------------------------
+        * TABLE: mean share execution / voids in t and t+1
+        *   - Create generic names for t and t+1 so rows align across samples
+        *------------------------------------------------------------
+
+        * --- Year t: copy year-specific variables into generic names ---
+        gen share_exec_all_t        = share_exec_all`t'
+        gen share_exec_ALG_t        = share_exec_ALG`t'
+        gen share_exec_Inspectors_t = share_exec_Inspectors`t'
+        gen share_v_all_t           = share_v_all`t'
+        gen share_v_ALG_t           = share_v_ALG`t'
+        gen share_v_Inspectors_t    = share_v_Inspectors`t'
+
+        * --- Year t+1 ---
+        gen share_exec_all_t1        = share_exec_all`t1'
+        gen share_exec_ALG_t1        = share_exec_ALG`t1'
+        gen share_exec_Inspectors_t1 = share_exec_Inspectors`t1'
+        gen share_v_all_t1           = share_v_all`t1'
+        gen share_v_ALG_t1           = share_v_ALG`t1'
+        gen share_v_Inspectors_t1    = share_v_Inspectors`t1'
+
+        *------------------------------------------------------------
+        * estpost summarize: one set of estimates per group
+        *   (same bureau / changed / total), each with t AND t+1 rows
+        *------------------------------------------------------------
+
+        * Same bureau (unchanged_bureau == 1)
+        eststo insp_share_`sample'_u1: estpost summarize ///
+            share_exec_all_t share_exec_ALG_t share_exec_Inspectors_t ///
+            share_v_all_t     share_v_ALG_t     share_v_Inspectors_t ///
+            share_exec_all_t1 share_exec_ALG_t1 share_exec_Inspectors_t1 ///
+            share_v_all_t1     share_v_ALG_t1     share_v_Inspectors_t1 ///
+            if unchanged_bureau == 1
+
+        * Changed bureau (unchanged_bureau == 0)
+        eststo insp_share_`sample'_u0: estpost summarize ///
+            share_exec_all_t share_exec_ALG_t share_exec_Inspectors_t ///
+            share_v_all_t     share_v_ALG_t     share_v_Inspectors_t ///
+            share_exec_all_t1 share_exec_ALG_t1 share_exec_Inspectors_t1 ///
+            share_v_all_t1     share_v_ALG_t1     share_v_Inspectors_t1 ///
+            if unchanged_bureau == 0
+
+        * Total (all inspectors)
+        eststo insp_share_`sample'_tot: estpost summarize ///
+            share_exec_all_t share_exec_ALG_t share_exec_Inspectors_t ///
+            share_v_all_t     share_v_ALG_t     share_v_Inspectors_t ///
+            share_exec_all_t1 share_exec_ALG_t1 share_exec_Inspectors_t1 ///
+            share_v_all_t1     share_v_ALG_t1     share_v_Inspectors_t1
+
+	
+		*------------------------------------------------------------
+        * Indicators for descriptive table: t and t+1
+        *   (names do NOT contain the actual year, only _t / _t1)
+        *------------------------------------------------------------
+
+        * --- Year t ---
+        gen has_executed_all_t = (share_exec_all`t' > 0 & share_exec_all`t' != .)
+        gen has_void_all_t     = (share_v_all`t'     > 0 & share_v_all`t'     != .)
+
+        foreach met in ALG Inspectors {
+            gen has_executed_`met'_t = (share_exec_`met'`t' > 0 & share_exec_`met'`t' != .)
+            gen has_void_`met'_t     = (share_v_`met'`t'    > 0 & share_v_`met'`t'    != .)
+        }
+
+        * --- Year t+1 ---
+        gen has_executed_all_t1 = (share_exec_all`t1' > 0 & share_exec_all`t1' != .)
+        gen has_void_all_t1     = (share_v_all`t1'    > 0 & share_v_all`t1'    != .)
+
+        foreach met in ALG Inspectors {
+            gen has_executed_`met'_t1 = (share_exec_`met'`t1' > 0 & share_exec_`met'`t1' != .)
+            gen has_void_`met'_t1     = (share_v_`met'`t1'    > 0 & share_v_`met'`t1'    != .)
+        }
+
+        *------------------------------------------------------------
+        * estpost tabstat: ONE set of estimates per group, containing
+        * BOTH t and t+1 variables as rows
+        *------------------------------------------------------------
+
+        * Same bureau (unchanged == 1)
+        eststo insp_has_`sample'_u1: estpost tabstat ///
+            has_executed_all_t has_executed_ALG_t has_executed_Inspectors_t ///
+            has_void_all_t     has_void_ALG_t     has_void_Inspectors_t ///
+            has_executed_all_t1 has_executed_ALG_t1 has_executed_Inspectors_t1 ///
+            has_void_all_t1     has_void_ALG_t1     has_void_Inspectors_t1 ///
+            if unchanged==1, stat(sum) columns(statistics)
+
+        * Changed bureau (unchanged == 0)
+        eststo insp_has_`sample'_u0: estpost tabstat ///
+            has_executed_all_t has_executed_ALG_t has_executed_Inspectors_t ///
+            has_void_all_t     has_void_ALG_t     has_void_Inspectors_t ///
+            has_executed_all_t1 has_executed_ALG_t1 has_executed_Inspectors_t1 ///
+            has_void_all_t1     has_void_ALG_t1     has_void_Inspectors_t1 ///
+            if unchanged==0, stat(sum) columns(statistics)
+
+        * Total (all inspectors)
+        eststo insp_has_`sample'_tot: estpost tabstat ///
+            has_executed_all_t has_executed_ALG_t has_executed_Inspectors_t ///
+            has_void_all_t     has_void_ALG_t     has_void_Inspectors_t ///
+            has_executed_all_t1 has_executed_ALG_t1 has_executed_Inspectors_t1 ///
+            has_void_all_t1     has_void_ALG_t1     has_void_Inspectors_t1, ///
+            stat(sum) columns(statistics)
 		**# Generating graphs 
 
-		foreach share in share_exec_all share_exec_ALG share_exec_Inspectors ///
-						 share_v_all   share_v_ALG   share_v_Inspectors {
+foreach share in share_exec_all share_exec_ALG share_exec_Inspectors ///
+                 share_v_all   share_v_ALG   share_v_Inspectors {
 
-						 
-		
-			** Only do the plot for the "v" shares vrs execution rates in t+1
-		*All void cases
-			if "`share'"=="share_v_all" {
-			
-				count if !missing(`share'`t', share_exec_all`t1', share_exec_all`t') & share_exec_all`t' != 0
-				local samp = r(N)
+    * ------------------------------------------------------------------
+    * Case 1: All void cases – v-share (all) vs exec_all in t+1
+    * ------------------------------------------------------------------
+    if "`share'" == "share_v_all" {
 
-				*scatter plot
-				twoway (scatter share_exec_all`t1' `share'`t'  if share_exec_all`t' != 0 & share_exec_all`t' != .), ///
-					legend(off) note("N = `samp'", pos(6)) xscale(range(0 100)) xlabel(0(20)100) ///
-    yscale(range(0 100)) ylabel(0(20)100)
-					graph export "$output\scatter_`share'_`t'_`t1'.pdf", replace
-			}
-			
-		*Void algo cases
-			else if "`share'"=="share_v_ALG" {
+        * Sample size by "unchanged_bureau"
+        forvalues b = 0/1 { 
+            count if !missing(`share'`t', share_exec_all`t', share_exec_all`t1') ///
+                & share_exec_all`t' != 0 ///
+                & unchanged_bureau == `b'
+            local samp_`b' = r(N)
+        }
 
-				count if !missing(share_exec_ALG`t1', `share'`t', share_exec_ALG`t') & share_exec_ALG`t' != 0
-				local samp = r(N)
+        * Regressions to get coefficients (same sample as scatter)
+        quietly reg share_exec_all`t1' `share'`t' ///
+            if !missing(`share'`t', share_exec_all`t', share_exec_all`t1') ///
+            & share_exec_all`t' != 0 ///
+            & unchanged_bureau == 1
 
-				*scatter plot
-				twoway (scatter share_exec_ALG`t1'  `share'`t' if share_exec_ALG`t' != 0 & share_exec_ALG`t'!=.), ///
-					legend(off) note("N = `samp'", pos(6))  xscale(range(0 100)) xlabel(0(20)100) ///
-    yscale(range(0 100)) ylabel(0(20)100)
-					graph export "$output\scatter_`share'_`t'_`t1'.pdf", replace
-			
-			}
-			
-		*Void inspector cases
-			else if "`share'"=="share_v_Inspectors" {
-				count if !missing(`share'`t', share_exec_Inspectors`t1', share_exec_Inspectors`t') & share_exec_Inspectors`t' != 0
-				local samp = r(N)
+        local xname "`share'`t'"
+        local b0_1 : display %5.2f _b[_cons]
+        local b1_1 : display %5.3f _b[`xname']
+        local eq1  "linear fit:  y = `b0_1' + `b1_1' x"
 
-				*scatter plot
-				twoway (scatter share_exec_Inspectors`t1' `share'`t'  if share_exec_Inspectors`t' != 0 & share_exec_Inspectors`t'!=.), ///
-					legend(off) note("N = `samp'", pos(6))  xscale(range(0 100)) xlabel(0(20)100) ///
-    yscale(range(0 100)) ylabel(0(20)100)
-					graph export "$output\scatter_`share'_`t'_`t1'.pdf", replace
-			}
-			
-		
-		*Execution rates t vrs t+1
-			else {
-				count if !missing(`share'`t', `share'`t1') 
-				local samp = r(N)
+        quietly reg share_exec_all`t1' `share'`t' ///
+            if !missing(`share'`t', share_exec_all`t', share_exec_all`t1') ///
+            & share_exec_all`t' != 0 ///
+            & unchanged_bureau == 0
 
-				*scatter plot
-				twoway (scatter `share'`t1' `share'`t' ), ///
-					legend(off) note("N = `samp'", pos(6))  xscale(range(0 100)) xlabel(0(20)100) ///
-    yscale(range(0 100)) ylabel(0(20)100)
-					graph export "$output\scatter_`share'_`t'_`t1'.pdf", replace
-				}
-			}
-*	restore
-*}
+        local b0_0 : display %5.2f _b[_cons]
+        local b1_0 : display %5.3f _b[`xname']
+        local eq0  "linear fit: y = `b0_0' + `b1_0' x"
+
+        * Scatter plot + linear fits + legend with equations
+        twoway ///
+            (scatter share_exec_all`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_all`t', share_exec_all`t1') ///
+                & share_exec_all`t' != 0 ///
+                & unchanged_bureau == 1, ///
+                mcolor(dknavy) msymbol(triangle)) ///
+            (lfit share_exec_all`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_all`t', share_exec_all`t1') ///
+                & share_exec_all`t' != 0 ///
+                & unchanged_bureau == 1, ///
+                lcolor(dknavy) lpattern(solid) lwidth(medthick)) ///
+            (scatter share_exec_all`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_all`t', share_exec_all`t1') ///
+                & share_exec_all`t' != 0 ///
+                & unchanged_bureau == 0, ///
+                mcolor(eltblue) msymbol(circle)) ///
+            (lfit share_exec_all`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_all`t', share_exec_all`t1') ///
+                & share_exec_all`t' != 0 ///
+                & unchanged_bureau == 0, ///
+                lcolor(eltblue) lpattern(dash) lwidth(medthick)) ///
+        , ///
+            legend( ///
+                order(1 2 3 4) ///
+                label(1 "Remained tax office [N = `samp_1']") ///
+                label(2 "`eq1'") ///
+                label(3 "Changed tax office [N = `samp_0']") ///
+                label(4 "`eq0'") ///
+                pos(6) ring(1) cols(2) ///
+            ) ///
+            xscale(range(0 100)) xlabel(0(20)100) ///
+            yscale(range(0 100)) ylabel(0(20)100) ///
+            xtitle("Void rate, all audits, year t") ///
+            ytitle("Execution rate, all audits, year t+1")
+
+        graph export "$output/scatter_`share'_`t'_`t1'.pdf", replace
+    }
+
+    * ------------------------------------------------------------------
+    * Case 2: Void algo cases – v-share (ALG) vs exec_ALG in t+1
+    * ------------------------------------------------------------------
+    else if "`share'" == "share_v_ALG" {
+
+        forvalues b = 0/1 {
+            count if !missing(`share'`t', share_exec_ALG`t', share_exec_ALG`t1') ///
+                & share_exec_ALG`t' != 0 ///
+                & unchanged_bureau == `b'
+            local samp_`b' = r(N)
+        }
+
+        quietly reg share_exec_ALG`t1' `share'`t' ///
+            if !missing(`share'`t', share_exec_ALG`t', share_exec_ALG`t1') ///
+            & share_exec_ALG`t' != 0 ///
+            & unchanged_bureau == 1
+
+        local xname "`share'`t'"
+        local b0_1 : display %5.2f _b[_cons]
+        local b1_1 : display %5.3f _b[`xname']
+        local eq1  "linear fit:  y = `b0_1' + `b1_1' x"
+
+        quietly reg share_exec_ALG`t1' `share'`t' ///
+            if !missing(`share'`t', share_exec_ALG`t', share_exec_ALG`t1') ///
+            & share_exec_ALG`t' != 0 ///
+            & unchanged_bureau == 0
+
+        local b0_0 : display %5.2f _b[_cons]
+        local b1_0 : display %5.3f _b[`xname']
+        local eq0  "linear fit: y = `b0_0' + `b1_0' x"
+
+        twoway ///
+            (scatter share_exec_ALG`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_ALG`t', share_exec_ALG`t1') ///
+                & share_exec_ALG`t' != 0 ///
+                & unchanged_bureau == 1, ///
+                mcolor(dknavy) msymbol(triangle)) ///
+            (lfit share_exec_ALG`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_ALG`t', share_exec_ALG`t1') ///
+                & share_exec_ALG`t' != 0 ///
+                & unchanged_bureau == 1, ///
+                lcolor(dknavy) lpattern(solid) lwidth(medthick)) ///
+            (scatter share_exec_ALG`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_ALG`t', share_exec_ALG`t1') ///
+                & share_exec_ALG`t' != 0 ///
+                & unchanged_bureau == 0, ///
+                mcolor(eltblue) msymbol(circle)) ///
+            (lfit share_exec_ALG`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_ALG`t', share_exec_ALG`t1') ///
+                & share_exec_ALG`t' != 0 ///
+                & unchanged_bureau == 0, ///
+                lcolor(eltblue) lpattern(dash) lwidth(medthick)) ///
+        , ///
+            legend( ///
+                order(1 2 3 4) ///
+                label(1 "Remained tax office [N = `samp_1']") ///
+                label(2 "`eq1'") ///
+                label(3 "Changed tax office [N = `samp_0']") ///
+                label(4 "`eq0'") ///
+                pos(6) ring(1) cols(2) ///
+            ) ///
+            xscale(range(0 100)) xlabel(0(20)100) ///
+            yscale(range(0 100)) ylabel(0(20)100) ///
+            xtitle("Void rate, algo audits, year t") ///
+            ytitle("Execution rate, algo audits, year t+1")
+
+        graph export "$output/scatter_`share'_`t'_`t1'.pdf", replace
+    }
+
+    * ------------------------------------------------------------------
+    * Case 3: Void inspector cases – v-share (Inspectors) vs exec_Inspectors in t+1
+    * ------------------------------------------------------------------
+    else if "`share'" == "share_v_Inspectors" {
+
+        forvalues b = 0/1 {
+            count if !missing(`share'`t', share_exec_Inspectors`t', share_exec_Inspectors`t1') ///
+                & share_exec_Inspectors`t' != 0 ///
+                & unchanged_bureau == `b'
+            local samp_`b' = r(N)
+        }
+
+        quietly reg share_exec_Inspectors`t1' `share'`t' ///
+            if !missing(`share'`t', share_exec_Inspectors`t', share_exec_Inspectors`t1') ///
+            & share_exec_Inspectors`t' != 0 ///
+            & unchanged_bureau == 1
+
+        local xname "`share'`t'"
+        local b0_1 : display %5.2f _b[_cons]
+        local b1_1 : display %5.3f _b[`xname']
+        local eq1  "linear fit:  y = `b0_1' + `b1_1' x"
+
+        quietly reg share_exec_Inspectors`t1' `share'`t' ///
+            if !missing(`share'`t', share_exec_Inspectors`t', share_exec_Inspectors`t1') ///
+            & share_exec_Inspectors`t' != 0 ///
+            & unchanged_bureau == 0
+
+        local b0_0 : display %5.2f _b[_cons]
+        local b1_0 : display %5.3f _b[`xname']
+        local eq0  "linear fit: y = `b0_0' + `b1_0' x"
+
+        twoway ///
+            (scatter share_exec_Inspectors`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_Inspectors`t', share_exec_Inspectors`t1') ///
+                & share_exec_Inspectors`t' != 0 ///
+                & unchanged_bureau == 1, ///
+                mcolor(dknavy) msymbol(triangle)) ///
+            (lfit share_exec_Inspectors`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_Inspectors`t', share_exec_Inspectors`t1') ///
+                & share_exec_Inspectors`t' != 0 ///
+                & unchanged_bureau == 1, ///
+                lcolor(dknavy) lpattern(solid) lwidth(medthick)) ///
+            (scatter share_exec_Inspectors`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_Inspectors`t', share_exec_Inspectors`t1') ///
+                & share_exec_Inspectors`t' != 0 ///
+                & unchanged_bureau == 0, ///
+                mcolor(eltblue) msymbol(circle)) ///
+            (lfit share_exec_Inspectors`t1' `share'`t' ///
+                if !missing(`share'`t', share_exec_Inspectors`t', share_exec_Inspectors`t1') ///
+                & share_exec_Inspectors`t' != 0 ///
+                & unchanged_bureau == 0, ///
+                lcolor(eltblue) lpattern(dash) lwidth(medthick)) ///
+        , ///
+            legend( ///
+                order(1 2 3 4) ///
+                label(1 "Remained tax office [N = `samp_1']") ///
+                label(2 "`eq1'") ///
+                label(3 "Changed tax office [N = `samp_0']") ///
+                label(4 "`eq0'") ///
+                pos(6) ring(1) cols(2) ///
+            ) ///
+            xscale(range(0 100)) xlabel(0(20)100) ///
+            yscale(range(0 100)) ylabel(0(20)100) ///
+            xtitle("Void rate, inspector audits, year t") ///
+            ytitle("Execution rate, inspector audits, year t+1")
+
+        graph export "$output/scatter_`share'_`t'_`t1'.pdf", replace
+    }
+
+    * ------------------------------------------------------------------
+    * Case 4: Execution (or void) rates t vs t+1 – same measure both axes
+    * ------------------------------------------------------------------
+    else {
+
+        forvalues b = 0/1 {
+            count if !missing(`share'`t', `share'`t1') ///
+                & `share'`t' != 0 ///
+                & unchanged_bureau == `b'
+            local samp_`b' = r(N)
+        }
+
+        quietly reg `share'`t1' `share'`t' ///
+            if !missing(`share'`t', `share'`t1') ///
+            & `share'`t' != 0 ///
+            & unchanged_bureau == 1
+
+        local xname "`share'`t'"
+        local b0_1 : display %5.2f _b[_cons]
+        local b1_1 : display %5.3f _b[`xname']
+        local eq1  "linear fit:  y = `b0_1' + `b1_1' x"
+
+        quietly reg `share'`t1' `share'`t' ///
+            if !missing(`share'`t', `share'`t1') ///
+            & `share'`t' != 0 ///
+            & unchanged_bureau == 0
+
+        local b0_0 : display %5.2f _b[_cons]
+        local b1_0 : display %5.3f _b[`xname']
+        local eq0  "linear fit: y = `b0_0' + `b1_0' x"
+
+        twoway ///
+            (scatter `share'`t1' `share'`t' ///
+                if !missing(`share'`t', `share'`t1') ///
+                & `share'`t' != 0 ///
+                & unchanged_bureau == 1, ///
+                mcolor(dknavy) msymbol(triangle)) ///
+            (lfit `share'`t1' `share'`t' ///
+                if !missing(`share'`t', `share'`t1') ///
+                & `share'`t' != 0 ///
+                & unchanged_bureau == 1, ///
+                lcolor(dknavy) lpattern(solid) lwidth(medthick)) ///
+            (scatter `share'`t1' `share'`t' ///
+                if !missing(`share'`t', `share'`t1') ///
+                & `share'`t' != 0 ///
+                & unchanged_bureau == 0, ///
+                mcolor(eltblue) msymbol(circle)) ///
+            (lfit `share'`t1' `share'`t' ///
+                if !missing(`share'`t', `share'`t1') ///
+                & `share'`t' != 0 ///
+                & unchanged_bureau == 0, ///
+                lcolor(eltblue) lpattern(dash) lwidth(medthick)) ///
+        , ///
+            legend( ///
+                order(1 2 3 4) ///
+                label(1 "Remained tax office [N = `samp_1']") ///
+                label(2 "`eq1'") ///
+                label(3 "Changed tax office [N = `samp_0']") ///
+                label(4 "`eq0'") ///
+                pos(6) ring(1) cols(2) ///
+            ) ///
+            xscale(range(0 100)) xlabel(0(20)100) ///
+            yscale(range(0 100)) ylabel(0(20)100) ///
+            xtitle("Share in year t") ///
+            ytitle("Share in year t+1")
+
+        graph export "$output/scatter_`share'_`t'_`t1'.pdf", replace
+    }
+
+}
+
+
+	restore
+}
+
+
+*********
+**# Some tables
+*********
+
+*Table: Inspector sample size
+esttab insp_stats_1_u1 insp_stats_1_u0 insp_stats_1_total ///
+       insp_stats_2_u1 insp_stats_2_u0 insp_stats_2_total ///
+       insp_stats_3_u1 insp_stats_3_u0 insp_stats_3_total ///
+       using "$output\inspector_sample_stats.tex", replace ///
+    main(sum) noobs nonote ///
+    varlabels( tag_verificateur  "Total Inspectors" ///
+               insp_consec       "Inspectors observable two periods" ) ///
+    mtitles("Same bureau" "Changed bureau" "Total" ///
+            "Same bureau" "Changed bureau" "Total" ///
+            "Same bureau" "Changed bureau" "Total") ///
+    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+            pattern(1 0 0 1 0 0 1 0 0) ///
+            span ///
+            prefix(\multicolumn{@span}{c}{) suffix(}) ///
+            erepeat(\cmidrule(lr){@span})) ///
+    booktabs 
+	
+* Table: Inspectors that executed / voided algo vs inspectors / all (t and t+1)
+esttab insp_has_1_u1 insp_has_1_u0 insp_has_1_tot ///
+       insp_has_2_u1 insp_has_2_u0 insp_has_2_tot ///
+       insp_has_3_u1 insp_has_3_u0 insp_has_3_tot ///
+       using "$output\inspector_has_exec_void_t_t1.tex", replace ///
+    main(sum) noobs nonote ///
+    order( ///
+        has_executed_all_t has_executed_ALG_t has_executed_Inspectors_t ///
+        has_void_all_t     has_void_ALG_t     has_void_Inspectors_t ///
+        has_executed_all_t1 has_executed_ALG_t1 has_executed_Inspectors_t1 ///
+        has_void_all_t1     has_void_ALG_t1     has_void_Inspectors_t1 ///
+    ) ///
+    refcat( has_executed_all_t  "Year t"  has_executed_all_t1 "Year t+1" , nolabel) ///
+    varlabels( ///
+        has_executed_all_t        "Executed any audit" ///
+        has_executed_ALG_t        "Executed algo-selected audit" ///
+        has_executed_Inspectors_t "Executed inspector-selected audit" ///
+        has_void_all_t            "Reported any void audit" ///
+        has_void_ALG_t            "Reported void algo audit" ///
+        has_void_Inspectors_t     "Reported void inspector audit" ///
+        has_executed_all_t1        "Executed any audit" ///
+        has_executed_ALG_t1        "Executed algo-selected audit" ///
+        has_executed_Inspectors_t1 "Executed inspector-selected audit" ///
+        has_void_all_t1            "Reported any void audit" ///
+        has_void_ALG_t1            "Reported void algo audit" ///
+        has_void_Inspectors_t1     "Reported void inspector audit" ///
+    ) ///
+    mtitles("Same bureau" "Changed bureau" "Total" ///
+            "Same bureau" "Changed bureau" "Total" ///
+            "Same bureau" "Changed bureau" "Total") ///
+    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+            pattern(1 0 0 1 0 0 1 0 0) ///
+            span ///
+            prefix(\multicolumn{@span}{c}{) suffix(}) ///
+            erepeat(\cmidrule(lr){@span})) ///
+    booktabs
+	
+
+	* Table: Mean shares of execution / voids in t and t+1 (percent)
+esttab insp_share_1_u1 insp_share_1_u0 insp_share_1_tot ///
+       insp_share_2_u1 insp_share_2_u0 insp_share_2_tot ///
+       insp_share_3_u1 insp_share_3_u0 insp_share_3_tot ///
+       using "$output\inspector_share_exec_void_t_t1.tex", replace ///
+    noobs nonote  ///
+    main(mean ) ///
+    aux(sd) ///
+    order( ///
+        share_exec_all_t share_exec_ALG_t share_exec_Inspectors_t ///
+        share_v_all_t     share_v_ALG_t     share_v_Inspectors_t ///
+        share_exec_all_t1 share_exec_ALG_t1 share_exec_Inspectors_t1 ///
+        share_v_all_t1     share_v_ALG_t1     share_v_Inspectors_t1 ///
+    ) ///
+	 refcat( share_exec_all_t  "Year t"  share_exec_all_t1 "Year t+1" , nolabel) ///
+    varlabels( ///
+        share_exec_all_t        "Exec rate, all audits" ///
+        share_exec_ALG_t        "Exec rate, algo audits" ///
+        share_exec_Inspectors_t "Exec rate, inspector audits" ///
+        share_v_all_t           "Void rate, all audits" ///
+        share_v_ALG_t           "Void rate, algo audits" ///
+        share_v_Inspectors_t    "Void rate, inspector audits" ///
+        share_exec_all_t1        "Exec rate, all audits" ///
+        share_exec_ALG_t1        "Exec rate, algo audits" ///
+        share_exec_Inspectors_t1 "Exec rate, inspector audits" ///
+        share_v_all_t1           "Void rate, all audits" ///
+        share_v_ALG_t1           "Void rate, algo audits" ///
+        share_v_Inspectors_t1    "Void rate, inspector audits" ///
+    ) ///
+    mtitles("Same bureau" "Changed bureau" "Total" ///
+            "Same bureau" "Changed bureau" "Total" ///
+            "Same bureau" "Changed bureau" "Total") ///
+    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+            pattern(1 0 0 1 0 0 1 0 0) ///
+            span ///
+            prefix(\multicolumn{@span}{c}{) suffix(}) ///
+            erepeat(\cmidrule(lr){@span})) ///
+    booktabs
+

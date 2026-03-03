@@ -1,0 +1,19 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{Top 1}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}\\
+\midrule
+\textbf{Dependent variable}: `Share cases below median predicted evasion&                     &                     &                     &                     \\
+\addlinespace
+Share of potential evasion case at the top&       0.118         &       0.132         &       0.179\sym{**} &       0.127         \\
+            &     (0.073)         &     (0.109)         &     (0.081)         &     (0.122)         \\
+\midrule
+Selection Year FE&         Yes         &         Yes         &         Yes         &         Yes         \\
+Bureau FE   &         Yes         &         Yes         &         Yes         &         Yes         \\
+Observations&         116         &         116         &         116         &         116         \\
+R-squared   &       0.157         &       0.150         &       0.175         &       0.148         \\
+\bottomrule
+\end{tabular}
+}

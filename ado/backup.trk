@@ -1,0 +1,480 @@
+* 00000014
+*! version 1.0.0
+* Do not erase or edit this file
+* It is used by Stata to track the ado and help
+* files you have installed.
+
+S http://fmwww.bc.edu/repec/bocode/m
+N missings.pkg
+D 12 Nov 2025
+U 1
+d 'MISSINGS': module to manage missing values
+d 
+d  missings includes utility commands for managing variables  that
+d (may) have missing values, which variously report, list  and
+d tabulate missing values; generate a variable containing  numbers
+d of missing values; and drop variables and/or observations that
+d are all missing.   missings is intended to unite and supersede
+d the author's previous commands nmissing and dropmiss.
+d 
+d KW: missings
+d KW: drop
+d KW: data management
+d KW: missing values
+d 
+d Requires: Stata version 12
+d 
+d Distribution-Date: 20170511
+d 
+d Author: Nicholas J. Cox, Durham University
+d Support: email N.J.Cox@@durham.ac.uk
+d 
+f m\missings.ado
+f m\missings.sthlp
+e
+S http://www.stata-journal.com/software/sj15-4
+N dm89_2.pkg
+D 12 Nov 2025
+U 2
+d SJ15-4 dm89_2. Update: Drop variables...
+d Update: Drop variables (observations) that are
+d   all missing
+d by Nicholas J. Cox, Department of Geography,
+d      Durham University, Durham City, UK
+d Support:  n.j.cox@@durham.ac.uk
+d {cmd:dropmiss} has been superseded by {cmd:missings}.
+d See {cmd:help missings} and
+d Cox (2015, {it:Stata Journal} 15: 1173-1184).
+f d\dropmiss.ado
+f d\dropmiss.hlp
+e
+S http://fmwww.bc.edu/repec/bocode/m
+N matchit.pkg
+D 12 Nov 2025
+U 3
+d 'MATCHIT': module to match two datasets based on similar text patterns
+d 
+d  matchit is a tool to join observations from two datasets based
+d on string variables which do not necessarily need to be exactly
+d the same. It performs many different string-based matching
+d techniques, allowing for a fuzzy similarity between the two
+d different text variables.
+d 
+d KW: match
+d KW: merge
+d KW: fuzzy match
+d 
+d Requires: Stata version 12 and freqindex from SSC (q.v.)
+d 
+d Distribution-Date: 20200520
+d 
+d Author: Julio Raffo, World Intellectual Property Organization
+d Support: email julio.raffo@@wipo.int
+d 
+f m\matchit.ado
+f m\matchit.sthlp
+e
+S http://www.stata-journal.com/software/sj15-4
+N dm0085.pkg
+D 12 Nov 2025
+U 4
+d SJ15-4 dm0085. A set of utilities for...
+d A set of utilities for managing missing values
+d by Nicholas J. Cox, Department of Geography,
+d      Durham University, Durham City, UK
+d Support:  n.j.cox@@durham.ac.uk
+d After installation, type help ^missings^
+f m\missings.ado
+f m\missings.sthlp
+e
+S http://fmwww.bc.edu/repec/bocode/f
+N freqindex.pkg
+D 12 Nov 2025
+U 5
+d 'FREQINDEX': module to generate an index of terms from string variable
+d 
+d  freqindex indexes each singular term in a given string variable
+d from the current dataset and computes its frequencies. It returns
+d a new dataset containing a string variable listing the terms and
+d a numeric variable with the corresponding frequencies.
+d 
+d KW: index
+d KW: string
+d KW: string manipulation
+d KW: frequency
+d 
+d Requires: Stata version 12
+d 
+d Distribution-Date: 20190413
+d 
+d Author: Julio Raffo, World Intellectual Property Organization
+d Support: email julio.raffo@@wipo.int
+d 
+f f\freqindex.ado
+f f\freqindex.sthlp
+e
+S http://fmwww.bc.edu/repec/bocode/u
+N unique.pkg
+D 12 Nov 2025
+U 6
+d 'UNIQUE': module to report number of unique values in variable(s)
+d 
+d  The command unique without a by reports the number of unique
+d values for the varlist. With a by it does the same, but also
+d creates a new variable (_Unique by default but can be named in
+d the gen option). This new variable contains the number of unique
+d values of the varlist for each level of the by variable. The new
+d variable is coded missing except for the first record in each
+d group defined by the levels of the by variable. The command is
+d useful for exploring data where the records refer to more than
+d one level, for example longitudinal data where each record refers
+d to a visit by a subject.
+d 
+d 
+d Requires: Stata version 10.1
+d 
+d Distribution-Date: 20200618
+d 
+d Author: Tony Brady
+d Support: email tony@@sealedenvelope.com
+d 
+f u\unique.ado
+f u\unique.sthlp
+e
+S http://fmwww.bc.edu/repec/bocode/o
+N outreg.pkg
+D 13 Nov 2025
+U 7
+d 'OUTREG': module to write estimation tables to a Word or TeX file
+d 
+d outreg arranges the results of Stata estimation commands in
+d tables as they are typically presented in journal articles,
+d rather than as they are presented in the Stata Results window. By
+d default, t statistics appear in parentheses below the
+d coefficient estimates with asterisks for significance levels.
+d outreg provides as complete control of the statistics,  layout,
+d and formatting of estimation tables as possible, both  in Word
+d and TeX files.  Almost every aspect of the table's  structure and
+d format (including fonts and Greek letters) can  be specified with
+d options.  Multiple tables can be written to  the same document,
+d with paragraphs of text in between,  creating a whole statistical
+d appendix.  outreg works after any estimation command in Stata.
+d Successive estimation results, with different variables, can be
+d merged into a single table.  In addition to writing a  Microsoft
+d Word or a TeX file, the reformatted table is displayed in the
+d Results window.  This is a complete rewrite of earlier versions
+d of outreg.
+d 
+d KW: estimates
+d KW: table
+d KW: formatting
+d KW: Microsoft Word
+d KW: LaTeX
+d 
+d Requires: Stata version 10.1
+d 
+d 
+d Author: John Luke Gallup, Portland State University
+d Support: email jlgallup@@pdx.edu
+d 
+d Distribution-Date: 20150918
+d 
+f o\outreg.ado
+f o\outreg.sthlp
+f f\frmttable.ado
+f f\frmttable.sthlp
+f f\frmt_opts.sthlp
+f o\outreg_complete.sthlp
+f o\outreg_update.sthlp
+f g\greek_in_word.sthlp
+f l\l_cfrmt.mlib
+e
+S http://www.stata-journal.com/software/sj14-2
+N st0085_2.pkg
+D 13 Nov 2025
+U 8
+d SJ14-2 st0085_2. Update: Making regression...
+d Update: Making regression tables from stored
+d   estimates
+d by Ben Jann, University of Bern
+d Support:  jann@@soz.unibe.ch
+d After installation, type help ^estout^,
+d   ^esttab^, ^eststo^, ^estadd^, and ^estpost^
+f _\_eststo.ado
+f _\_eststo.hlp
+f e\esttab.ado
+f e\esttab.hlp
+f e\estadd.ado
+f e\estadd.hlp
+f e\eststo.ado
+f e\eststo.hlp
+f e\estout.ado
+f e\estout.hlp
+f e\estpost.ado
+f e\estpost.hlp
+e
+S http://fmwww.bc.edu/repec/bocode/r
+N reghdfe.pkg
+D 13 Nov 2025
+U 9
+d 'REGHDFE': module to perform linear or instrumental-variable regression absorbing any number of high-dimensional fixed effects
+d 
+d  reghdfe fits a linear or instrumental-variable regression
+d absorbing an arbitrary number of categorical factors and
+d factorial interactions Optionally, it saves the estimated fixed
+d effects.
+d 
+d KW: regression
+d KW: instrumental variables
+d KW: fixed effects
+d KW: high dimension fixed effects
+d 
+d Requires: Stata version 11.2
+d 
+d Distribution-Date: 20230821
+d 
+d Author: Sergio Correia, Board of Governors of the Federal Reserve System
+d Support: email sergio.correia@@gmail.com
+d 
+f r\reghdfe.ado
+f r\reghdfe.mata
+f r\reghdfe3.ado
+f r\reghdfe_p.ado
+f r\reghdfe3_p.ado
+f r\reghdfe5.ado
+f r\reghdfe5_p.ado
+f r\reghdfe_estat.ado
+f r\reghdfe3_estat.ado
+f r\reghdfe5_estat.ado
+f r\reghdfe_parse.ado
+f r\reghdfe5_parse.ado
+f r\reghdfe_footnote.ado
+f r\reghdfe3_footnote.ado
+f r\reghdfe5_footnote.ado
+f e\estfe.ado
+f r\reghdfe_header.ado
+f r\reghdfe5_header.ado
+f r\reghdfe5_parse.ado
+f r\reghdfe.sthlp
+f r\reghdfe3.sthlp
+f r\reghdfe5.sthlp
+f r\reghdfe.mata
+f r\reghdfe_programming.sthlp
+e
+S http://fmwww.bc.edu/repec/bocode/f
+N ftools.pkg
+D 13 Nov 2025
+U 10
+d 'FTOOLS': module to provide alternatives to common Stata commands optimized for large datasets
+d 
+d  ftools consists of a Mata file and several Stata commands: The
+d Mata file creates identifiers (factors) from variables by using
+d hash functions instead of sorting the data, so it runs in time
+d O(N) and not in O(N log N). The Stata commands exploit this to
+d avoid sort operations,  at the cost of being slower for small
+d datasets (mainly because of the cost involved in moving data from
+d Stata to Mata). Implemented commands are fcollapse, fegen group,
+d and fsort. Note that most of the capabilities of levels and
+d contract are already supported by these commands. Possible
+d commands include more egen functions and merge and reshape
+d alternatives.
+d 
+d KW: levels
+d KW: collapse
+d KW: contract
+d KW: egen
+d KW: sort
+d KW: factor variables
+d KW: Mata
+d 
+d Requires: Stata version 11.2
+d 
+d Distribution-Date: 20230821
+d 
+d Author: Sergio Correia, Board of Governors of the Federal Reserve System
+d Support: email sergio.correia@@gmail.com
+d 
+f f\ftools.ado
+f f\ftools.mata
+f f\ftools.sthlp
+f f\fcollapse.ado
+f f\fcollapse.sthlp
+f f\fegen.ado
+f f\fegen_group.ado
+f f\fegen.sthlp
+f f\fisid.ado
+f f\fisid.sthlp
+f f\flevelsof.ado
+f f\flevelsof.sthlp
+f f\fmerge.ado
+f f\fmerge.sthlp
+f f\freshape.ado
+f f\fsort.ado
+f f\fsort.sthlp
+f f\ftab.ado
+f j\join.ado
+f j\join.sthlp
+f l\local_inlist.ado
+f l\local_inlist.sthlp
+f f\fcollapse_functions.mata
+f f\fcollapse_main.mata
+f f\ftools_type_aliases.mata
+f f\ftools.mata
+f f\ftools_common.mata
+f f\ftools_hash1.mata
+f f\ftools_main.mata
+f f\ftools_experimental.mata
+f f\ftools_plugin.mata
+f f\ftools_type_aliases.mata
+f m\ms_compile_mata.ado
+f m\ms_expand_varlist.ado
+f m\ms_fvstrip.ado
+f m\ms_fvstrip.sthlp
+f m\ms_fvunab.ado
+f m\ms_get_version.ado
+f m\ms_parse_absvars.ado
+f m\ms_parse_varlist.ado
+f m\ms_parse_vce.ado
+f m\ms_add_comma.ado
+e
+S http://fmwww.bc.edu/repec/bocode/p
+N ppmlhdfe.pkg
+D 13 Nov 2025
+U 11
+d 'PPMLHDFE': module for Poisson pseudo-likelihood regression with multiple levels of fixed effects
+d 
+d   ppmlhdfe implements Poisson pseudo-maximum likelihood
+d regressions (PPML) with multi-way fixed effects, as  described
+d by Correia, Guimarães, Zylkin (arXiv:1903.01690).  The estimator
+d employed is robust to statistical separation and    convergence
+d issues, due to the procedures developed in Correia, Guimarães,
+d Zylkin (arXiv:1903.01633).
+d 
+d KW: Poisson pseudo-likelihood
+d KW: ppml
+d KW: fixed effects
+d KW: high dimension fixed effects
+d 
+d Requires: Stata version 11.2, reghdfe, ftools  from SSC (q.v.)
+d 
+d Distribution-Date: 20230907
+d 
+d Author: Sergio Correia, Board of Governors of the Federal Reserve System
+d Support: email sergio.correia@@gmail.com
+d 
+d Author: Paulo Guimaraes, University of Porto
+d Support: email pguimaraes@@fep.up.pt
+d 
+d Author: Thomas Zylkin, University of Richmond
+d Support: email tzylkin@@richmond.edu
+d 
+f p\ppmlhdfe.ado
+f p\ppmlhdfe.sthlp
+f p\ppmlhdfe_header.ado
+f p\ppmlhdfe_p.ado
+f p\ppmlhdfe.mata
+f r\reghdfe5.mata
+f p\ppmlhdfe_functions.mata
+f p\ppmlhdfe_separation_relu.mata
+f p\ppmlhdfe_separation_simplex.mata
+e
+S http://fmwww.bc.edu/repec/bocode/g
+N grc1leg2.pkg
+D 13 Nov 2025
+U 12
+d 'GRC1LEG2': module to combine multiple graphs with a single common legend
+d 
+d    grc1leg2 is an enhanced version of Vince Wiggins' grc1leg.
+d Like grc1leg, grc1leg2 is a wrapper for Stata's graph    combine,
+d invoking its ability to array separate, previously drawn graphs
+d as panels in a single combined graph.    By default, the
+d characteristics of the common legend are inherited from the
+d original version of the legend in the first  component graph,
+d or in the graph specified by the option legendfrom(name).  With
+d grc1leg2's legend options, the user can    precisely control the
+d placement of the common legend within the combined graph.  Other
+d legend options allow the user to    override some of the
+d characteristics of the legend inherited from its original
+d creation as part of one of the component    graphs.
+d 
+d KW: graphics
+d KW: legend
+d 
+d Requires: Stata version 13
+d 
+d Distribution-Date: 20240812
+d 
+d Author:   Mead Over, Center for Global Development
+d Support: email MOver@@cgdev.org
+d 
+f g\grc1leg2.ado
+f g\grc1leg2.sthlp
+f g\grc1leg2_examples.ado
+f g\grc1leg2.dlg
+e
+S http://fmwww.bc.edu/repec/bocode/s
+N swindex.pkg
+D 13 Nov 2025
+U 13
+d 'SWINDEX': module to create a standardized weighted index of multiple indicator variables
+d 
+d  swindex calculates a standardized weighted index from the
+d variables in the varlist.  The procedure follows a GLS weighting
+d procedure as described in Anderson (JASA, 2008).
+d 
+d KW: indicator variables
+d KW: index
+d 
+d Requires: Stata version 14
+d 
+d Distribution-Date: 20210224
+d 
+d Author: Benjamin Schwab, Kansas State University
+d Support: email benschwab@@ksu.edu
+d 
+d Author: Sarah Janzen, University of Illinois at Urbana Champaign
+d Support: email sjanzen@@illinois.edu
+d 
+d Author: Nicholas P. Magnan, University of Georgia
+d Support: email nmagnan@@uga.edu
+d 
+d Author: William M. Thompson, IDInsight
+d Support: email will.thompson@@idinsight.org
+d 
+f s\swindex.ado
+f s\swindex.sthlp
+e
+S http://fmwww.bc.edu/repec/bocode/r
+N rforest.pkg
+D 13 Nov 2025
+U 14
+d 'RFOREST': module to implement Random Forest algorithm
+d 
+d  rforest is a plugin for random forest classification and
+d regression algorithms. It is built on a Java backend which acts
+d as an interface to the RandomForest Java    class presented in
+d the WEKA project, developed at the University of Waikato and
+d distributed under the GNU Public License.
+d 
+d KW: random forest
+d KW: classification
+d KW: regression
+d 
+d Requires: Stata version 15
+d 
+d Distribution-Date: 20241130
+d 
+d Author: Rosie Yuyan Zou,  University of Waterloo
+d Support: email y53zou@@uwaterloo.ca
+d 
+d Author: Matthias Schonlau,  University of Waterloo
+d Support: email schonlau@@uwaterloo.ca
+d 
+f r\rforest.ado
+f r\rforest.sthlp
+f r\randomforest_predict.ado
+f r\rforest_examples.ado
+f r\rforest_examples.ihlp
+f jar\randomforest.jar
+f jar\weka.jar
+e

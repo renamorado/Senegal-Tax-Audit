@@ -1,0 +1,23 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{9}{c}}
+\toprule
+            &\multicolumn{3}{c}{No FE}                                        &\multicolumn{3}{c}{Selection year FE}                            &\multicolumn{3}{c}{Bureau FE}                                    \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}&\multicolumn{1}{c}{(8)}&\multicolumn{1}{c}{(9)}\\
+            &\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}\\
+\midrule
+\textbf{Dependent variable}: `Share cases cases in bottom 20\% predicted evasion&                     &                     &                     &                     &                     &                     &                     &                     &                     \\
+\addlinespace
+High potential evasion case in list =1&       0.053         &      -0.007         &       0.151         &       0.045         &      -0.018         &       0.154         &      -0.091         &      -0.173         &       0.099         \\
+            &     (0.087)         &     (0.111)         &     (0.093)         &     (0.099)         &     (0.114)         &     (0.109)         &     (0.158)         &     (0.204)         &     (0.144)         \\
+\addlinespace
+Low potential evasion case in list =1&       0.251\sym{*}  &       0.166         &       0.312\sym{**} &       0.247\sym{*}  &       0.165         &       0.316\sym{*}  &       0.261\sym{**} &       0.252\sym{**} &       0.366\sym{**} \\
+            &     (0.122)         &     (0.135)         &     (0.134)         &     (0.139)         &     (0.142)         &     (0.153)         &     (0.120)         &     (0.104)         &     (0.133)         \\
+\midrule
+Selection Year FE&          No         &          No         &          No         &         Yes         &         Yes         &         Yes         &          No         &          No         &          No         \\
+Bureau FE   &          No         &          No         &          No         &          No         &          No         &          No         &         Yes         &         Yes         &         Yes         \\
+Observations&          24         &          24         &          24         &          24         &          24         &          24         &          23         &          23         &          23         \\
+R-squared   &       0.198         &       0.099         &       0.240         &       0.200         &       0.110         &       0.242         &       0.414         &       0.426         &       0.426         \\
+\bottomrule
+\end{tabular}
+}

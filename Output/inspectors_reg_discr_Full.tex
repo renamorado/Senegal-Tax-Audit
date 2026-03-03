@@ -1,0 +1,25 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{5}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+                    &\multicolumn{1}{c}{Top 1}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}&\multicolumn{1}{c}{m20pc}\\
+\midrule
+Good luck: top20 in top 10\% seq&                     &                     &                     &                     &                     \\
+                    &                     &                     &                     &                     &                     \\
+Bad luck: bottom20 in top 10\% seq&                     &                     &                     &                     &                     \\
+                    &                     &                     &                     &                     &                     \\
+Good luck: top20 in top 2&                     &                     &                     &                     &                     \\
+                    &                     &                     &                     &                     &                     \\
+Bad luck: bottom20 in top 2&                     &                     &                     &                     &                     \\
+                    &                     &                     &                     &                     &                     \\
+Share top20 among top 20\% seq&                     &                     &                     &                     &                     \\
+                    &                     &                     &                     &                     &                     \\
+\midrule
+Selection Year FE   &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         \\
+Bureau FE           &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         \\
+Observations        &          29         &          29         &          29         &          29         &          29         \\
+R-squared           &       0.601         &       0.566         &       0.566         &       0.565         &       0.565         \\
+\bottomrule
+\end{tabular}
+}

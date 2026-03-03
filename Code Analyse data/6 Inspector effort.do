@@ -32,7 +32,7 @@ global check = 1 // to save outside official replication folder
 	
 	if $check == 1 {
 	global output "C:\Users\User\OneDrive\World Bank\Senegal-Tax-Audit\Output"
-	}
+	global analysisdata "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit"	}
 	di "$output"
 	
 /*	
@@ -48,6 +48,7 @@ global check = 1 // to save outside official replication folder
 		
 		if $check == 1 {
 	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
+	global analysisdata "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit"	}
 	}
 	di "$output"
 

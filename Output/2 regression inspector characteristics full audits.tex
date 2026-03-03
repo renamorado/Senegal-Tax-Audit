@@ -1,0 +1,24 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{15}{c}}
+\toprule
+            &\multicolumn{5}{c}{All}                                                                                      &\multicolumn{5}{c}{Algorithm cases}                                                                          &\multicolumn{5}{c}{Inspector cases}                                                                          \\\cmidrule(lr){2-6}\cmidrule(lr){7-11}\cmidrule(lr){12-16}
+            &\multicolumn{1}{c}{\shortstack{N Cases\\(Unw. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Turnover)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Employees)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Firm age)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{Risk score\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{N Cases\\(Unw. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Turnover)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Employees)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Firm age)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{Risk score\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{N Cases\\(Unw. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Turnover)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Employees)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{log(Firm age)\\(W. Avg.)}}&\multicolumn{1}{c}{\shortstack{Risk score\\(W. Avg.)}}\\
+\midrule
+Masters/PhD &       -0.67         &        0.46         &        0.10         &       -0.12\sym{*}  &        0.04         &        0.37         &        0.08         &       -0.23         &       -0.07         &        0.03         &       -0.37         &        0.41         &        0.32         &       -0.11\sym{*}  &        0.07         \\
+            &      (1.51)         &      (0.49)         &      (0.31)         &      (0.07)         &      (0.28)         &      (0.83)         &      (0.51)         &      (0.42)         &      (0.13)         &      (0.28)         &      (0.99)         &      (0.57)         &      (0.35)         &      (0.07)         &      (0.17)         \\
+\addlinespace
+Above median age&        3.51\sym{***}&        0.57         &        0.06         &        0.03         &        0.05         &        1.71\sym{**} &        0.02         &       -0.02         &       -0.15         &        0.14         &        2.20\sym{***}&        0.66         &        0.01         &        0.07         &        0.08         \\
+            &      (1.17)         &      (0.39)         &      (0.22)         &      (0.06)         &      (0.18)         &      (0.66)         &      (0.58)         &      (0.37)         &      (0.12)         &      (0.19)         &      (0.77)         &      (0.47)         &      (0.27)         &      (0.06)         &      (0.16)         \\
+\addlinespace
+Above median experience&        0.94         &        0.33         &        0.34         &       -0.07         &       -0.00         &        0.42         &        0.40         &        0.31         &       -0.07         &       -0.26         &        0.65         &        0.39         &        0.37         &       -0.04         &       -0.02         \\
+            &      (0.80)         &      (0.50)         &      (0.21)         &      (0.05)         &      (0.18)         &      (0.47)         &      (0.57)         &      (0.36)         &      (0.11)         &      (0.21)         &      (0.57)         &      (0.54)         &      (0.24)         &      (0.05)         &      (0.15)         \\
+\midrule
+N           &      152.00         &      150.00         &      150.00         &      152.00         &      152.00         &       99.00         &       98.00         &       97.00         &       99.00         &       99.00         &      140.00         &      138.00         &      138.00         &      140.00         &      140.00         \\
+R2          &        0.26         &        0.28         &        0.42         &        0.12         &        0.46         &        0.28         &        0.28         &        0.48         &        0.15         &        0.64         &        0.24         &        0.27         &        0.25         &        0.11         &        0.53         \\
+Mean outcome&        5.53         &       20.84         &        5.11         &        1.12         &        0.21         &        2.71         &       20.78         &        4.61         &        1.03         &        1.92         &        4.09         &       21.01         &        5.35         &        1.14         &       -0.59         \\
+\bottomrule
+\multicolumn{16}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{16}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+}

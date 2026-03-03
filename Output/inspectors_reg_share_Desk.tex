@@ -1,0 +1,19 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{Top 1}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}\\
+\midrule
+\textbf{Dependent variable}: Execution rate of algorithm-selected cases&                     &                     &                     &                     \\
+\addlinespace
+Share of potential evasion case at the top&       0.103\sym{**} &       0.168\sym{**} &       0.119\sym{**} &       0.194\sym{**} \\
+            &     (0.052)         &     (0.083)         &     (0.055)         &     (0.079)         \\
+\midrule
+Selection Year FE&         Yes         &         Yes         &         Yes         &         Yes         \\
+Bureau FE   &         Yes         &         Yes         &         Yes         &         Yes         \\
+Observations&         165         &         165         &         165         &         165         \\
+R-squared   &       0.528         &       0.533         &       0.531         &       0.542         \\
+\bottomrule
+\end{tabular}
+}

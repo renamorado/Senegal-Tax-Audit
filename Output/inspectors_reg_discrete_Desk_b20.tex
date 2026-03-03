@@ -1,0 +1,22 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{Top 1}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}\\
+\midrule
+\textbf{Dependent variable}: `Execution rate of bottom-20\% cases&                     &                     &                     &                     \\
+\addlinespace
+High potential evasion case in list =1&       0.113         &       0.183\sym{**} &       0.136         &       0.167\sym{**} \\
+            &     (0.095)         &     (0.073)         &     (0.091)         &     (0.080)         \\
+\addlinespace
+Low potential evasion case in list =1&       0.088         &       0.150\sym{**} &       0.155\sym{**} &       0.108         \\
+            &     (0.072)         &     (0.068)         &     (0.076)         &     (0.076)         \\
+\midrule
+Selection Year FE&         Yes         &         Yes         &         Yes         &         Yes         \\
+Bureau FE   &         Yes         &         Yes         &         Yes         &         Yes         \\
+Observations&         144         &         144         &         144         &         144         \\
+R-squared   &       0.422         &       0.441         &       0.436         &       0.431         \\
+\bottomrule
+\end{tabular}
+}
