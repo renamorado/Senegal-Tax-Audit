@@ -243,7 +243,7 @@ collapse ///
 local dvlist "exec_rate b20 b20t"
 
 * Nice labels for refcat / filenames
-local dvlabel_exec_rate      "Algorithm Execution rate"
+local dvlabel_exec_rate      "Outcome: Execution Rate of Algorithm-Selected Cases"
 local dvlabel_b20  "Execution rate of bottom-20\% cases"
 local dvlabel_b20t "Executed bottom-20\% \/ assigned (all)"
 
@@ -469,7 +469,7 @@ restore
 * FINAL STACKED TABLE (FULL audits exec_rate): Panel A + Panel B from CLONED estimates
 ********************************************************************************
 local outpan "$output/inspectors_reg_panels_Full_exec_rate.tex"
-local dvlabel_exec_rate "Algorithm Execution rate"
+local dvlabel_exec_rate "Outcome: Execution Rate of Algorithm-Selected Cases"
 
 local ncols : word count `PA_exec'
 local span  = `ncols' + 1
@@ -483,10 +483,10 @@ local ncols : word count `PA_exec'
 local span  = `ncols' + 1
 
 * Build header rows as locals (avoids unmatched quotes)
-local headA "\multicolumn{`span'}{l}{\textbf{Dependent variable}: Algorithm execution rate}\\ \addlinespace \multicolumn{`span'}{l}{\textbf{Panel A: Discrete measures}}\\ \addlinespace \midrule"
+local headA "\multicolumn{`span'}{l}{\textbf{Dependent variable}: Outcome: Execution Rate of Algorithm-Selected Cases}\\ \addlinespace \multicolumn{`span'}{l}{\textbf{Panel A: Discrete measures}}\\ \addlinespace \midrule"
 
 * --- Build the custom header row (DV in stub + the 9 column titles) ---
-local dvrow "\multicolumn{1}{l}{\textbf{Algorithm execution rate}} & Top 2 & First 10\% seq & First 20\% seq & Top 2 & First 10\% seq & First 20\% seq & Top 2 & First 10\% seq & First 20\% seq \\"
+local dvrow "\multicolumn{1}{l}{\textbf{Outcome: Execution Rate of Algorithm-Selected Cases}} & Top 2 & First 10\% seq & First 20\% seq & Top 2 & First 10\% seq & First 20\% seq & Top 2 & First 10\% seq & First 20\% seq \\"
 local postA "`dvrow' \midrule \multicolumn{`span'}{l}{\textbf{Panel A: Discrete measures}}\\ \addlinespace"
 
 * Panel A (custom header; Panel A title below the line)
@@ -719,10 +719,11 @@ esttab ry2_full ry2_desk1 ry2_desk2 ///
         span prefix(\multicolumn{@span}{c}{) suffix(}) ///
         erepeat(\cmidrule(lr){@span})) ///
     stats(pp N taxcenteryear inspectoryear, ///
-        labels("Mean of dep. var." "N" "Tax center × year FE" "Inspector × year FE") ///
+        labels("Mean of dep. var." "N" "Tax center ?? year FE" "Inspector ?? year FE") ///
         fmt(%9.2f %9.0f %9s %9s)) ///
     booktabs nonotes compress
 
 	/* *Create variable for sequencing 
 bys inspectorclusteryear: egen maxsequencing = max(sequencing)
 */
+

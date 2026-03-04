@@ -100,10 +100,6 @@ foreach audtype in 1 0 {
 			local xti "Firm Size (Mean turnover 2014-2020)"
 		}
 
-		quietly summarize `b'
-		local min_v = floor(r(min))
-		local max_v = ceil(r(max))
-
 		********************************************************************************
 		** LOOP over bin definition
 		********************************************************************************
@@ -113,23 +109,29 @@ foreach audtype in 1 0 {
 			capture drop bin_`b'
 			capture drop mid_bin_`b'
 
+			* Bins are computed within selection method (Algorithm vs Inspectors).
 			* --- QUANTILE BINS (ADDED quintile) ---
 			if "`bin_def'" == "decile" {
-				xtile bin_`b' = `b', nq(10)
-				bysort bin_`b': egen mid_bin_`b' = mean(`b')
+				bysort algorithm: egen bin_`b' = xtile(`b'), nq(10)
+				bysort algorithm bin_`b': egen mid_bin_`b' = mean(`b')
 				local bin_tag "decile"
 			}
 			else if "`bin_def'" == "quintile" {
-				xtile bin_`b' = `b', nq(5)
-				bysort bin_`b': egen mid_bin_`b' = mean(`b')
+				bysort algorithm: egen bin_`b' = xtile(`b'), nq(5)
+				bysort algorithm bin_`b': egen mid_bin_`b' = mean(`b')
 				local bin_tag "quintile"
 			}
 			else {
 				* --- FIXED-WIDTH BINS ---
 				local w = real(substr("`bin_def'",2,.))
-				gen bin_`b' = floor((`b' - `min_v')/`w')*`w' + `min_v'
-				replace bin_`b' = `max_v' if bin_`b' > `max_v'
+				bysort algorithm: egen min_raw_`b' = min(`b')
+				bysort algorithm: egen max_raw_`b' = max(`b')
+				gen min_v_`b' = floor(min_raw_`b')
+				gen max_v_`b' = ceil(max_raw_`b')
+				gen bin_`b' = floor((`b' - min_v_`b')/`w')*`w' + min_v_`b'
+				replace bin_`b' = max_v_`b' if bin_`b' > max_v_`b'
 				gen mid_bin_`b' = bin_`b' + (`w'/2)
+				drop min_raw_`b' max_raw_`b' min_v_`b' max_v_`b'
 				local bin_tag "`w'u"
 			}
 
@@ -181,7 +183,6 @@ foreach audtype in 1 0 {
 					foreach k of local bin_levels {
 						local lower = `k'
 						local upper = `k' + `w'
-						if `upper' > `max_v' local upper = `max_v'
 
 						quietly summarize mid_bin_`b' if bin_`b'==`k', meanonly
 						local m = r(mean)

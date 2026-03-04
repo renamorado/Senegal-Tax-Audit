@@ -345,6 +345,50 @@ forval sample = 1/3 {
 			gen share_exec_`met' = (total_executed`met'/total_assigned`met')*100 
 		}
 
+		*relIns measures: ratio of algorithm(+random) to inspector shares/rates
+		gen byte zero_den_exec  = (total_assignedALG==0 | total_assignedInspectors==0)
+		gen byte zero_den_share = (total_executedALG==0 | total_executedInspectors==0)
+
+		gen byte zero_ins_v    = (share_v_Inspectors==0)
+		gen byte zero_ins_med  = (share_med_er_Inspectors==0)
+		gen byte zero_ins_botq = (share_botq_er_Inspectors==0)
+		gen byte zero_ins_exec = (share_exec_Inspectors==0)
+
+		gen rel_share_v_ALG       = share_v_ALG / share_v_Inspectors
+		replace rel_share_v_ALG   = . if zero_ins_v==1 | zero_den_share==1
+
+		gen rel_share_med_er_ALG     = share_med_er_ALG / share_med_er_Inspectors
+		replace rel_share_med_er_ALG = . if zero_ins_med==1 | zero_den_share==1
+
+		gen rel_share_botq_er_ALG     = share_botq_er_ALG / share_botq_er_Inspectors
+		replace rel_share_botq_er_ALG = . if zero_ins_botq==1 | zero_den_share==1
+
+		gen rel_share_exec_ALG     = share_exec_ALG / share_exec_Inspectors
+		replace rel_share_exec_ALG = . if zero_ins_exec==1 | zero_den_exec==1
+
+		local N_rel_before = _N
+		quietly count if !zero_den_share & !zero_ins_v
+		local N_rel_after_v = r(N)
+		quietly count if !zero_den_share & !zero_ins_med
+		local N_rel_after_med = r(N)
+		quietly count if !zero_den_share & !zero_ins_botq
+		local N_rel_after_botq = r(N)
+		quietly count if !zero_den_exec & !zero_ins_exec
+		local N_rel_after_exec = r(N)
+		quietly count if zero_ins_v==1
+		local N_zero_ins_v = r(N)
+		quietly count if zero_ins_med==1
+		local N_zero_ins_med = r(N)
+		quietly count if zero_ins_botq==1
+		local N_zero_ins_botq = r(N)
+		quietly count if zero_ins_exec==1
+		local N_zero_ins_exec = r(N)
+
+		di as txt "relIns summary (DESK, sample `sample'): unit-years before filters = `N_rel_before'"
+		di as txt "  after filters (void/med/botq/exec) = `N_rel_after_v' / `N_rel_after_med' / `N_rel_after_botq' / `N_rel_after_exec'"
+		di as txt "  dropped due to zero inspector share (void/med/botq/exec) = `N_zero_ins_v' / `N_zero_ins_med' / `N_zero_ins_botq' / `N_zero_ins_exec'"
+		di as txt "  weights used: none"
+
 
 
 		*make the scatter plot 
@@ -353,13 +397,17 @@ forval sample = 1/3 {
 		share_med_er_ALG share_botq_er_ALG share_exec_ALG share_exec_ALG_all ///
 		share_v_all share_exec_all share_med_er_all share_botq_er_all ///
 		share_v_Inspectors_all share_v_Inspectors share_med_er_Inspectors ///
-		share_botq_er_Inspectors share_exec_Inspectors_all share_exec_Inspectors
+		share_botq_er_Inspectors share_exec_Inspectors_all share_exec_Inspectors ///
+		rel_share_v_ALG rel_share_med_er_ALG rel_share_botq_er_ALG ///
+		rel_share_exec_ALG
 
 		reshape wide share_v_ALG_all share_v_ALG ///  
 		share_med_er_ALG share_botq_er_ALG share_exec_ALG share_exec_ALG_all ///
 		share_v_all share_exec_all share_med_er_all share_botq_er_all ///
 		share_v_Inspectors_all share_v_Inspectors share_med_er_Inspectors ///
-		share_botq_er_Inspectors share_exec_Inspectors_all share_exec_Inspectors, i(verificateur_selection unchanged_bureau) j(selectionyear)
+		share_botq_er_Inspectors share_exec_Inspectors_all share_exec_Inspectors ///
+		rel_share_v_ALG rel_share_med_er_ALG rel_share_botq_er_ALG ///
+		rel_share_exec_ALG, i(verificateur_selection unchanged_bureau) j(selectionyear)
 
 
 			if `sample'==1  {
@@ -382,7 +430,9 @@ forval sample = 1/3 {
 				share_exec_Inspectors share_v_all share_v_ALG ///
 				share_v_Inspectors share_med_er_all ///
 				share_med_er_ALG share_med_er_Inspectors ///
-				share_botq_er_all share_botq_er_ALG share_botq_er_Inspectors {
+				share_botq_er_all share_botq_er_ALG share_botq_er_Inspectors ///
+				rel_share_exec_ALG rel_share_v_ALG ///
+				rel_share_med_er_ALG rel_share_botq_er_ALG {
 						egen `share'avg =rowmean(`share'2019 `share'2020)
 					}
 				
@@ -828,6 +878,123 @@ twoway ///
 graph export "$output/scatter_`share'_`t'_`t1'.pdf", replace
 
 				 }
+
+foreach relshare in rel_share_exec_ALG rel_share_v_ALG ///
+                    rel_share_med_er_ALG rel_share_botq_er_ALG {
+
+local xvar "`relshare'`t'"
+
+local y_t   ""
+local y_t1  ""
+local xtit  ""
+local ytit  ""
+local relstub ""
+
+if "`relshare'" == "rel_share_exec_ALG" {
+    local y_t  "rel_share_exec_ALG`t'"
+    local y_t1 "rel_share_exec_ALG`t1'"
+    local xtit "Execution rate ratio (ALG/Inspectors), year t"
+    local ytit "Execution rate ratio (ALG/Inspectors), year t+1"
+    local relstub "share_exec_relIns_ALG"
+}
+else if "`relshare'" == "rel_share_v_ALG" {
+    local y_t  "rel_share_exec_ALG`t'"
+    local y_t1 "rel_share_exec_ALG`t1'"
+    local xtit "Void rate ratio (ALG/Inspectors), year t"
+    local ytit "Execution rate ratio (ALG/Inspectors), year t+1"
+    local relstub "share_v_relIns_ALG"
+}
+else if "`relshare'" == "rel_share_med_er_ALG" {
+    local y_t  "rel_share_exec_ALG`t'"
+    local y_t1 "rel_share_exec_ALG`t1'"
+    local xtit "Below-median evasion-rate share ratio (ALG/Inspectors), year t"
+    local ytit "Execution rate ratio (ALG/Inspectors), year t+1"
+    local relstub "share_med_er_relIns_ALG"
+}
+else if "`relshare'" == "rel_share_botq_er_ALG" {
+    local y_t  "rel_share_exec_ALG`t'"
+    local y_t1 "rel_share_exec_ALG`t1'"
+    local xtit "Bottom-quartile evasion-rate share ratio (ALG/Inspectors), year t"
+    local ytit "Execution rate ratio (ALG/Inspectors), year t+1"
+    local relstub "share_botq_er_relIns_ALG"
+}
+else {
+    local y_t  "`relshare'`t'"
+    local y_t1 "`relshare'`t1'"
+    local xtit "Ratio in year t"
+    local ytit "Ratio in year t+1"
+}
+
+local cond "!missing(`xvar') & !missing(`y_t') & !missing(`y_t1') & (`y_t'!=0)"
+
+quietly count if `cond' & unchanged_bureau==1
+local N1 = r(N)
+quietly count if `cond' & unchanged_bureau==0
+local N0 = r(N)
+
+local sc0 = cond(`N1' >= 2, 3, 2)
+local fit1n = 2
+local fit0n = cond(`N1' >= 2, 4, 3)
+
+local eq1 "Linear fit  not estimated"
+local eq0 "Linear fit not estimated"
+
+local fit1 ""
+if (`N1' >= 2) {
+    quietly regress `y_t1' `xvar' if `cond' & unchanged_bureau==1
+
+    local b0   : display %6.2f _b[_cons]
+    local b1ab : display %6.3f abs(_b[`xvar'])
+    local se1  : display %6.3f _se[`xvar']
+    local sign "+"
+    if (_b[`xvar'] < 0) local sign "-"
+
+    local eq1 "Linear fit: y = `b0' `sign' `b1ab'x  (SE=`se1')"
+
+    local fit1 "(lfit `y_t1' `xvar' if `cond' & unchanged_bureau==1, lcolor(dknavy) lpattern(solid) lwidth(medthick))"
+}
+
+local fit0 ""
+if (`N0' >= 2) {
+    quietly regress `y_t1' `xvar' if `cond' & unchanged_bureau==0
+
+    local b0   : display %6.2f _b[_cons]
+    local b1ab : display %6.3f abs(_b[`xvar'])
+    local se1  : display %6.3f _se[`xvar']
+    local sign "+"
+    if (_b[`xvar'] < 0) local sign "-"
+
+    local eq0 "Linear fit: y = `b0' `sign' `b1ab'x  (SE=`se1')"
+
+    local fit0 "(lfit `y_t1' `xvar' if `cond' & unchanged_bureau==0, lcolor(eltblue) lpattern(dash) lwidth(medthick))"
+}
+
+local legorder "1"
+local leglabs  `"label(1 "Remained tax office [N=`N1']")"'
+
+if (`N1' >= 2) {
+    local legorder "`legorder' `fit1n'"
+    local leglabs  `"`leglabs' label(`fit1n' "`eq1'")"'
+}
+
+local legorder "`legorder' `sc0'"
+local leglabs  `"`leglabs' label(`sc0' "Changed tax office [N=`N0']")"'
+
+if (`N0' >= 2) {
+    local legorder "`legorder' `fit0n'"
+    local leglabs  `"`leglabs' label(`fit0n' "`eq0'")"'
+}
+
+twoway ///
+    (scatter `y_t1' `xvar' if `cond' & unchanged_bureau==1, mcolor(dknavy) msymbol(triangle)) ///
+    `fit1' ///
+    (scatter `y_t1' `xvar' if `cond' & unchanged_bureau==0, mcolor(eltblue) msymbol(circle)) ///
+    `fit0', ///
+    legend(order(`legorder') `leglabs' cols(2) pos(6) ring(1) size(small)) ///
+    xtitle("`xtit'") ytitle("`ytit'")
+
+graph export "$output/scatter_`relstub'_`t'_`t1'_desk.pdf", replace
+}
 				 restore
 }
 *********

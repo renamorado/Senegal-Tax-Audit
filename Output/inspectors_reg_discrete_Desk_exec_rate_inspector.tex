@@ -1,0 +1,22 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{Top 1}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}\\
+\midrule
+\textbf{Dependent variable}: `Outcome: Execution Rate of Inspector-Selected Cases&                     &                     &                     &                     \\
+\addlinespace
+High potential evasion case in list =1&       0.014         &      -0.022         &      -0.005         &      -0.038         \\
+            &     (0.042)         &     (0.044)         &     (0.043)         &     (0.045)         \\
+\addlinespace
+Low potential evasion case in list =1&       0.050         &       0.021         &       0.052         &      -0.001         \\
+            &     (0.044)         &     (0.054)         &     (0.046)         &     (0.055)         \\
+\midrule
+Selection Year FE&         Yes         &         Yes         &         Yes         &         Yes         \\
+Bureau FE   &         Yes         &         Yes         &         Yes         &         Yes         \\
+Observations&         165         &         165         &         165         &         165         \\
+R-squared   &       0.498         &       0.497         &       0.499         &       0.497         \\
+\bottomrule
+\end{tabular}
+}

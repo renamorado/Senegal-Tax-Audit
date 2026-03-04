@@ -91,16 +91,13 @@ keep if x2 == 1
 ** sample 
 tab method y2
 
-**# Obtaining bins of predicted evasion for the whole set selected cases
-* Get min and max values of predicted evasion for binning
-
-
-quietly summarize yhatrf
-*min 
-gen min_v = floor(r(min))
-
-*max
-gen max_v = ceil(r(max))
+**# Obtaining bins of predicted evasion within selection method
+* Bins are computed within selection method (Algorithm vs Inspectors).
+bysort method: egen min_raw = min(yhatrf)
+bysort method: egen max_raw = max(yhatrf)
+gen min_v = floor(min_raw)
+gen max_v = ceil(max_raw)
+drop min_raw max_raw
 
 * Create bins (width of 1)
 gen bin = floor(yhatrf - min_v) + min_v
@@ -158,8 +155,7 @@ twoway ///
     (rarea ci_upper_ninspectors ci_lower_ninspectors mid_bin if method=="Inspectors" ///
 	& mid_bin, sort fcolor(`col_ins'%50) fintensity(10) lcolor(`col_ins'%0)) ///
     (line  avg_ninspectors  mid_bin if method=="Inspectors" & mid_bin, ///
-        sort lcolor(`col_ins'%50) lwidth(medthick)), xlabel(5(5)22) ///
-    xscale(range(5 22) ) ///
+        sort lcolor(`col_ins'%50) lwidth(medthick)), ///
     ytitle("Average number of inspectors") xtitle("Evasion (log FCFA)") ///
     legend(order(2 "Algorithm Cases P(Agents assigned | predicted evasion)" ///
                  4 "Inspector Cases P(Agents assigned | predicted evasion)") ///
@@ -177,31 +173,9 @@ twoway ///
     (rarea ci_upper_y19 ci_lower_y19 mid_bin if method=="Inspectors" ///
 	& mid_bin, sort fcolor(`col_ins'%50) fintensity(10) lcolor(`col_ins'%0)) ///
     (line  avg_y19  mid_bin if method=="Inspectors" & mid_bin, ///
-        sort lcolor(`col_ins'%50) lwidth(medthick)), xlabel(5(5)22) ///
-    xscale(range(5 22) ) ///
+        sort lcolor(`col_ins'%50) lwidth(medthick)), ///
     ytitle("Average duration (days)") xtitle("Evasion (log FCFA)") ///
     legend(order(2 "Algorithm Cases P(Duration from start to Conf | predicted evasion)" ///
                  4 "Inspector Cases P(Duration from start to Conf | predicted evasion)") ///
 				 pos(6) col(1) row(2)) graphregion(color(white)) ///
 				 plotregion(color(white))  graphregion(color(white)) plotregion(color(white))
-s
-s
-
-
-
-
-* Calculate distribution percentage
-egen total_n = total(n)
-gen distribution_percent = (n / total_n) * 100
-
-* Add group identifier
-gen group = "algorithm"
-
-* Save algorithm results
-tempfile algorithm_data
-
-s
-collapse (mean) mean_yhatrf = yhatrf (sum) n_agents = numberagents , by(method bureau_detailed)  
-egen  insp_decile = xtile(mean_yhatrf), nq(10) by(method)
-
-collapse (count) n_bureau = `inspvar' (sum) cases = n_cases, by(source insp_decile)

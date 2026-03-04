@@ -1,0 +1,20 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{9}{c}}
+\toprule
+            &\multicolumn{3}{c}{No FE}                                        &\multicolumn{3}{c}{Selection year FE}                            &\multicolumn{3}{c}{Bureau FE}                                    \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}&\multicolumn{1}{c}{(8)}&\multicolumn{1}{c}{(9)}\\
+            &\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}\\
+\midrule
+\textbf{Dependent variable}: `Execution rate of bottom-20\% cases&                     &                     &                     &                     &                     &                     &                     &                     &                     \\
+\addlinespace
+Share of potential evasion case at the top&      -0.113         &      -0.103         &      -0.363         &       0.028         &       0.052         &      -0.222         &      -0.076         &      -0.219         &       0.225         \\
+            &     (0.335)         &     (0.422)         &     (0.476)         &     (0.280)         &     (0.327)         &     (0.385)         &     (0.312)         &     (0.401)         &     (0.434)         \\
+\midrule
+Selection Year FE&          No         &          No         &          No         &         Yes         &         Yes         &         Yes         &          No         &          No         &          No         \\
+Bureau FE   &          No         &          No         &          No         &          No         &          No         &          No         &         Yes         &         Yes         &         Yes         \\
+Observations&          26         &          26         &          26         &          26         &          26         &          26         &          24         &          24         &          24         \\
+R-squared   &       0.005         &       0.003         &       0.027         &       0.226         &       0.227         &       0.236         &       0.476         &       0.485         &       0.481         \\
+\bottomrule
+\end{tabular}
+}

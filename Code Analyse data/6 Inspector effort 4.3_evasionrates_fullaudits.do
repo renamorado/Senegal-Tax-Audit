@@ -326,6 +326,50 @@ forval sample = 1/3 {
 			gen share_exec_`met' = (total_executed`met'/total_assigned`met')*100 
 		}
 
+		*relIns measures: ratio of algorithm to inspector shares/rates
+		gen byte zero_den_exec  = (total_assignedAlgorithm==0 | total_assignedInspectors==0)
+		gen byte zero_den_share = (total_executedAlgorithm==0 | total_executedInspectors==0)
+
+		gen byte zero_ins_v    = (share_v_Inspectors==0)
+		gen byte zero_ins_med  = (share_med_er_Inspectors==0)
+		gen byte zero_ins_botq = (share_botq_er_Inspectors==0)
+		gen byte zero_ins_exec = (share_exec_Inspectors==0)
+
+		gen rel_share_v_Algorithm       = share_v_Algorithm / share_v_Inspectors
+		replace rel_share_v_Algorithm   = . if zero_ins_v==1 | zero_den_share==1
+
+		gen rel_share_med_er_Algorithm     = share_med_er_Algorithm / share_med_er_Inspectors
+		replace rel_share_med_er_Algorithm = . if zero_ins_med==1 | zero_den_share==1
+
+		gen rel_share_botq_er_Algorithm     = share_botq_er_Algorithm / share_botq_er_Inspectors
+		replace rel_share_botq_er_Algorithm = . if zero_ins_botq==1 | zero_den_share==1
+
+		gen rel_share_exec_Algorithm     = share_exec_Algorithm / share_exec_Inspectors
+		replace rel_share_exec_Algorithm = . if zero_ins_exec==1 | zero_den_exec==1
+
+		local N_rel_before = _N
+		quietly count if !zero_den_share & !zero_ins_v
+		local N_rel_after_v = r(N)
+		quietly count if !zero_den_share & !zero_ins_med
+		local N_rel_after_med = r(N)
+		quietly count if !zero_den_share & !zero_ins_botq
+		local N_rel_after_botq = r(N)
+		quietly count if !zero_den_exec & !zero_ins_exec
+		local N_rel_after_exec = r(N)
+		quietly count if zero_ins_v==1
+		local N_zero_ins_v = r(N)
+		quietly count if zero_ins_med==1
+		local N_zero_ins_med = r(N)
+		quietly count if zero_ins_botq==1
+		local N_zero_ins_botq = r(N)
+		quietly count if zero_ins_exec==1
+		local N_zero_ins_exec = r(N)
+
+		di as txt "relIns summary (FULL, sample `sample'): unit-years before filters = `N_rel_before'"
+		di as txt "  after filters (void/med/botq/exec) = `N_rel_after_v' / `N_rel_after_med' / `N_rel_after_botq' / `N_rel_after_exec'"
+		di as txt "  dropped due to zero inspector share (void/med/botq/exec) = `N_zero_ins_v' / `N_zero_ins_med' / `N_zero_ins_botq' / `N_zero_ins_exec'"
+		di as txt "  weights used: none"
+
 
 
 		*make the scatter plot 
@@ -335,14 +379,18 @@ forval sample = 1/3 {
 		share_exec_Algorithm_all  share_v_all share_exec_all share_med_er_all ///
 		share_botq_er_all share_v_Inspectors_all share_v_Inspectors ///
 		share_med_er_Inspectors share_botq_er_Inspectors ///
-		share_exec_Inspectors_all share_exec_Inspectors
- 
+		share_exec_Inspectors_all share_exec_Inspectors ///
+		rel_share_v_Algorithm rel_share_med_er_Algorithm rel_share_botq_er_Algorithm ///
+		rel_share_exec_Algorithm
+
 		reshape wide share_v_Algorithm_all share_v_Algorithm ///  
 		share_med_er_Algorithm share_botq_er_Algorithm share_exec_Algorithm /// 
 		share_exec_Algorithm_all share_v_all share_exec_all share_med_er_all ///
 		share_botq_er_all share_v_Inspectors_all share_v_Inspectors ///
 		share_med_er_Inspectors share_botq_er_Inspectors ///
-		share_exec_Inspectors_all share_exec_Inspectors, ///
+		share_exec_Inspectors_all share_exec_Inspectors ///
+		rel_share_v_Algorithm rel_share_med_er_Algorithm rel_share_botq_er_Algorithm ///
+		rel_share_exec_Algorithm, ///
 		i(bureau) j(selectionyear)
 		
 		* Merge bureau coverage (built from full 2018–2020 sample)
@@ -383,7 +431,9 @@ forval sample = 1/3 {
 				share_exec_Inspectors share_v_all share_v_Algorithm ///
 				share_v_Inspectors share_med_er_all ///
 				share_med_er_Algorithm share_med_er_Inspectors ///
-				share_botq_er_all share_botq_er_Algorithm share_botq_er_Inspectors {
+				share_botq_er_all share_botq_er_Algorithm share_botq_er_Inspectors ///
+				rel_share_exec_Algorithm rel_share_v_Algorithm ///
+				rel_share_med_er_Algorithm rel_share_botq_er_Algorithm {
 						egen `share'avg =rowmean(`share'2019 `share'2020)
 					}
 				
@@ -785,6 +835,117 @@ twoway `plotcmd', ///
 
 	graph export "$output/scatter_`share'_`t'_`t1'_full.pdf", replace
 	}
+
+foreach relshare in rel_share_exec_Algorithm rel_share_v_Algorithm ///
+                    rel_share_med_er_Algorithm rel_share_botq_er_Algorithm {
+
+    local xvar "`relshare'`t'"
+
+    local y_t     ""
+    local y_t1    ""
+    local x_title ""
+    local y_title ""
+    local relstub ""
+
+    if "`relshare'" == "rel_share_exec_Algorithm" {
+        local y_t     "rel_share_exec_Algorithm`t'"
+        local y_t1    "rel_share_exec_Algorithm`t1'"
+        local x_title "Execution rate ratio (Algorithm/Inspectors), year t"
+        local y_title "Execution rate ratio (Algorithm/Inspectors), year t+1"
+        local relstub "share_exec_relIns_Algorithm"
+    }
+    else if "`relshare'" == "rel_share_v_Algorithm" {
+        local y_t     "rel_share_exec_Algorithm`t'"
+        local y_t1    "rel_share_exec_Algorithm`t1'"
+        local x_title "Void rate ratio (Algorithm/Inspectors), year t"
+        local y_title "Execution rate ratio (Algorithm/Inspectors), year t+1"
+        local relstub "share_v_relIns_Algorithm"
+    }
+    else if "`relshare'" == "rel_share_med_er_Algorithm" {
+        local y_t     "rel_share_exec_Algorithm`t'"
+        local y_t1    "rel_share_exec_Algorithm`t1'"
+        local x_title "Below-median evasion-rate share ratio (Algorithm/Inspectors), year t"
+        local y_title "Execution rate ratio (Algorithm/Inspectors), year t+1"
+        local relstub "share_med_er_relIns_Algorithm"
+    }
+    else if "`relshare'" == "rel_share_botq_er_Algorithm" {
+        local y_t     "rel_share_exec_Algorithm`t'"
+        local y_t1    "rel_share_exec_Algorithm`t1'"
+        local x_title "Bottom-quartile evasion-rate share ratio (Algorithm/Inspectors), year t"
+        local y_title "Execution rate ratio (Algorithm/Inspectors), year t+1"
+        local relstub "share_botq_er_relIns_Algorithm"
+    }
+
+    local cond "!missing(`xvar', `y_t', `y_t1') & `y_t' != 0"
+    local show_partial = (`sample'==2)
+
+    count if `cond' & btype==2
+    local n_all3 = r(N)
+
+    local n_part = 0
+    if `show_partial' {
+        count if `cond' & btype==1
+        local n_part = r(N)
+    }
+
+    local eq_all3 "Linear Fit (observed the whole period): N<2"
+    if `n_all3' >= 2 {
+        quietly reg `y_t1' `xvar' if `cond' & btype==2
+        local b0_all3    : display %5.2f _b[_cons]
+        local b1abs_all3 : display %5.3f abs(_b[`xvar'])
+        local se_all3    : display %5.3f _se[`xvar']
+        local sign_all3  = cond(_b[`xvar']>=0, "+", "-")
+        local eq_all3    "Linear fit: y = `b0_all3' `sign_all3' `b1abs_all3' x (SE=`se_all3')"
+    }
+
+    local eq_part "Linear fit (partial coverage)"
+    if `show_partial' & `n_part' >= 2 {
+        quietly reg `y_t1' `xvar' if `cond' & btype==1
+        local b0_part    : display %5.2f _b[_cons]
+        local b1abs_part : display %5.3f abs(_b[`xvar'])
+        local se_part    : display %5.3f _se[`xvar']
+        local sign_part  = cond(_b[`xvar']>=0, "+", "-")
+        local eq_part    "Linear fit: y = `b0_part' `sign_part' `b1abs_part' x (SE=`se_part')"
+    }
+
+    local plotcmd ""
+    local legorder ""
+    local leglbls  ""
+    local p = 0
+
+    local plotcmd `"`plotcmd' (scatter `y_t1' `xvar' if `cond' & btype==2, mcolor(dknavy) msymbol(triangle))"'
+    local p = `p' + 1
+    local legorder "`legorder' `p'"
+    local leglbls  `"`leglbls' label(`p' "Tax office observed 2018-2020 [N=`n_all3']")"'
+
+    if `n_all3' >= 2 {
+        local plotcmd `"`plotcmd' (lfit `y_t1' `xvar' if `cond' & btype==2, lcolor(dknavy) lpattern(solid) lwidth(medthick))"'
+        local p = `p' + 1
+        local legorder "`legorder' `p'"
+        local leglbls  `"`leglbls' label(`p' "`eq_all3'")"'
+    }
+
+    if `show_partial' & `n_part' > 0 {
+        local plotcmd `"`plotcmd' (scatter `y_t1' `xvar' if `cond' & btype==1, mcolor(eltblue) msymbol(circle))"'
+        local p = `p' + 1
+        local legorder "`legorder' `p'"
+        local leglbls  `"`leglbls' label(`p' "Tax office observed 2019-2020 only [N=`n_part']")"'
+
+        if `n_part' >= 2 {
+            local plotcmd `"`plotcmd' (lfit `y_t1' `xvar' if `cond' & btype==1, lcolor(eltblue) lpattern(dash) lwidth(medthick))"'
+            local p = `p' + 1
+            local legorder "`legorder' `p'"
+            local leglbls  `"`leglbls' label(`p' "`eq_part'")"'
+        }
+    }
+
+    twoway `plotcmd', ///
+        legend(order(`legorder') `leglbls' pos(6) ring(1) cols(2) size(vsmall)) ///
+        xtitle("`x_title'") ///
+        ytitle("`y_title'")
+
+	graph export "$output/scatter_`relstub'_`t'_`t1'_full.pdf", replace
+}
 	
 	restore			 
 }

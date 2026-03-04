@@ -1,0 +1,19 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{4}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+            &\multicolumn{1}{c}{Top 1}&\multicolumn{1}{c}{Top 2}&\multicolumn{1}{c}{First 10\% seq}&\multicolumn{1}{c}{First 20\% seq}\\
+\midrule
+\textbf{Dependent variable}: `Execution rate of bottom-20\% cases&                     &                     &                     &                     \\
+\addlinespace
+Share of high predicted evasion case at the top&      -0.035         &      -0.107         &      -0.027         &      -0.038         \\
+            &     (0.070)         &     (0.101)         &     (0.076)         &     (0.102)         \\
+\midrule
+Selection Year FE&         Yes         &         Yes         &         Yes         &         Yes         \\
+Bureau FE   &         Yes         &         Yes         &         Yes         &         Yes         \\
+Observations&         139         &         139         &         139         &         139         \\
+R-squared   &       0.372         &       0.376         &       0.372         &       0.372         \\
+\bottomrule
+\end{tabular}
+}

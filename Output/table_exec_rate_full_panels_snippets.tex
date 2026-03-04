@@ -1,0 +1,22 @@
+\begin{table}[H]\centering
+\begin{threeparttable}
+\caption{Execution of algorithm-assigned audits and high predicted evasion cases at the top of the list [Full audits]}
+\label{tab:exec_rate_full_panels}
+
+\footnotesize
+\input{Output/inspectors_reg_panels_Full_exec_rate.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: Panel A reports discrete specifications where the dependent variable is the overall execution rate of algorithm-selected cases among assigned algorithm-selected cases in each list. Predicted evasion is partitioned into quintiles within bureau $\times$ selection year; ``high'' predicted evasion corresponds to the top quintile ($\text{yhatrf\_q5}=5$) and ``low'' predicted evasion to the bottom quintile ($\text{yhatrf\_q5}=1$). For list $\ell$ (bureau $\times$ selection year), the estimated model is
+\[
+y_{\ell}=\alpha+\beta_H\mathbf{1}\{\text{HighTop}_{\ell}=1\}+\beta_L\mathbf{1}\{\text{LowTop}_{\ell}=1\}+\delta_t+\mu_b+\varepsilon_{\ell},
+\]
+where $\text{HighTop}_{\ell}$ and $\text{LowTop}_{\ell}$ indicate whether the top of the ranking contains, respectively, a high- or low-predicted-evasion case under each top-of-list definition (Top 2, first 10\% of the sequence, first 20\% of the sequence). Panel B reports the continuous specification
+\[
+y_{\ell}=\alpha+\theta\,\text{ShareHighTop}_{\ell}+\delta_t+\mu_b+\varepsilon_{\ell},
+\]
+where $\text{ShareHighTop}_{\ell}$ is the share of high-predicted-evasion cases at the top of the list. Columns labeled No FE set $(\delta_t,\mu_b)=(0,0)$, Selection Year FE includes $\delta_t$ only, and Bureau FE includes $\mu_b$ only. Standard errors are robust. Stars denote significance at $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
