@@ -9,17 +9,15 @@
 ** DESCRIPTION  **
 *****************
 /*
-Case-level sub-analysis:
-Discrepancies between notified and confirmed tax amounts vs survey corruption and dissatisfaction outcomes.
-
-Main choices implemented:
-- Unit of observation: audit case
-- Main sample: selection==1, safeties==0, y2==1
-- Main regressor: W_main = (notificationvalue - confirmationvalue) / notificationvalue
-- Keep flagged notification imputations (flagnotification==1), as requested
-- VCE/FE conventions mimic C5 mix:
-    Full (x2==1): absorb(controlbureauannee), vce(cluster controlbureauannee)
-    Desk (x2==0): absorb(inspectorclusteryear), vce(robust)
+W-main discrepancy analysis:
+1) Set globals/directories
+2) Load datasetforanalysis.dta
+3) Apply sample filters aligned with prior taxpayer-survey analysis
+4) Generate C5 dispute variables d1-d21
+5) Build W_main and robustness variants
+6) Export descriptive stats tables with estpost/esttab (.tex)
+7) Export W_main plots (.pdf)
+8) Run regressions and export all tables with esttab (.tex)
 */
 
 * Set-up
@@ -50,576 +48,275 @@ global output       "$rootdir\Analysis all data\replication_package\Output"
 if $check == 1 {
     global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
 }
-di "Output folder: $output"
 
-local outtables "$output\Tables"
-cap mkdir "$output"
-cap mkdir "`outtables'"
 
 ***************************
 ** LOAD ANALYSIS DATASET **
 ***************************
-local datafile "$analysisdata\datasetforanalysis.dta"
-if !fileexists("`datafile'") {
-    local datafile "datasetforanalysis.dta"
-}
-if !fileexists("`datafile'") {
-    di as error "Could not find datasetforanalysis.dta in $analysisdata or current folder."
-    exit 601
-}
-use "`datafile'", clear
-di "Using data file: `datafile'"
+use "datasetforanalysis.dta", clear
 
-* Required variables check
-local must_have "selection safeties y2 x2 firmid notification confirmation notificationvalue confirmationvalue controlbureauannee inspectorclusteryear center selectionyear algorithm overlap random horsprogramme q34 q35 q32 q42 q41 evaluation flagnotification"
-local allvars : varlist _all
-foreach v of local must_have {
-    if strpos(" `allvars' ", " `v' ") == 0 {
-        di as error "Missing required variable: `v'"
-        exit 111
-    }
-}
 
-***************************
-** SAMPLE + W CONSTRUCTION
-***************************
-gen byte sample_selected = selection == 1 & safeties == 0
-gen byte sample_main     = sample_selected == 1 & y2 == 1
+*****************************
+* APPLY BASELINE PREFILTER
+*****************************
+keep if selection == 1
+drop if safeties == 1
+keep if recent == selectionyear
+drop recent
 
-gen double W_main = .
-replace W_main = (notificationvalue - confirmationvalue) / notificationvalue if ///
-    sample_main == 1 & notification == 1 & confirmation == 1 & ///
-    notificationvalue > 0 & notificationvalue < . & confirmationvalue < .
+****************************************
+* GENERATE C5 DISPUTE VARIABLES (d1-d21)
+****************************************
+*Generate dispute variables
+gen d1 = notification if y2 == 1
+gen d2 = confirmation  if y2 == 1 
+egen d3 = rowmax(notification confirmation) if y2 == 1
+gen d4 = notificationvalue > 0 if d1 == 1  & y2 == 1 
+gen d5 = confirmationvalue > 0 if d2 == 1 & y2 == 1
+egen d6 = rowmax(d4 d5) if y2 == 1
+gen d7 = confirmation if d4 == 1 & y2 == 1
+gen d8 = d5 if d4 == 1  & y2 == 1 
+gen d9 = log(confirmationvalue) if d2 == 1 & d4 == 1 & y2 == 1
+gen d9n = log(notificationvalue) if d2 == 1 & d4 == 1 & y2 == 1
+gen d10 =  confirmationvalue/notificationvalue > 0.95 & confirmationvalue/notificationvalue < 1.05 if d2 == 1 & d4 == 1 & y2 == 1
+gen d11 =  log(confirmationvalue/notificationvalue) if d2 == 1 & d4 == 1 & y2 == 1
+gen d12 =  confirmationvalue/notificationvalue if d2 == 1 & d4 == 1 & y2 == 1
+gen d13 = log(notificationvalue - confirmationvalue) if d2 == 1 & d4 == 1 & y2 == 1
+gen d14 =  log(confirmationvalue/notificationvalue) if d2 == 1 & d4 == 1  & y2 == 1 & confirmationvalue/notificationvalue < 0.95
+gen d15 =  confirmationvalue/notificationvalue if d2 == 1 & d4 == 1  & y2 == 1  & confirmationvalue/notificationvalue < 0.95
+gen d16 =  log(notificationvalue - confirmationvalue) if d2 == 1 & d4 == 1  & y2 == 1  & confirmationvalue/notificationvalue < 0.95
+ 
+*For presentation
+gen d17 = confirmationvalue > notificationvalue & confirmationvalue != . if d2 == 1 & d4 == 1 & y2 == 1
+gen d18 = log(confirmationvalue) if d5 == 1 & d4 == 1 & y2 == 1
+gen d19 = log(notificationvalue) if d5 == 1 & d4 == 1 & y2 == 1
+gen d20 = log(notificationvalue + 1)
+replace d20 = log(confirmationvalue + 1) if d20 == .
+gen d21 = log(confirmationvalue)
 
-quietly summarize W_main, detail
-local w_n   = r(N)
-local w_p1  = r(p1)
-local w_p99 = r(p99)
-local w_p5  = r(p5)
-local w_p50 = r(p50)
+************************************
+* W-MAIN CONSTRUCTION + SANITY CHECKS
+************************************
+gen W_main = (notificationvalue - confirmationvalue) / notificationvalue ///
+    if y2 == 1 & notification == 1 & confirmation == 1 & notificationvalue > 0
+label var W_main "W_main = (notification-confirmation)/notification"
+
+gen W_neg = W_main < 0 if W_main < .
+label var W_neg "Share W_main < 0"
+
+gen W_in_unit = W_main >= 0 & W_main <= 1 if W_main < .
+label var W_in_unit "Share 0 <= W_main <= 1"
+
+gen q32_bad = 10 - q32 if q32 < .
+label var q32_bad "Perceived dishonesty (10-q32)"
+
+local w_sample "q1 != . & W_main < ."
+
+quietly summarize W_main if `w_sample', detail
+local w_p1 = r(p1)
 local w_p95 = r(p95)
+local w_p99 = r(p99)
+local w_median = r(p50)
+local w_mean = r(mean)
+local w_n = r(N)
 
-gen double W_win = W_main
-if `w_n' > 0 {
-    replace W_win = `w_p1'  if W_win < `w_p1'  & W_win < .
-    replace W_win = `w_p99' if W_win > `w_p99' & W_win < .
+gen W_winsor = W_main
+replace W_winsor = `w_p1' if W_winsor < `w_p1' & W_winsor < .
+replace W_winsor = `w_p99' if W_winsor > `w_p99' & W_winsor < .
+label var W_winsor "W_main winsorized at p1/p99"
+
+di as text "W_main estimation sample (q1!=. & W_main!=.): `w_n'"
+di as text "W_main mean: `w_mean'"
+di as text "W_main median (p50): `w_median'"
+di as text "W_main p95: `w_p95'"
+
+************************************
+* DESCRIPTIVE TABLES (ESTTAB TO TEX)
+************************************
+estimates drop _all
+
+* Main descriptive moments for W_main by pooled/full/desk
+quietly estpost summarize W_main if `w_sample', detail
+eststo w_all
+quietly estpost summarize W_main if `w_sample' & x2 == 1, detail
+eststo w_full
+quietly estpost summarize W_main if `w_sample' & x2 == 0, detail
+eststo w_desk
+
+#delim ;
+esttab w_all w_full w_desk
+    using "$output\w_main_descriptive_stats.tex",
+    cells("count(fmt(0)) mean(fmt(3)) sd(fmt(3)) min(fmt(3)) p1(fmt(3)) p5(fmt(3)) p10(fmt(3)) p25(fmt(3)) p50(fmt(3)) p75(fmt(3)) p90(fmt(3)) p95(fmt(3)) p99(fmt(3)) max(fmt(3))")
+    mtitles("All audited survey firms" "Full audits" "Desk audits")
+    label nonumber noobs
+    prehead("") posthead(\hline) postfoot("\hline")
+    replace
+    substitute(\_ _)
+;
+#delim cr
+
+* Shares table for W_main tail sanity checks
+estimates drop _all
+quietly estpost summarize W_neg W_in_unit if `w_sample'
+eststo ws_all
+quietly estpost summarize W_neg W_in_unit if `w_sample' & x2 == 1
+eststo ws_full
+quietly estpost summarize W_neg W_in_unit if `w_sample' & x2 == 0
+eststo ws_desk
+
+#delim ;
+esttab ws_all ws_full ws_desk
+    using "$output\w_main_share_stats.tex",
+    cells("mean(fmt(3)) count(fmt(0))")
+    mtitles("All audited survey firms" "Full audits" "Desk audits")
+    label nonumber noobs
+    prehead("") posthead(\hline) postfoot("\hline")
+    replace
+    substitute(\_ _)
+;
+#delim cr
+
+* W_main moments by selection method groups
+estimates drop _all
+local method_models ""
+local method_titles ""
+foreach m in dgid overlap algorithm random horsprogramme {
+    quietly count if `w_sample' & `m' == 1
+    if r(N) > 0 {
+        quietly estpost summarize W_main if `w_sample' & `m' == 1, detail
+        eststo wm_`m'
+        local method_models "`method_models' wm_`m'"
+        if "`m'" == "dgid" local method_titles `"`method_titles' "Inspectors""'
+        if "`m'" == "overlap" local method_titles `"`method_titles' "Overlap""'
+        if "`m'" == "algorithm" local method_titles `"`method_titles' "Algorithm""'
+        if "`m'" == "random" local method_titles `"`method_titles' "Random""'
+        if "`m'" == "horsprogramme" local method_titles `"`method_titles' "Ad hoc""'
+    }
 }
 
-gen double abs_diff = .
-replace abs_diff = notificationvalue - confirmationvalue if ///
-    sample_main == 1 & notification == 1 & confirmation == 1 & ///
-    notificationvalue > 0 & notificationvalue < . & confirmationvalue < .
-
-gen double abs_diff_mn = abs_diff / 1000000 if abs_diff < .
-
-gen double log_ratio = .
-replace log_ratio = log((notificationvalue + 1) / (confirmationvalue + 1)) if ///
-    sample_main == 1 & notification == 1 & confirmation == 1 & ///
-    notificationvalue >= 0 & confirmationvalue >= 0 & ///
-    notificationvalue < . & confirmationvalue < .
-
-gen byte sample_w = W_main < .
-gen byte confirmed_gt_notified = confirmationvalue > notificationvalue if sample_w == 1
-
-*********************
-** ASSERTIONS/CHECKS
-*********************
-capture assert W_main == . if sample_main == 1 & notificationvalue <= 0 & notificationvalue < .
-if _rc di as error "Warning: W_main nonmissing with nonpositive notificationvalue."
-
-if `w_n' > 0 {
-    capture assert W_win >= `w_p1' & W_win <= `w_p99' if W_win < .
-    if _rc di as error "Warning: W_win outside expected [p1,p99] bounds."
+if "`method_models'" != "" {
+    #delim ;
+    esttab `method_models'
+        using "$output\w_main_descriptive_by_method.tex",
+        cells("count(fmt(0)) mean(fmt(3)) sd(fmt(3)) p25(fmt(3)) p50(fmt(3)) p75(fmt(3)) p95(fmt(3))")
+        mtitles(`method_titles')
+        label nonumber noobs
+        prehead("") posthead(\hline) postfoot("\hline")
+        replace
+        substitute(\_ _)
+    ;
+    #delim cr
 }
 
-***************************
-** DIAGNOSTICS: COUNTS
-***************************
+******************
+* W-MAIN PLOTS
+******************
+preserve
+keep if `w_sample'
+
+histogram W_main, fraction color(navy%35) lcolor(navy) ///
+    xtitle("W_main = (notification - confirmation) / notification") ///
+    ytitle("Fraction") ///
+    title("Distribution of W_main") ///
+    graphregion(color(white))
+graph export "$output\w_main_histogram.pdf", as(pdf) replace
+
+twoway ///
+    (kdensity W_main if x2 == 1, lcolor(navy) lwidth(medthick)) ///
+    (kdensity W_main if x2 == 0, lcolor(orange_red) lpattern(dash) lwidth(medthick)), ///
+    legend(order(1 "Full audits" 2 "Desk audits") pos(6) ring(0) rows(1)) ///
+    xtitle("W_main = (notification - confirmation) / notification") ///
+    ytitle("Density") ///
+    title("W_main density by audit type") ///
+    graphregion(color(white))
+graph export "$output\w_main_density_by_x2.pdf", as(pdf) replace
+
+restore
+
+**************************************
+* REGRESSIONS (ALL TABLES VIA ESTTAB)
+**************************************
+local outcomes "q35 q34 q32_bad q41 evaluation"
+local reg_sample "q1 != . & W_main < ."
+
+foreach y of local outcomes {
+    estimates drop _all
+    local spec = 0
+
+    * Baseline pooled (parsimonious)
+    local ++spec
+    quietly eststo r`spec': reghdfe `y' W_main i.x2 if `reg_sample', vce(robust)
+    quietly summarize `y' if e(sample) == 1
+    estadd scalar meanout = r(mean)
+
+    * Controlled pooled
+    local ++spec
+    quietly eststo r`spec': reghdfe `y' W_main algorithm overlap random horsprogramme i.x2 ///
+        if `reg_sample', a(selectionyear center) vce(robust)
+    quietly summarize `y' if e(sample) == 1
+    estadd scalar meanout = r(mean)
+
+    * Full audits only
+    local ++spec
+    quietly eststo r`spec': reghdfe `y' W_main if `reg_sample' & x2 == 1, vce(robust)
+    quietly summarize `y' if e(sample) == 1
+    estadd scalar meanout = r(mean)
+
+    * Desk audits only
+    local ++spec
+    quietly eststo r`spec': reghdfe `y' W_main if `reg_sample' & x2 == 0, vce(robust)
+    quietly summarize `y' if e(sample) == 1
+    estadd scalar meanout = r(mean)
+
+    * W robustness: winsorized W
+    local ++spec
+    quietly eststo r`spec': reghdfe `y' W_winsor i.x2 if `reg_sample', vce(robust)
+    quietly summarize `y' if e(sample) == 1
+    estadd scalar meanout = r(mean)
+
+    * C5 robustness: ratio d12
+    local ++spec
+    quietly eststo r`spec': reghdfe `y' d12 i.x2 if q1 != . & d12 < ., vce(robust)
+    quietly summarize `y' if e(sample) == 1
+    estadd scalar meanout = r(mean)
+
+    * C5 robustness: log-ratio d11
+    local ++spec
+    quietly eststo r`spec': reghdfe `y' d11 i.x2 if q1 != . & d11 < ., vce(robust)
+    quietly summarize `y' if e(sample) == 1
+    estadd scalar meanout = r(mean)
+
+    #delim ;
+    esttab r1 r2 r3 r4 r5 r6 r7
+        using "$output\w_main_reg_`y'.tex",
+        order(W_main W_winsor d12 d11 1.x2 algorithm overlap random horsprogramme)
+        keep(W_main W_winsor d12 d11 1.x2 algorithm overlap random horsprogramme)
+        label se
+        mtitles("Baseline pooled" "Controlled pooled" "Full only" "Desk only" "Winsor W" "Ratio d12" "Log-ratio d11")
+        s(N r2 meanout, label("N" "R2" "Mean outcome"))
+        star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+        b(%5.3f) se(%5.3f)
+        coeflabels(W_main "W_main" W_winsor "W_main (winsor)" d12 "Confirmation/notification" d11 "log(confirmation/notification)" 1.x2 "Full audit (x2=1)" algorithm "Algorithm" overlap "Inspectors x Overlap" random "Algorithm x Random" horsprogramme "Ad hoc")
+        prehead("") posthead(\hline) postfoot("\hline")
+        replace
+        substitute(\_ _)
+    ;
+    #delim cr
+
+    quietly count if e(sample) == 1
+    di as text "Outcome `y': N in last spec = " r(N)
+}
+
+*****************************
+* FINAL LIGHT DIAGNOSTICS
+*****************************
 quietly count
-local n_total_cases = r(N)
+local n_after_filter = r(N)
+quietly count if `reg_sample'
+local n_reg_sample = r(N)
+quietly count if `reg_sample' & W_main < 0
+local n_wneg = r(N)
 
-quietly count if sample_selected == 1
-local n_selected_cases = r(N)
-tempvar tag_selected
-egen `tag_selected' = tag(firmid) if sample_selected == 1
-quietly count if `tag_selected' == 1
-local n_selected_firms = r(N)
-drop `tag_selected'
-
-quietly count if sample_main == 1
-local n_main_cases = r(N)
-tempvar tag_main
-egen `tag_main' = tag(firmid) if sample_main == 1
-quietly count if `tag_main' == 1
-local n_main_firms = r(N)
-drop `tag_main'
-
-quietly count if sample_w == 1
-local n_w_cases = r(N)
-tempvar tag_w
-egen `tag_w' = tag(firmid) if sample_w == 1
-quietly count if `tag_w' == 1
-local n_w_firms = r(N)
-drop `tag_w'
-
-quietly count if sample_selected == 1 & flagnotification == 1
-local n_flag_selected = r(N)
-
-quietly count if sample_main == 1 & flagnotification == 1
-local n_flag_main = r(N)
-
-tempvar n_case_per_firm_w
-bysort firmid: egen `n_case_per_firm_w' = total(sample_w)
-quietly count if sample_w == 1 & `n_case_per_firm_w' > 1
-local n_w_repeat_cases = r(N)
-tempvar tag_w_repeat
-egen `tag_w_repeat' = tag(firmid) if sample_w == 1 & `n_case_per_firm_w' > 1
-quietly count if `tag_w_repeat' == 1
-local n_w_repeat_firms = r(N)
-drop `n_case_per_firm_w' `tag_w_repeat'
-
-quietly summarize confirmed_gt_notified if sample_w == 1, meanonly
-local share_confirmed_gt_notified = r(mean)
-
-local outcomes_bribe "q34 q35 q32 q42"
-local outcomes_dissat "q41 evaluation"
-local outcomes_all "`outcomes_bribe' `outcomes_dissat'"
-
-foreach y of local outcomes_all {
-    quietly count if sample_main == 1 & `y' < .
-    local n_x_case_`y' = r(N)
-    tempvar tag_x
-    egen `tag_x' = tag(firmid) if sample_main == 1 & `y' < .
-    quietly count if `tag_x' == 1
-    local n_x_firm_`y' = r(N)
-    drop `tag_x'
-
-    quietly count if sample_w == 1 & `y' < .
-    local n_xw_case_`y' = r(N)
-    tempvar tag_xw
-    egen `tag_xw' = tag(firmid) if sample_w == 1 & `y' < .
-    quietly count if `tag_xw' == 1
-    local n_xw_firm_`y' = r(N)
-    drop `tag_xw'
-}
-
-***************************
-** MAIN REGRESSIONS
-***************************
-capture which reghdfe
-if _rc {
-    di as error "reghdfe is required but not installed."
-    exit 199
-}
-
-local controls "algorithm overlap random horsprogramme"
-
-foreach y of local outcomes_all {
-    * Full baseline
-    capture noisily reghdfe `y' W_main if sample_main == 1 & x2 == 1, ///
-        a(controlbureauannee) vce(cluster controlbureauannee)
-    if _rc == 0 {
-        local b_`y'_fb  = _b[W_main]
-        local se_`y'_fb = _se[W_main]
-        local p_`y'_fb  = 2*ttail(e(df_r), abs(`b_`y'_fb'/`se_`y'_fb'))
-        quietly count if e(sample)
-        local n_`y'_fb = r(N)
-        tempvar tag_reg
-        egen `tag_reg' = tag(firmid) if e(sample)
-        quietly count if `tag_reg' == 1
-        local nf_`y'_fb = r(N)
-        drop `tag_reg'
-    }
-    else {
-        local b_`y'_fb = .
-        local se_`y'_fb = .
-        local p_`y'_fb = .
-        local n_`y'_fb = .
-        local nf_`y'_fb = .
-    }
-
-    * Full controls
-    capture noisily reghdfe `y' W_main `controls' if sample_main == 1 & x2 == 1, ///
-        a(controlbureauannee) vce(cluster controlbureauannee)
-    if _rc == 0 {
-        local b_`y'_fc  = _b[W_main]
-        local se_`y'_fc = _se[W_main]
-        local p_`y'_fc  = 2*ttail(e(df_r), abs(`b_`y'_fc'/`se_`y'_fc'))
-        quietly count if e(sample)
-        local n_`y'_fc = r(N)
-        tempvar tag_reg
-        egen `tag_reg' = tag(firmid) if e(sample)
-        quietly count if `tag_reg' == 1
-        local nf_`y'_fc = r(N)
-        drop `tag_reg'
-    }
-    else {
-        local b_`y'_fc = .
-        local se_`y'_fc = .
-        local p_`y'_fc = .
-        local n_`y'_fc = .
-        local nf_`y'_fc = .
-    }
-
-    * Desk baseline
-    capture noisily reghdfe `y' W_main if sample_main == 1 & x2 == 0, ///
-        a(inspectorclusteryear) vce(robust)
-    if _rc == 0 {
-        local b_`y'_db  = _b[W_main]
-        local se_`y'_db = _se[W_main]
-        local p_`y'_db  = 2*ttail(e(df_r), abs(`b_`y'_db'/`se_`y'_db'))
-        quietly count if e(sample)
-        local n_`y'_db = r(N)
-        tempvar tag_reg
-        egen `tag_reg' = tag(firmid) if e(sample)
-        quietly count if `tag_reg' == 1
-        local nf_`y'_db = r(N)
-        drop `tag_reg'
-    }
-    else {
-        local b_`y'_db = .
-        local se_`y'_db = .
-        local p_`y'_db = .
-        local n_`y'_db = .
-        local nf_`y'_db = .
-    }
-
-    * Desk controls
-    capture noisily reghdfe `y' W_main `controls' if sample_main == 1 & x2 == 0, ///
-        a(inspectorclusteryear) vce(robust)
-    if _rc == 0 {
-        local b_`y'_dc  = _b[W_main]
-        local se_`y'_dc = _se[W_main]
-        local p_`y'_dc  = 2*ttail(e(df_r), abs(`b_`y'_dc'/`se_`y'_dc'))
-        quietly count if e(sample)
-        local n_`y'_dc = r(N)
-        tempvar tag_reg
-        egen `tag_reg' = tag(firmid) if e(sample)
-        quietly count if `tag_reg' == 1
-        local nf_`y'_dc = r(N)
-        drop `tag_reg'
-    }
-    else {
-        local b_`y'_dc = .
-        local se_`y'_dc = .
-        local p_`y'_dc = .
-        local n_`y'_dc = .
-        local nf_`y'_dc = .
-    }
-}
-
-***************************
-** ROBUSTNESS REGRESSIONS
-***************************
-foreach y of local outcomes_all {
-    * Pooled FE controls with alternative discrepancy metrics
-    capture noisily reghdfe `y' W_main `controls' i.x2 if sample_main == 1, ///
-        a(selectionyear center) vce(robust)
-    if _rc == 0 {
-        local rb_`y'_m1  = _b[W_main]
-        local rse_`y'_m1 = _se[W_main]
-        local rp_`y'_m1  = 2*ttail(e(df_r), abs(`rb_`y'_m1'/`rse_`y'_m1'))
-        quietly count if e(sample)
-        local rn_`y'_m1 = r(N)
-    }
-    else {
-        local rb_`y'_m1 = .
-        local rse_`y'_m1 = .
-        local rp_`y'_m1 = .
-        local rn_`y'_m1 = .
-    }
-
-    capture noisily reghdfe `y' W_win `controls' i.x2 if sample_main == 1, ///
-        a(selectionyear center) vce(robust)
-    if _rc == 0 {
-        local rb_`y'_m2  = _b[W_win]
-        local rse_`y'_m2 = _se[W_win]
-        local rp_`y'_m2  = 2*ttail(e(df_r), abs(`rb_`y'_m2'/`rse_`y'_m2'))
-        quietly count if e(sample)
-        local rn_`y'_m2 = r(N)
-    }
-    else {
-        local rb_`y'_m2 = .
-        local rse_`y'_m2 = .
-        local rp_`y'_m2 = .
-        local rn_`y'_m2 = .
-    }
-
-    capture noisily reghdfe `y' abs_diff_mn `controls' i.x2 if sample_main == 1, ///
-        a(selectionyear center) vce(robust)
-    if _rc == 0 {
-        local rb_`y'_m3  = _b[abs_diff_mn]
-        local rse_`y'_m3 = _se[abs_diff_mn]
-        local rp_`y'_m3  = 2*ttail(e(df_r), abs(`rb_`y'_m3'/`rse_`y'_m3'))
-        quietly count if e(sample)
-        local rn_`y'_m3 = r(N)
-    }
-    else {
-        local rb_`y'_m3 = .
-        local rse_`y'_m3 = .
-        local rp_`y'_m3 = .
-        local rn_`y'_m3 = .
-    }
-
-    capture noisily reghdfe `y' log_ratio `controls' i.x2 if sample_main == 1, ///
-        a(selectionyear center) vce(robust)
-    if _rc == 0 {
-        local rb_`y'_m4  = _b[log_ratio]
-        local rse_`y'_m4 = _se[log_ratio]
-        local rp_`y'_m4  = 2*ttail(e(df_r), abs(`rb_`y'_m4'/`rse_`y'_m4'))
-        quietly count if e(sample)
-        local rn_`y'_m4 = r(N)
-    }
-    else {
-        local rb_`y'_m4 = .
-        local rse_`y'_m4 = .
-        local rp_`y'_m4 = .
-        local rn_`y'_m4 = .
-    }
-
-    capture noisily reghdfe `y' c.W_main##i.x2 `controls' if sample_main == 1, ///
-        a(selectionyear center) vce(robust)
-    if _rc == 0 {
-        local rb_`y'_m5_main  = _b[c.W_main]
-        local rse_`y'_m5_main = _se[c.W_main]
-        local rp_`y'_m5_main  = 2*ttail(e(df_r), abs(`rb_`y'_m5_main'/`rse_`y'_m5_main'))
-        local rb_`y'_m5_int   = _b[1.x2#c.W_main]
-        local rse_`y'_m5_int  = _se[1.x2#c.W_main]
-        local rp_`y'_m5_int   = 2*ttail(e(df_r), abs(`rb_`y'_m5_int'/`rse_`y'_m5_int'))
-        quietly count if e(sample)
-        local rn_`y'_m5 = r(N)
-    }
-    else {
-        local rb_`y'_m5_main = .
-        local rse_`y'_m5_main = .
-        local rp_`y'_m5_main = .
-        local rb_`y'_m5_int = .
-        local rse_`y'_m5_int = .
-        local rp_`y'_m5_int = .
-        local rn_`y'_m5 = .
-    }
-}
-
-***************************
-** HELPERS FOR FORMATTING
-***************************
-capture program drop _fmtcoef
-program define _fmtcoef, rclass
-    args b se p
-    if missing(`b') | missing(`se') {
-        return local bstr "."
-        return local sestr "(.)"
-        exit
-    }
-    local stars ""
-    if `p' < 0.10 local stars "*"
-    if `p' < 0.05 local stars "**"
-    if `p' < 0.01 local stars "***"
-    local bstr : display %9.3f `b'
-    local sestr : display %9.3f `se'
-    return local bstr "`bstr'`stars'"
-    return local sestr "(`sestr')"
-end
-
-************************************
-** EXPORT MAIN LATEX TABLE (PANELS)
-************************************
-local maintex "`outtables'\6_corruption_discrepancy_main.tex"
-cap erase "`maintex'"
-file open fmain using "`maintex'", write replace text
-
-file write fmain "\begin{tabular}{lcccc}" _n
-file write fmain "\hline" _n
-file write fmain " & Full baseline & Full + controls & Desk baseline & Desk + controls \\\\" _n
-file write fmain "\hline" _n
-file write fmain "\multicolumn{5}{l}{\textit{Panel A: Bribe/corruption outcomes}} \\\\" _n
-
-foreach y in q34 q35 q32 q42 {
-    local ylab "`y'"
-    if "`y'" == "q34" local ylab "q34: Informal payment share perception"
-    if "`y'" == "q35" local ylab "q35: Ever informal payment (binary)"
-    if "`y'" == "q32" local ylab "q32: Inspector honesty rating"
-    if "`y'" == "q42" local ylab "q42: Agreement with DGID-connection statement"
-
-    quietly _fmtcoef `b_`y'_fb' `se_`y'_fb' `p_`y'_fb'
-    local c1 = r(bstr)
-    local s1 = r(sestr)
-    quietly _fmtcoef `b_`y'_fc' `se_`y'_fc' `p_`y'_fc'
-    local c2 = r(bstr)
-    local s2 = r(sestr)
-    quietly _fmtcoef `b_`y'_db' `se_`y'_db' `p_`y'_db'
-    local c3 = r(bstr)
-    local s3 = r(sestr)
-    quietly _fmtcoef `b_`y'_dc' `se_`y'_dc' `p_`y'_dc'
-    local c4 = r(bstr)
-    local s4 = r(sestr)
-
-    file write fmain "`ylab' \\\\" _n
-    file write fmain "W main & `c1' & `c2' & `c3' & `c4' \\\\" _n
-    file write fmain " & `s1' & `s2' & `s3' & `s4' \\\\" _n
-    file write fmain "N & `n_`y'_fb' & `n_`y'_fc' & `n_`y'_db' & `n_`y'_dc' \\\\" _n
-    file write fmain "Unique firms & `nf_`y'_fb' & `nf_`y'_fc' & `nf_`y'_db' & `nf_`y'_dc' \\\\" _n
-    file write fmain "\hline" _n
-}
-
-file write fmain "\multicolumn{5}{l}{\textit{Panel B: Dissatisfaction outcomes}} \\\\" _n
-
-foreach y in q41 evaluation {
-    local ylab "`y'"
-    if "`y'" == "q41" local ylab "q41: Inspectors discover all hidden amounts (agreement)"
-    if "`y'" == "evaluation" local ylab "evaluation: mean(q31,q32,q33)"
-
-    quietly _fmtcoef `b_`y'_fb' `se_`y'_fb' `p_`y'_fb'
-    local c1 = r(bstr)
-    local s1 = r(sestr)
-    quietly _fmtcoef `b_`y'_fc' `se_`y'_fc' `p_`y'_fc'
-    local c2 = r(bstr)
-    local s2 = r(sestr)
-    quietly _fmtcoef `b_`y'_db' `se_`y'_db' `p_`y'_db'
-    local c3 = r(bstr)
-    local s3 = r(sestr)
-    quietly _fmtcoef `b_`y'_dc' `se_`y'_dc' `p_`y'_dc'
-    local c4 = r(bstr)
-    local s4 = r(sestr)
-
-    file write fmain "`ylab' \\\\" _n
-    file write fmain "W main & `c1' & `c2' & `c3' & `c4' \\\\" _n
-    file write fmain " & `s1' & `s2' & `s3' & `s4' \\\\" _n
-    file write fmain "N & `n_`y'_fb' & `n_`y'_fc' & `n_`y'_db' & `n_`y'_dc' \\\\" _n
-    file write fmain "Unique firms & `nf_`y'_fb' & `nf_`y'_fc' & `nf_`y'_db' & `nf_`y'_dc' \\\\" _n
-    file write fmain "\hline" _n
-}
-
-file write fmain "\multicolumn{5}{l}{\footnotesize Notes: W main = (notification - confirmation)/notification. Main sample: selection==1, safeties==0, y2==1. Full specs cluster by controlbureauannee. Desk specs use robust SE.} \\\\" _n
-file write fmain "\end{tabular}" _n
-file close fmain
-
-*****************************************
-** EXPORT ROBUSTNESS LATEX TABLE
-*****************************************
-local robtex "`outtables'\6_corruption_discrepancy_robustness.tex"
-cap erase "`robtex'"
-file open frob using "`robtex'", write replace text
-
-file write frob "\begin{tabular}{lccccc}" _n
-file write frob "\hline" _n
-file write frob " & W main & W winsor(1,99) & Abs diff (M FCFA) & Log ratio & W main + W main x Desk \\\\" _n
-file write frob "\hline" _n
-
-foreach y of local outcomes_all {
-    local ylab "`y'"
-    if "`y'" == "q34" local ylab "q34"
-    if "`y'" == "q35" local ylab "q35"
-    if "`y'" == "q32" local ylab "q32"
-    if "`y'" == "q42" local ylab "q42"
-    if "`y'" == "q41" local ylab "q41"
-    if "`y'" == "evaluation" local ylab "evaluation"
-
-    quietly _fmtcoef `rb_`y'_m1' `rse_`y'_m1' `rp_`y'_m1'
-    local c1 = r(bstr)
-    local s1 = r(sestr)
-    quietly _fmtcoef `rb_`y'_m2' `rse_`y'_m2' `rp_`y'_m2'
-    local c2 = r(bstr)
-    local s2 = r(sestr)
-    quietly _fmtcoef `rb_`y'_m3' `rse_`y'_m3' `rp_`y'_m3'
-    local c3 = r(bstr)
-    local s3 = r(sestr)
-    quietly _fmtcoef `rb_`y'_m4' `rse_`y'_m4' `rp_`y'_m4'
-    local c4 = r(bstr)
-    local s4 = r(sestr)
-    quietly _fmtcoef `rb_`y'_m5_main' `rse_`y'_m5_main' `rp_`y'_m5_main'
-    local c5 = r(bstr)
-    local s5 = r(sestr)
-    quietly _fmtcoef `rb_`y'_m5_int' `rse_`y'_m5_int' `rp_`y'_m5_int'
-    local cint = r(bstr)
-    local sint = r(sestr)
-
-    file write frob "`ylab' \\\\" _n
-    file write frob "Main coeff & `c1' & `c2' & `c3' & `c4' & `c5' \\\\" _n
-    file write frob " & `s1' & `s2' & `s3' & `s4' & `s5' \\\\" _n
-    file write frob "Interaction (Desk x W main) &  &  &  &  & `cint' \\\\" _n
-    file write frob " &  &  &  &  & `sint' \\\\" _n
-    file write frob "N & `rn_`y'_m1' & `rn_`y'_m2' & `rn_`y'_m3' & `rn_`y'_m4' & `rn_`y'_m5' \\\\" _n
-    file write frob "\hline" _n
-}
-
-file write frob "\multicolumn{6}{l}{\footnotesize Pooled FE specs absorb selectionyear and center, with controls algorithm overlap random horsprogramme and i.x2 where applicable.} \\\\" _n
-file write frob "\end{tabular}" _n
-file close frob
-
-*****************************************
-** EXPORT MERGE/DIAGNOSTIC LATEX TABLE
-*****************************************
-local diagtex "`outtables'\6_corruption_merge_diagnostics.tex"
-cap erase "`diagtex'"
-file open fdiag using "`diagtex'", write replace text
-
-file write fdiag "\begin{tabular}{lrr}" _n
-file write fdiag "\hline" _n
-file write fdiag "Step & Cases & Unique firms \\\\" _n
-file write fdiag "\hline" _n
-file write fdiag "All observations in datasetforanalysis & `n_total_cases' & . \\\\" _n
-file write fdiag "Selected non-safety cases (selection==1, safeties==0) & `n_selected_cases' & `n_selected_firms' \\\\" _n
-file write fdiag "Main analysis sample (+ y2==1) & `n_main_cases' & `n_main_firms' \\\\" _n
-file write fdiag "W main nonmissing & `n_w_cases' & `n_w_firms' \\\\" _n
-file write fdiag "Flag-notification cases in selected sample & `n_flag_selected' & . \\\\" _n
-file write fdiag "Flag-notification cases in main sample & `n_flag_main' & . \\\\" _n
-file write fdiag "W sample cases in repeated firms & `n_w_repeat_cases' & `n_w_repeat_firms' \\\\" _n
-file write fdiag "\hline" _n
-file write fdiag "\multicolumn{3}{l}{Outcome availability in main sample and after requiring W main} \\\\" _n
-file write fdiag "q34 & `n_x_case_q34' / `n_xw_case_q34' & `n_x_firm_q34' / `n_xw_firm_q34' \\\\" _n
-file write fdiag "q35 & `n_x_case_q35' / `n_xw_case_q35' & `n_x_firm_q35' / `n_xw_firm_q35' \\\\" _n
-file write fdiag "q32 & `n_x_case_q32' / `n_xw_case_q32' & `n_x_firm_q32' / `n_xw_firm_q32' \\\\" _n
-file write fdiag "q42 & `n_x_case_q42' / `n_xw_case_q42' & `n_x_firm_q42' / `n_xw_firm_q42' \\\\" _n
-file write fdiag "q41 & `n_x_case_q41' / `n_xw_case_q41' & `n_x_firm_q41' / `n_xw_firm_q41' \\\\" _n
-file write fdiag "evaluation & `n_x_case_evaluation' / `n_xw_case_evaluation' & `n_x_firm_evaluation' / `n_xw_firm_evaluation' \\\\" _n
-file write fdiag "\hline" _n
-file write fdiag "\multicolumn{3}{l}{\footnotesize Entries of the form A/B denote nonmissing outcome counts in main sample / in W-nonmissing sample.} \\\\" _n
-file write fdiag "\multicolumn{3}{l}{\footnotesize Share(confirmation > notification) in W sample = `share_confirmed_gt_notified'.} \\\\" _n
-file write fdiag "\end{tabular}" _n
-file close fdiag
-
-*****************************************
-** DATA PROCESSING NOTE (TEXT)
-*****************************************
-local notefile "`outtables'\6_corruption_data_processing_note.txt"
-cap erase "`notefile'"
-file open fnote using "`notefile'", write replace text
-
-file write fnote "Data processing note: discrepancy-corruption sub-analysis" _n
-file write fnote "Date: `c(current_date)'" _n
-file write fnote "" _n
-file write fnote "Admin amount variables used for W:" _n
-file write fnote "- notificationvalue, confirmationvalue, notification, confirmation, y2, flagnotification." _n
-file write fnote "- Upstream cleaning (from dataset construction): negative components set to missing; components winsorized at p99 by bureau; totals built as rowtotals." _n
-file write fnote "- Replacement rule retained in main analysis: if notification total is zero and confirmation > 0, notification total is replaced with confirmation total and flagnotification=1." _n
-file write fnote "" _n
-file write fnote "Survey outcomes used for X:" _n
-file write fnote "- Bribe/corruption: q34 q35 q32 q42." _n
-file write fnote "- Dissatisfaction/experience: q41 evaluation." _n
-file write fnote "- Cleaning inherited from dataset construction: special codes {99,999,9999,99999,0.999} recoded to missing; q35 recoded to binary with 0->missing, 1->0, 2->1; for q40-q44, value 1 ('do not know') recoded to missing." _n
-file write fnote "" _n
-file write fnote "Current run sample accounting (cases):" _n
-file write fnote "- selected non-safety: `n_selected_cases'" _n
-file write fnote "- main (conducted) sample: `n_main_cases'" _n
-file write fnote "- W nonmissing sample: `n_w_cases'" _n
-file write fnote "" _n
-file write fnote "W distribution diagnostics (W nonmissing sample):" _n
-file write fnote "- N = `w_n'" _n
-file write fnote "- p1 = `w_p1', p5 = `w_p5', p50 = `w_p50', p95 = `w_p95', p99 = `w_p99'" _n
-file write fnote "- share(confirmation > notification) = `share_confirmed_gt_notified'" _n
-file close fnote
-
-*****************************************
-** LOG SUMMARY
-*****************************************
-di "======================================================="
-di "Corruption discrepancy analysis completed."
-di "Main table: `maintex'"
-di "Robustness table: `robtex'"
-di "Diagnostics table: `diagtex'"
-di "Data processing note: `notefile'"
-di "Main sample cases (selection==1 & safeties==0 & y2==1): `n_main_cases'"
-di "W nonmissing cases: `n_w_cases'"
-di "======================================================="
-
+di as text "N after base + recent filters: `n_after_filter'"
+di as text "N regression sample (q1!=. & W_main!=.): `n_reg_sample'"
+di as text "N with W_main < 0 in regression sample: `n_wneg'"

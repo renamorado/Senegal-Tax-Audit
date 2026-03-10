@@ -94,7 +94,7 @@ foreach audtype in 1 0 {
 
 		* x-axis title
 		if "`b'" == "yhatrf" {
-			local xti "Evasion (log FCFA)"
+			local xti "Predicted evasion (log FCFA)"
 		}
 		else if "`b'" == "turnover_mean" {
 			local xti "Firm Size (Mean turnover 2014-2020)"
@@ -116,12 +116,28 @@ foreach audtype in 1 0 {
 			if "`bin_def'" == "decile" {
 				bysort algorithm: egen bin_`b' = xtile(`b'), nq(10)
 				bysort algorithm bin_`b': egen mid_bin_`b' = mean(`b')
+				local nq = 10
+				local bin_family "quantile"
 				local bin_tag "decile"
+				if "`b'" == "yhatrf" {
+					local xti_bin "Decile of Predicted evasion (log FCFA)"
+				}
+				else if "`b'" == "turnover_mean" {
+					local xti_bin "Decile of Firm Size (Mean turnover 2014-2020)"
+				}
 			}
 			else if "`bin_def'" == "quintile" {
 				bysort algorithm: egen bin_`b' = xtile(`b'), nq(5)
 				bysort algorithm bin_`b': egen mid_bin_`b' = mean(`b')
+				local nq = 5
+				local bin_family "quantile"
 				local bin_tag "quintile"
+				if "`b'" == "yhatrf" {
+					local xti_bin "Quintile of Predicted evasion (log FCFA)"
+				}
+				else if "`b'" == "turnover_mean" {
+					local xti_bin "Quintile of Firm Size (Mean turnover 2014-2020)"
+				}
 			}
 			else {
 				* --- FIXED-WIDTH BINS ---
@@ -134,7 +150,14 @@ foreach audtype in 1 0 {
 				replace bin_`b' = max_v_`b' if bin_`b' > max_v_`b'
 				gen mid_bin_`b' = bin_`b' + (`w'/2)
 				drop min_raw_`b' max_raw_`b' min_v_`b' max_v_`b'
+				local bin_family "fixed"
 				local bin_tag "`w'u"
+				if "`b'" == "yhatrf" {
+					local xti_bin "Bins of Predicted evasion (log FCFA), width = `w'"
+				}
+				else if "`b'" == "turnover_mean" {
+					local xti_bin "Bins of Firm Size (Mean turnover 2014-2020), width = `w'"
+				}
 			}
 
 			********************************************************************************
@@ -160,23 +183,56 @@ foreach audtype in 1 0 {
 				replace ci_lower_y2 = 0 if !missing(ci_lower_y2) & ci_lower_y2 < 0
 				replace ci_upper_y2 = 1 if !missing(ci_upper_y2) & ci_upper_y2 > 1
 
-				local xvar "mid_bin_`b'"
-				if inlist("`bin_def'","decile","quintile") {
-					local xvar "bin_`b'"
-				}
+				local xlbl ""
+				local xscale_opt ""
 
-				if "`b'"=="yhatrf" & !inlist("`bin_def'","decile","quintile") {
-					quietly count if `xvar' >= `tail_cut'
-					if r(N) == 0 {
-						restore
-						continue
-					}
-					local plot_if_alg "if algorithm==1 & `xvar'>=`tail_cut'"
-					local plot_if_ins "if algorithm==0 & `xvar'>=`tail_cut'"
-				}
-				else {
+				if "`bin_family'" == "quantile" {
+					local xvar "bin_`b'"
+					if "`bin_def'" == "decile" local xlbl "1(1)10"
+					else local xlbl "1(1)5"
+					local xscale_opt "xscale(range(1 `nq') noextend)"
 					local plot_if_alg "if algorithm==1"
 					local plot_if_ins "if algorithm==0"
+					local sample_if ""
+				}
+				else {
+					local xvar "mid_bin_`b'"
+					if "`b'"=="yhatrf" {
+						levelsof bin_`b' if mid_bin_`b' >= `tail_cut', local(bin_levels_exec)
+					}
+					else {
+						levelsof bin_`b', local(bin_levels_exec)
+					}
+					foreach k of local bin_levels_exec {
+						local lower = `k'
+						local upper = `k' + `w'
+						quietly summarize mid_bin_`b' if bin_`b'==`k', meanonly
+						local m = r(mean)
+						local lower_lbl = string(`lower',"%9.0f")
+						local upper_lbl = string(`upper',"%9.0f")
+						local xlbl `"`xlbl' `m' "`lower_lbl'-`upper_lbl'""'
+					}
+
+					if "`b'"=="yhatrf" {
+						quietly count if `xvar' >= `tail_cut'
+						if r(N) == 0 {
+							restore
+							continue
+						}
+						local plot_if_alg "if algorithm==1 & `xvar'>=`tail_cut'"
+						local plot_if_ins "if algorithm==0 & `xvar'>=`tail_cut'"
+						local sample_if "if `xvar'>=`tail_cut'"
+					}
+					else {
+						local plot_if_alg "if algorithm==1"
+						local plot_if_ins "if algorithm==0"
+						local sample_if ""
+					}
+
+					quietly summarize `xvar' `sample_if', meanonly
+					local xlo = r(min)
+					local xhi = r(max)
+					local xscale_opt "xscale(range(`xlo' `xhi') noextend)"
 				}
 
 				local col_alg "#0072B2"
@@ -186,6 +242,13 @@ foreach audtype in 1 0 {
 				local pat_alg "solid"
 				local pat_ins "dash"
 
+				quietly summarize ci_upper_y2 `sample_if', meanonly
+				local y_top_y2 = r(max)
+				if missing(`y_top_y2') | `y_top_y2' <= 0 local y_top_y2 = 0.2
+				local y_step_y2 = cond(`y_top_y2'<=0.5,0.1,0.2)
+				local y_top_y2 = ceil(`y_top_y2'/`y_step_y2')*`y_step_y2'
+				if `y_top_y2' > 1 local y_top_y2 = 1
+				local y_ticks_y2 "0(`y_step_y2')`y_top_y2'"
 				twoway ///
 					(rarea ci_upper_y2 ci_lower_y2 `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
@@ -207,10 +270,11 @@ foreach audtype in 1 0 {
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///
-					xlabel(, angle(45) labsize(vsmall)) ///
-					yscale(range(0 1)) ///
-					ylabel(0(0.2)1, format(%3.1f) angle(horizontal)) ///
-					ytitle("Share of executed cases") xtitle("`xti'") ///
+					xlabel(`xlbl', angle(45) labsize(vsmall) nogrid) ///
+					`xscale_opt' ///
+					yscale(range(0 `y_top_y2')) ///
+					ylabel(`y_ticks_y2', format(%3.1f) angle(horizontal) nogrid) ///
+					ytitle("Share of executed cases") xtitle("`xti_bin'") ///
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
@@ -248,25 +312,56 @@ foreach audtype in 1 0 {
 				********************************************************************************
 				** X labels
 				********************************************************************************
-				local xvar "mid_bin_`b'"
+				local xlbl ""
+				local xscale_opt ""
 
-				* For quantiles (decile/quintile): plot against bin index (1..K)
-				if inlist("`bin_def'","decile","quintile") {
+				if "`bin_family'" == "quantile" {
 					local xvar "bin_`b'"
-				}
-
-				if "`b'"=="yhatrf" & !inlist("`bin_def'","decile","quintile") {
-					quietly count if `xvar' >= `tail_cut'
-					if r(N) == 0 {
-						restore
-						continue
-					}
-					local plot_if_alg "if algorithm==1 & `xvar'>=`tail_cut'"
-					local plot_if_ins "if algorithm==0 & `xvar'>=`tail_cut'"
-				}
-				else {
+					if "`bin_def'" == "decile" local xlbl "1(1)10"
+					else local xlbl "1(1)5"
+					local xscale_opt "xscale(range(1 `nq') noextend)"
 					local plot_if_alg "if algorithm==1"
 					local plot_if_ins "if algorithm==0"
+					local sample_if ""
+				}
+				else {
+					local xvar "mid_bin_`b'"
+					if "`b'"=="yhatrf" {
+						levelsof bin_`b' if mid_bin_`b' >= `tail_cut', local(bin_levels)
+					}
+					else {
+						levelsof bin_`b', local(bin_levels)
+					}
+					foreach k of local bin_levels {
+						local lower = `k'
+						local upper = `k' + `w'
+						quietly summarize mid_bin_`b' if bin_`b'==`k', meanonly
+						local m = r(mean)
+						local lower_lbl = string(`lower',"%9.0f")
+						local upper_lbl = string(`upper',"%9.0f")
+						local xlbl `"`xlbl' `m' "`lower_lbl'-`upper_lbl'""'
+					}
+
+					if "`b'"=="yhatrf" {
+						quietly count if `xvar' >= `tail_cut'
+						if r(N) == 0 {
+							restore
+							continue
+						}
+						local plot_if_alg "if algorithm==1 & `xvar'>=`tail_cut'"
+						local plot_if_ins "if algorithm==0 & `xvar'>=`tail_cut'"
+						local sample_if "if `xvar'>=`tail_cut'"
+					}
+					else {
+						local plot_if_alg "if algorithm==1"
+						local plot_if_ins "if algorithm==0"
+						local sample_if ""
+					}
+
+					quietly summarize `xvar' `sample_if', meanonly
+					local xlo = r(min)
+					local xhi = r(max)
+					local xscale_opt "xscale(range(`xlo' `xhi') noextend)"
 				}
 
 				********************************************************************************
@@ -286,6 +381,12 @@ foreach audtype in 1 0 {
 				********************************************************************************
 				** (1) Avg number of inspectors
 				********************************************************************************
+				quietly summarize ci_upper_ninspectors `sample_if', meanonly
+				local y_top_ninspectors = r(max)
+				if missing(`y_top_ninspectors') | `y_top_ninspectors' <= 0 local y_top_ninspectors = 0.2
+				local y_step_ninspectors = cond(`y_top_ninspectors'<=1,0.1,cond(`y_top_ninspectors'<=2,0.2,cond(`y_top_ninspectors'<=4,0.5,1)))
+				local y_top_ninspectors = ceil(`y_top_ninspectors'/`y_step_ninspectors')*`y_step_ninspectors'
+				local y_ticks_ninspectors "0(`y_step_ninspectors')`y_top_ninspectors'"
 				twoway ///
 					(rarea ci_upper_ninspectors ci_lower_ninspectors `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
@@ -307,10 +408,11 @@ foreach audtype in 1 0 {
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///
-					xlabel(, angle(45) labsize(vsmall)) ///
-					yscale(range(0 .)) ///
-					ylabel(, angle(horizontal)) ///
-					ytitle("Average number of inspectors") xtitle("`xti'") ///
+					xlabel(`xlbl', angle(45) labsize(vsmall) nogrid) ///
+					`xscale_opt' ///
+					yscale(range(0 `y_top_ninspectors')) ///
+					ylabel(`y_ticks_ninspectors', format(%3.1f) angle(horizontal) nogrid) ///
+					ytitle("Average number of inspectors") xtitle("`xti_bin'") ///
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
@@ -319,6 +421,12 @@ foreach audtype in 1 0 {
 				********************************************************************************
 				** (2) Duration (Admin data) y19
 				********************************************************************************
+				quietly summarize ci_upper_y19 `sample_if', meanonly
+				local y_top_y19 = r(max)
+				if missing(`y_top_y19') | `y_top_y19' <= 0 local y_top_y19 = 1
+				local y_step_y19 = cond(`y_top_y19'<=10,1,cond(`y_top_y19'<=20,2,cond(`y_top_y19'<=50,5,cond(`y_top_y19'<=100,10,20))))
+				local y_top_y19 = ceil(`y_top_y19'/`y_step_y19')*`y_step_y19'
+				local y_ticks_y19 "0(`y_step_y19')`y_top_y19'"
 				twoway ///
 					(rarea ci_upper_y19 ci_lower_y19 `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
@@ -340,9 +448,11 @@ foreach audtype in 1 0 {
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///
-					xlabel(, angle(45) labsize(vsmall)) ///
-					yscale(range(0 .)) ylabel(0, add) ///
-					ytitle("Average duration (days)") xtitle("`xti'") ///
+					xlabel(`xlbl', angle(45) labsize(vsmall) nogrid) ///
+					`xscale_opt' ///
+					yscale(range(0 `y_top_y19')) ///
+					ylabel(`y_ticks_y19', angle(horizontal) nogrid) ///
+					ytitle("Average duration (days)") xtitle("`xti_bin'") ///
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
@@ -351,6 +461,12 @@ foreach audtype in 1 0 {
 				********************************************************************************
 				** (3) Duration (Taxpayer survey) q30
 				********************************************************************************
+				quietly summarize ci_upper_q30 `sample_if', meanonly
+				local y_top_q30 = r(max)
+				if missing(`y_top_q30') | `y_top_q30' <= 0 local y_top_q30 = 1
+				local y_step_q30 = cond(`y_top_q30'<=10,1,cond(`y_top_q30'<=20,2,cond(`y_top_q30'<=50,5,cond(`y_top_q30'<=100,10,20))))
+				local y_top_q30 = ceil(`y_top_q30'/`y_step_q30')*`y_step_q30'
+				local y_ticks_q30 "0(`y_step_q30')`y_top_q30'"
 				twoway ///
 					(rarea ci_upper_q30 ci_lower_q30 `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
@@ -372,9 +488,11 @@ foreach audtype in 1 0 {
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///
-					xlabel(, angle(45) labsize(vsmall)) ///
-					yscale(range(0 .)) ylabel(0, add) ///
-					ytitle("Average duration (days)") xtitle("`xti'") ///
+					xlabel(`xlbl', angle(45) labsize(vsmall) nogrid) ///
+					`xscale_opt' ///
+					yscale(range(0 `y_top_q30')) ///
+                    ylabel(`y_ticks_q30', angle(horizontal) nogrid) ///
+					ytitle("Average duration (days)") xtitle("`xti_bin'") ///
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
@@ -383,6 +501,12 @@ foreach audtype in 1 0 {
 				********************************************************************************
 				** (4) Duration (Self-reported) y8
 				********************************************************************************
+				quietly summarize ci_upper_y8 `sample_if', meanonly
+				local y_top_y8 = r(max)
+				if missing(`y_top_y8') | `y_top_y8' <= 0 local y_top_y8 = 1
+				local y_step_y8 = cond(`y_top_y8'<=10,1,cond(`y_top_y8'<=20,2,cond(`y_top_y8'<=50,5,cond(`y_top_y8'<=100,10,20))))
+				local y_top_y8 = ceil(`y_top_y8'/`y_step_y8')*`y_step_y8'
+				local y_ticks_y8 "0(`y_step_y8')`y_top_y8'"
 				twoway ///
 					(rarea ci_upper_y8 ci_lower_y8 `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
@@ -404,9 +528,11 @@ foreach audtype in 1 0 {
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///
-					xlabel(, angle(45) labsize(vsmall)) ///
-					yscale(range(0 .)) ylabel(0, add) ///
-					ytitle("Average duration (days)") xtitle("`xti'") ///
+					xlabel(`xlbl', angle(45) labsize(vsmall) nogrid) ///
+					`xscale_opt' ///
+					yscale(range(0 `y_top_y8')) ///
+                    ylabel(`y_ticks_y8', angle(horizontal) nogrid) ///
+					ytitle("Average duration (days)") xtitle("`xti_bin'") ///
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
@@ -416,3 +542,4 @@ foreach audtype in 1 0 {
 		}
 	}
 }
+

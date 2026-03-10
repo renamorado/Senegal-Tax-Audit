@@ -1,0 +1,127 @@
+\section{Audit Discrepancies and taxpayer dissatisfaction with the audit process.}
+\label{sec:audit_discrepancy_taxpayer}
+\providecommand{\sym}[1]{\ifmmode^{#1}\else\(^{#1}\)\fi}
+
+This section studies whether larger discrepancies between notified and confirmed audit amounts are associated with taxpayer-reported dissatisfaction and corruption-related perceptions.
+
+\subsection{Empirical steps}
+\begin{enumerate}
+\item Start from \texttt{datasetforanalysis.dta}.
+\item Keep selected program cases and remove safety/replacement cases:
+\begin{verbatim}
+keep if selection == 1
+drop if safeties == 1
+\end{verbatim}
+\item Keep one observation per firm's most recent selection year:
+\begin{verbatim}
+keep if recent == selectionyear
+drop recent
+\end{verbatim}
+\item Recreate Table C5 dispute variables (\texttt{d1}--\texttt{d21}) exactly as in the main analysis script.
+\item Construct the main discrepancy measure:
+\[
+W_{\text{main}}=\frac{\text{notificationvalue}-\text{confirmationvalue}}{\text{notificationvalue}}
+\]
+for cases with \texttt{y2==1}, \texttt{notification==1}, \texttt{confirmation==1}, and \texttt{notificationvalue>0}.
+\item Restrict analysis sample to taxpayer survey respondents (\texttt{q1 != .}) when linking \(W_{\text{main}}\) to taxpayer outcomes.
+\item Produce descriptive statistics for \(W_{\text{main}}\), by audit type and by selection method.
+\item Run baseline and robustness regressions of taxpayer outcomes on discrepancy measures:
+\begin{itemize}
+\item baseline pooled: \(X\) on \(W_{\text{main}}\) with \texttt{i.x2};
+\item controlled pooled: add \texttt{algorithm overlap random horsprogramme}, absorb \texttt{selectionyear} and \texttt{center};
+\item split samples: full audits (\texttt{x2==1}) and desk audits (\texttt{x2==0});
+\item discrepancy robustness: \(W_{\text{winsor}}\), ratio \texttt{d12}, and log-ratio \texttt{d11}.
+\end{itemize}
+\end{enumerate}
+
+\subsection{Descriptive tables}
+
+\begin{table}[!htbp]
+\centering
+\caption{Descriptive distribution of \(W_{\text{main}}\): pooled and by audit type}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{l*{42}{c}}
+\input{Output/w_main_descriptive_stats.tex}
+\end{tabular}
+}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Shares in key \(W_{\text{main}}\) ranges}
+\begin{tabular}{l*{6}{c}}
+\input{Output/w_main_share_stats.tex}
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{\(W_{\text{main}}\) by selection method}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{l*{28}{c}}
+\input{Output/w_main_descriptive_by_method.tex}
+\end{tabular}
+}
+\end{table}
+
+\subsection{Plots}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.82\textwidth]{Output/w_main_histogram.pdf}
+\caption{Histogram of \(W_{\text{main}}\) in the taxpayer-survey-linked audited sample}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.82\textwidth]{Output/w_main_density_by_x2.pdf}
+\caption{Density of \(W_{\text{main}}\) by audit type (\(x2=1\) full audits, \(x2=0\) desk audits)}
+\end{figure}
+
+\subsection{Regression tables}
+
+\begin{table}[!htbp]
+\centering
+\caption{Taxpayer-reported bribe incidence (\texttt{q35}) and discrepancy}
+\begin{tabular}{l*{7}{c}}
+\input{Output/w_main_reg_q35.tex}
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Perceived informal payment prevalence (\texttt{q34}) and discrepancy}
+\begin{tabular}{l*{7}{c}}
+\input{Output/w_main_reg_q34.tex}
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Perceived dishonesty score (\texttt{q32\_bad}) and discrepancy}
+\begin{tabular}{l*{7}{c}}
+\input{Output/w_main_reg_q32_bad.tex}
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Audit-process dissatisfaction proxy (\texttt{q41}) and discrepancy}
+\begin{tabular}{l*{7}{c}}
+\input{Output/w_main_reg_q41.tex}
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{Overall evaluation index (\texttt{evaluation}) and discrepancy}
+\begin{tabular}{l*{7}{c}}
+\input{Output/w_main_reg_evaluation.tex}
+\end{tabular}
+\end{table}
+
+\noindent\textit{Notes.}
+All tables are exported directly from Stata using \texttt{estpost}/\texttt{esttab} in
+\texttt{Code Analyse data/6 Inspector effort - Corruption.do}.
+Standard errors are reported in parentheses. Stars denote significance levels:
+\(\sym{*} p<0.10\), \(\sym{**} p<0.05\), \(\sym{***} p<0.01\).
