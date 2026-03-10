@@ -48,7 +48,7 @@ fullaudits_realized_test <- fullaudits
 # Main Figure 4
 plot_name <- "10 density predicted evasion R"
 source(paste0(r_code_path, "02_Graph_Function.R"))
-
+write_dta(fullaudits_predicted, "Working Data/fullaudits_predicted.dta")
 
 # Predict on Algorithm-Selected Cases
 fullaudits_realized_test <- fullaudits %>% filter(algorithm == 1)
@@ -74,9 +74,11 @@ fullaudits_realized <- fullaudits %>%
 
 rf <- run_rf(fullaudits_realized)
 
-fullaudits_realized_test <- fullaudits
 
+fullaudits_realized_test <- fullaudits
+write_dta(fullaudits_predicted, "Working Data/deskaudits_predicted.dta")
 # Main Figure 4 desk audit
 fullaudits_realized_test <- fullaudits
 plot_name <- "10 density predicted evasion desk audits R quintiles"
 source(paste0(r_code_path, "02_Graph_Desk_Function.R"))
+

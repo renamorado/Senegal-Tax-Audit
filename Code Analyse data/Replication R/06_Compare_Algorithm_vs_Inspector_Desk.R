@@ -4,9 +4,9 @@ if ("package:plyr" %in% search()) {
 }
 
 # Descarregar o pacote dplyr
-if ("package:dplyr" %in% search()) {
-  detach("package:dplyr", unload = TRUE, character.only = TRUE)
-}
+#if ("package:dplyr" %in% search()) {
+#  detach("package:dplyr", unload = TRUE, character.only = TRUE)
+#}
 
 library(dplyr)
 
@@ -53,10 +53,16 @@ fullaudits_realized <- fullaudits %>% filter(y2 == 1 & !is.na(y4))
 # Train RF model
 rf <- run_rf(fullaudits_realized)
 
+
 # Apply predictions
+
+
+
+fullaudits_predicted2 <- predict_rf(rf, fullaudits) #%>%
+write_dta(fullaudits_predicted2, "Working Data/deskaudits_predicted.dta")
+
 fullaudits_predicted <- predict_rf(rf, fullaudits) %>%
   filter(yhatrf > 10)
-
 # Define min and max values
 min_v <- floor(min(fullaudits_predicted$yhatrf, na.rm = TRUE))
 max_v <- ceiling(max(fullaudits_predicted$yhatrf, na.rm = TRUE))

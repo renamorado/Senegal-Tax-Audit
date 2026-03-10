@@ -105,6 +105,8 @@ foreach audtype in 1 0 {
 		********************************************************************************
 		foreach bin_def in `bin_defs' {
 
+			local tail_cut = 12
+
 			* Clear prior bin vars
 			capture drop bin_`b'
 			capture drop mid_bin_`b'
@@ -134,6 +136,110 @@ foreach audtype in 1 0 {
 				drop min_raw_`b' max_raw_`b' min_v_`b' max_v_`b'
 				local bin_tag "`w'u"
 			}
+
+			********************************************************************************
+			** EXECUTION RATE (all selected cases; not conditional on execution)
+			********************************************************************************
+			preserve
+				gen n_total_exec = 1
+				drop if missing(bin_`b')
+
+				collapse ///
+					(mean)  avg_y2=y2 ///
+					(sd)    sd_y2=y2 ///
+					(count) n_y2=y2 ///
+					(sum)   n_total_exec=n_total_exec, ///
+					by(algorithm bin_`b' mid_bin_`b')
+
+				replace sd_y2 = 0 if n_y2==1 & missing(sd_y2)
+				gen se_y2 = .
+				replace se_y2 = sd_y2/sqrt(n_y2) if n_y2 > 0
+
+				gen ci_lower_y2 = avg_y2 - 1.96*se_y2
+				gen ci_upper_y2 = avg_y2 + 1.96*se_y2
+				replace ci_lower_y2 = 0 if !missing(ci_lower_y2) & ci_lower_y2 < 0
+				replace ci_upper_y2 = 1 if !missing(ci_upper_y2) & ci_upper_y2 > 1
+
+				local xlbl ""
+				local xvar "mid_bin_`b'"
+				if "`b'"=="yhatrf" & !inlist("`bin_def'","decile","quintile") {
+					levelsof bin_`b' if mid_bin_`b' >= `tail_cut', local(bin_levels_exec)
+				}
+				else {
+					levelsof bin_`b', local(bin_levels_exec)
+				}
+
+				if inlist("`bin_def'","decile","quintile") {
+					local xvar "bin_`b'"
+					foreach k of local bin_levels_exec {
+						local xlbl `"`xlbl' `k' "`k'""'
+					}
+				}
+				else {
+					foreach k of local bin_levels_exec {
+						local lower = `k'
+						local upper = `k' + `w'
+
+						quietly summarize mid_bin_`b' if bin_`b'==`k', meanonly
+						local m = r(mean)
+
+						local lower_lbl = string(`lower',"%9.0f")
+						local upper_lbl = string(`upper',"%9.0f")
+						local xlbl `"`xlbl' `m' "`lower_lbl'-`upper_lbl'""'
+					}
+				}
+
+				if "`b'"=="yhatrf" & !inlist("`bin_def'","decile","quintile") {
+					quietly count if `xvar' >= `tail_cut'
+					if r(N) == 0 {
+						restore
+						continue
+					}
+					local plot_if_alg "if algorithm==1 & `xvar'>=`tail_cut'"
+					local plot_if_ins "if algorithm==0 & `xvar'>=`tail_cut'"
+				}
+				else {
+					local plot_if_alg "if algorithm==1"
+					local plot_if_ins "if algorithm==0"
+				}
+
+				local col_alg "#0072B2"
+				local col_ins "#D55E00"
+				local band_a 20
+				local bound_a 60
+				local pat_alg "solid"
+				local pat_ins "dash"
+
+				twoway ///
+					(rarea ci_upper_y2 ci_lower_y2 `xvar' `plot_if_alg', ///
+						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
+					(line  ci_upper_y2 `xvar' `plot_if_alg', ///
+						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
+					(line  ci_lower_y2 `xvar' `plot_if_alg', ///
+						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
+					(connected avg_y2 `xvar' `plot_if_alg', ///
+						sort lcolor("`col_alg'") mcolor("`col_alg'") ///
+						lpattern(solid) lwidth(medthick) ///
+						msymbol(circle) msize(small)) || ///
+					(rarea ci_upper_y2 ci_lower_y2 `xvar' `plot_if_ins', ///
+						sort fcolor("`col_ins'%`band_a'") lcolor("`col_ins'%0")) || ///
+					(line  ci_upper_y2 `xvar' `plot_if_ins', ///
+						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
+					(line  ci_lower_y2 `xvar' `plot_if_ins', ///
+						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
+					(connected avg_y2 `xvar' `plot_if_ins', ///
+						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
+						lwidth(medthick) ///
+						msymbol(diamond) msize(small)), ///
+					xlabel(`xlbl', angle(45) labsize(vsmall)) ///
+					yscale(range(0 1)) ///
+					ylabel(0(0.2)1, format(%3.1f) angle(horizontal)) ///
+					ytitle("Share of executed cases") xtitle("`xti'") ///
+					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
+					graphregion(color(white)) plotregion(color(white))
+
+				graph export "$output\exec_rate_binplot_`b'_`audit_type'_`bin_tag'.pdf", replace
+			restore
 
 			********************************************************************************
 			** BIN-LEVEL DATASET (executed only) + FIXED CIs WITH OUTCOME-SPECIFIC n
@@ -169,7 +275,12 @@ foreach audtype in 1 0 {
 				local xlbl ""
 				local xvar "mid_bin_`b'"
 
-				levelsof bin_`b', local(bin_levels)
+				if "`b'"=="yhatrf" & !inlist("`bin_def'","decile","quintile") {
+					levelsof bin_`b' if mid_bin_`b' >= `tail_cut', local(bin_levels)
+				}
+				else {
+					levelsof bin_`b', local(bin_levels)
+				}
 
 				* For quantiles (decile/quintile): plot against bin index (1..K)
 				if inlist("`bin_def'","decile","quintile") {
@@ -193,6 +304,20 @@ foreach audtype in 1 0 {
 					}
 				}
 
+				if "`b'"=="yhatrf" & !inlist("`bin_def'","decile","quintile") {
+					quietly count if `xvar' >= `tail_cut'
+					if r(N) == 0 {
+						restore
+						continue
+					}
+					local plot_if_alg "if algorithm==1 & `xvar'>=`tail_cut'"
+					local plot_if_ins "if algorithm==0 & `xvar'>=`tail_cut'"
+				}
+				else {
+					local plot_if_alg "if algorithm==1"
+					local plot_if_ins "if algorithm==0"
+				}
+
 				********************************************************************************
 				** PLOT STYLE (keep same colors, improve CI visibility)
 				********************************************************************************
@@ -211,28 +336,29 @@ foreach audtype in 1 0 {
 				** (1) Avg number of inspectors
 				********************************************************************************
 				twoway ///
-					(rarea ci_upper_ninspectors ci_lower_ninspectors `xvar' if algorithm==1, ///
+					(rarea ci_upper_ninspectors ci_lower_ninspectors `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
-					(line  ci_upper_ninspectors `xvar' if algorithm==1, ///
+					(line  ci_upper_ninspectors `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
-					(line  ci_lower_ninspectors `xvar' if algorithm==1, ///
+					(line  ci_lower_ninspectors `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
-					(connected avg_ninspectors `xvar' if algorithm==1, ///
+					(connected avg_ninspectors `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'") mcolor("`col_alg'") ///
 						lpattern(solid) lwidth(medthick) ///
 						msymbol(circle) msize(small)) || ///
-					(rarea ci_upper_ninspectors ci_lower_ninspectors `xvar' if algorithm==0, ///
+					(rarea ci_upper_ninspectors ci_lower_ninspectors `xvar' `plot_if_ins', ///
 						sort fcolor("`col_ins'%`band_a'") lcolor("`col_ins'%0")) || ///
-					(line  ci_upper_ninspectors `xvar' if algorithm==0, ///
+					(line  ci_upper_ninspectors `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
-					(line  ci_lower_ninspectors `xvar' if algorithm==0, ///
+					(line  ci_lower_ninspectors `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
-					(connected avg_ninspectors `xvar' if algorithm==0, ///
+					(connected avg_ninspectors `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///
 					xlabel(`xlbl', angle(45) labsize(vsmall)) ///
-					yscale(range(0 .)) ylabel(0, add) ///
+					yscale(range(0 .)) ///
+					ylabel(, angle(horizontal)) ///
 					ytitle("Average number of inspectors") xtitle("`xti'") ///
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
@@ -243,23 +369,23 @@ foreach audtype in 1 0 {
 				** (2) Duration (Admin data) y19
 				********************************************************************************
 				twoway ///
-					(rarea ci_upper_y19 ci_lower_y19 `xvar' if algorithm==1, ///
+					(rarea ci_upper_y19 ci_lower_y19 `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
-					(line  ci_upper_y19 `xvar' if algorithm==1, ///
+					(line  ci_upper_y19 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
-					(line  ci_lower_y19 `xvar' if algorithm==1, ///
+					(line  ci_lower_y19 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
-					(connected avg_y19 `xvar' if algorithm==1, ///
+					(connected avg_y19 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'") mcolor("`col_alg'") ///
 						lpattern(solid) lwidth(medthick) ///
 						msymbol(circle) msize(small)) || ///
-					(rarea ci_upper_y19 ci_lower_y19 `xvar' if algorithm==0, ///
+					(rarea ci_upper_y19 ci_lower_y19 `xvar' `plot_if_ins', ///
 						sort fcolor("`col_ins'%`band_a'") lcolor("`col_ins'%0")) || ///
-					(line  ci_upper_y19 `xvar' if algorithm==0, ///
+					(line  ci_upper_y19 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
-					(line  ci_lower_y19 `xvar' if algorithm==0, ///
+					(line  ci_lower_y19 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
-					(connected avg_y19 `xvar' if algorithm==0, ///
+					(connected avg_y19 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///
@@ -275,23 +401,23 @@ foreach audtype in 1 0 {
 				** (3) Duration (Taxpayer survey) q30
 				********************************************************************************
 				twoway ///
-					(rarea ci_upper_q30 ci_lower_q30 `xvar' if algorithm==1, ///
+					(rarea ci_upper_q30 ci_lower_q30 `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
-					(line  ci_upper_q30 `xvar' if algorithm==1, ///
+					(line  ci_upper_q30 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
-					(line  ci_lower_q30 `xvar' if algorithm==1, ///
+					(line  ci_lower_q30 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
-					(connected avg_q30 `xvar' if algorithm==1, ///
+					(connected avg_q30 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'") mcolor("`col_alg'") ///
 						lpattern(solid) lwidth(medthick) ///
 						msymbol(circle) msize(small)) || ///
-					(rarea ci_upper_q30 ci_lower_q30 `xvar' if algorithm==0, ///
+					(rarea ci_upper_q30 ci_lower_q30 `xvar' `plot_if_ins', ///
 						sort fcolor("`col_ins'%`band_a'") lcolor("`col_ins'%0")) || ///
-					(line  ci_upper_q30 `xvar' if algorithm==0, ///
+					(line  ci_upper_q30 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
-					(line  ci_lower_q30 `xvar' if algorithm==0, ///
+					(line  ci_lower_q30 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
-					(connected avg_q30 `xvar' if algorithm==0, ///
+					(connected avg_q30 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///
@@ -307,23 +433,23 @@ foreach audtype in 1 0 {
 				** (4) Duration (Self-reported) y8
 				********************************************************************************
 				twoway ///
-					(rarea ci_upper_y8 ci_lower_y8 `xvar' if algorithm==1, ///
+					(rarea ci_upper_y8 ci_lower_y8 `xvar' `plot_if_alg', ///
 						sort fcolor("`col_alg'%`band_a'") lcolor("`col_alg'%0")) || ///
-					(line  ci_upper_y8 `xvar' if algorithm==1, ///
+					(line  ci_upper_y8 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
-					(line  ci_lower_y8 `xvar' if algorithm==1, ///
+					(line  ci_lower_y8 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'%`bound_a'") lpattern(`pat_alg') lwidth(vthin)) || ///
-					(connected avg_y8 `xvar' if algorithm==1, ///
+					(connected avg_y8 `xvar' `plot_if_alg', ///
 						sort lcolor("`col_alg'") mcolor("`col_alg'") ///
 						lpattern(solid) lwidth(medthick) ///
 						msymbol(circle) msize(small)) || ///
-					(rarea ci_upper_y8 ci_lower_y8 `xvar' if algorithm==0, ///
+					(rarea ci_upper_y8 ci_lower_y8 `xvar' `plot_if_ins', ///
 						sort fcolor("`col_ins'%`band_a'") lcolor("`col_ins'%0")) || ///
-					(line  ci_upper_y8 `xvar' if algorithm==0, ///
+					(line  ci_upper_y8 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
-					(line  ci_lower_y8 `xvar' if algorithm==0, ///
+					(line  ci_lower_y8 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'%`bound_a'") lpattern(`pat_ins') lwidth(vthin)) || ///
-					(connected avg_y8 `xvar' if algorithm==0, ///
+					(connected avg_y8 `xvar' `plot_if_ins', ///
 						sort lcolor("`col_ins'") mcolor("`col_ins'") ///
 						lwidth(medthick) ///
 						msymbol(diamond) msize(small)), ///

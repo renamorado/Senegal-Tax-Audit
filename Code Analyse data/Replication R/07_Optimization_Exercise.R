@@ -312,6 +312,11 @@ for (i in c(1, 2)) {
     
   }
   
+  ## Export dtas for stata analysis 
+  write_dta(
+    fullaudits_predicted,
+    paste0("Working Data/audits_predicted_", i, ".dta")
+  )  
 }
 
 #####

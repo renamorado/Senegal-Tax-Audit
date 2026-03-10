@@ -4,9 +4,10 @@
 ###R packages 
 ###########################
 #pack <- c('plyr',  'dplyr', 'tidyr', 'haven', 'sf', 'tidyverse', 'collapse', 'foreign', 'DescTools','randomForest', 'kableExtra')
-pack <- c('dplyr', 'tidyr', 'haven', 'sf', 'tidyverse', 'collapse', 'foreign', 'DescTools','randomForest', 'kableExtra')
+#pack <- c('dplyr', 'tidyr', 'haven', 'sf', 'tidyverse', 'collapse', 'foreign', 'DescTools','randomForest', 'kableExtra')
 #lapply(pack, install.packages, character.only = TRUE) 
-lapply(pack, library, character.only = TRUE)
+
+#lapply(pack, library, character.only = TRUE)
 library('grid')
 library(datasets)
 library(caret)

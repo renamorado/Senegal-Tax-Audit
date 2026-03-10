@@ -4,9 +4,9 @@ if ("package:plyr" %in% search()) {
 }
 
 # Descarregar o pacote dplyr
-if ("package:dplyr" %in% search()) {
-  detach("package:dplyr", unload = TRUE, character.only = TRUE)
-}
+#if ("package:dplyr" %in% search()) {
+  #detach("package:dplyr", unload = TRUE, character.only = TRUE)
+#}
 
 library(dplyr)
 
@@ -67,7 +67,7 @@ fullaudits <- fullaudits %>%
 fullaudits_realized <- fullaudits %>% filter(y2 == 1 & !is.na(y4))
 
 rf <- run_rf(fullaudits_realized)
-
+write_dta(fullaudits_predicted, "Working Data/fullaudits_predicted.dta")
 calc_bin_stats <- function(data, min_v, max_v) {
   data %>%
     mutate(

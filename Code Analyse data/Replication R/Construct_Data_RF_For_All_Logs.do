@@ -24,11 +24,11 @@ clear all
 		global rootdir "C:\Users\User\Dropbox\Senegal tax audits"
 	}
 
-/*
-	if strpos("`c(username)'","YOUR COMPUTER'S USERNAME") { 					// INSERT YOUR USER NAME HERE
-		global rootdir "...\Senegal tax audits" 								// Insert path to shared Dropbox folder "Senegal Tax Audits"	
+
+	if strpos("`c(username)'","wb614536") { 					// INSERT YOUR USER NAME HERE
+		global rootdir "C:\Users\wb614536\Dropbox\Senegal tax audits" 								// Insert path to shared Dropbox folder "Senegal Tax Audits"	
 	}
-*/
+
 
 		global rawdata "$rootdir"
 		global analysisdata "$rootdir\Analysis all data\replication_package\Working data"
