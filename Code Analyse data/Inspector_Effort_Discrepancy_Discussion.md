@@ -172,3 +172,124 @@ Created an Overleaf-ready section draft that documents steps and includes all ge
 It starts with:
 
 - `\section{Audit Discrepancies and taxpayer dissatisfaction with the audit process.}`
+
+## 12) Current editor state update (2026-03-10, latest)
+
+The active working script remains:
+
+- `Code Analyse data/6 Inspector effort - Corruption.do`
+
+Current content in that file now includes the full pipeline (filters, C5 variables, `W_main` block, descriptive tables, plots, and regressions), plus two explicit TODO markers:
+
+- `TODO: add the recreate clusterid`
+- `TODO: do data prep of dispute vars and taxpayer survey in different code chunks / snippets`
+
+Important handoff note before next run:
+
+- There are two standalone `s` lines in the script (currently around lines 66 and 110). If left in place, Stata will stop with an error.
+
+Definition check to resolve next session:
+
+- The conceptual definition agreed in these notes is:
+  - `W = (notificationvalue - confirmationvalue) / notificationvalue`
+- The current code line in the do-file is:
+  - `gen W_main = (d1 - d2) / d1`
+- This should be reconciled before producing final tables.
+
+## 13) Workspace snapshot for restart
+
+Git status snapshot during this update:
+
+- Modified: `.vscode/settings.json`
+- Modified: `Code Analyse data/6 Inspector effort - Corruption.do`
+- Untracked: `Code Analyse data/~6 Inspector effort - Corruption.do.stswp` (Stata temp/swap file)
+
+Output existence check at this point:
+
+- All previously documented `w_main_*.tex` regression/descriptive files exist in `Output/`.
+- Both figures exist:
+  - `Output/w_main_histogram.pdf`
+  - `Output/w_main_density_by_x2.pdf`
+
+## 14) Next-session quick restart checklist
+
+1. Clean temporary/syntax issues (`s` lines and swap file handling).
+2. Finalize the intended `W_main` formula and guard conditions.
+3. Re-run `6 Inspector effort - Corruption.do`.
+4. Confirm diagnostics (`N after filters`, regression sample size, negative `W_main` count).
+5. Regenerate `.tex`/`.pdf` outputs and re-check `Audit_Discrepancy_Taxpayer_Section.tex` references.
+
+## 15) Implemented update (2026-03-10, W table recreation)
+
+Main file updated:
+
+- `Code Analyse data/6 Inspector effort - Corruption.do`
+
+What was implemented:
+
+- Removed stray standalone `s` lines (syntax blocker).
+- Implemented cluster recreation:
+  - `capture drop clusterid`
+  - `egen clusterid = group(inspectorclusteryear)`
+- Split the workflow into explicit chunks:
+  - dispute variables (`d1`-`d21`)
+  - survey/index prep
+  - regressions/exports
+- W definition was revised in a later update (see Section 16):
+  - deprecated: `gen W_main = (d1 - d2) / d1`
+- Added panel logic for:
+  - A: recent-audit self-report firms (`selfreported_audit == 1`)
+  - B: all surveyed firms (`q1 != .`)
+- Rebuilt regressions to include:
+  - `W_main algorithm overlap random safeties horsprogramme`
+- Mirrored FE backbone by outcome family:
+  - Index outcomes: `a(selectionyear center)`
+  - Survey question outcomes: `a(inspectorclusteryear)`
+
+Final output file mapping:
+
+- Index table (2 outcomes, 2 panels, 3 columns each):
+  - `Output/w_main_table_indices_recent_all.tex`
+- Question table (q34 q35 q32 q42, 2 panels, 3 columns each):
+  - `Output/w_main_table_questions_recent_all.tex`
+
+## 16) Latest W update from main do-file (2026-03-10, evening)
+
+Main file update source:
+
+- `Code Analyse data/6 Inspector effort - Corruption.do`
+
+What changed in `W_main`:
+
+- Earlier ratio based on dummies (`(d1-d2)/d1`) was identified as not interpretable.
+- Current active definition is the value-ratio discrepancy:
+  - `gen W_main = (notificationvalue - confirmationvalue) / notificationvalue if d5 == 1 & d4 == 1 & y2 == 1`
+  - Label: `((Notification - Confirmation ) / Notification)`
+- Previous log-ratio version is now commented out in the script.
+
+Current panel filters in code:
+
+- `local panel_recent "q1 != . & selfreported_audit == 1"`
+- `local panel_all    "q1 != ."`
+
+## 17) TODO implementation update (2026-03-10, latest run)
+
+Implemented in `Code Analyse data/6 Inspector effort - Corruption.do`:
+
+- Added `W_main` coverage table by selection method (Total / Inspectors / Algorithm):
+  - Output: `Output/w_main_coverage_by_method.tex`
+- Added scatter + linear fit figure for `W_main` against notification value:
+  - Output: `Output/w_main_scatter_notification.pdf`
+- Added standalone density figure for `W_main`:
+  - Output: `Output/w_main_density.pdf`
+- Removed remaining TODO marker about panel filtering; panels now intentionally use:
+  - `local panel_recent "q1 != . & selfreported_audit == 1"`
+  - `local panel_all    "q1 != ."`
+  - Missing `W_main` is handled at estimation sample level.
+
+Latest validation run (`stata-mp -b do "Code Analyse data/6 Inspector effort - Corruption.do"`):
+
+- `Panel A sample (recent audit): 640`
+- `Panel B sample (all surveyed firms): 763`
+- `Index regressions estimated: 12 (expected 12)`
+- `Question regressions estimated: 24 (expected 24)`

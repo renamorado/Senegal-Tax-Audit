@@ -1,5 +1,8 @@
 {
     "stataRun.stataPath": "C:\\Program Files\\StataNow19\\StataMP-64.exe",
     "stataRun.skipComments": false,
-    "stataRun.whichApp": "stataMP"
+    "stataRun.whichApp": "stataMP",
+    "stata-all-in-one.stataPathOnWindows": "C:\\Program Files\\StataNow19\\StataMP-64.exe",
+    "stata-all-in-one.cdToDoFileDir": true,
+    "stataRun.pasteSpeed": 8
 }
