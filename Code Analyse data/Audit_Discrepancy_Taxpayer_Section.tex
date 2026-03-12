@@ -2,77 +2,136 @@
 \label{sec:audit_discrepancy_taxpayer}
 \providecommand{\sym}[1]{\ifmmode^{#1}\else\(^{#1}\)\fi}
 
+\makeatletter
+\@ifundefined{landscape}{\newenvironment{landscape}{}{}}{}
+\makeatother
+
 This section studies whether larger discrepancies between notified and confirmed audit amounts are associated with taxpayer-reported efficiency and corruption perceptions.
 
 \subsection{Current empirical steps (updated main specification)}
 \begin{enumerate}
 \item Start from \texttt{datasetforanalysis.dta}.
-\item Keep selected program cases and remove safety/replacement cases:
-\begin{verbatim}
-keep if selection == 1
-drop if safeties == 1
-\end{verbatim}
+\item Keep the broad analysis sample (no ex-ante drop of safety/ad hoc groups), and account for method composition in the regression controls.
 \item Recreate cluster groups used in fixed effects:
 \begin{verbatim}
 capture drop clusterid
 egen clusterid = group(inspectorclusteryear)
 \end{verbatim}
 \item Recreate Table C5 dispute variables (\texttt{d1}--\texttt{d21}) exactly as in the main analysis script.
-\item Construct the discrepancy regressor used in the current regressions:
+\item Construct the baseline discrepancy regressor:
 \[
 W_{\text{main}}=\frac{\text{notificationvalue}-\text{confirmationvalue}}{\text{notificationvalue}}
 \]
+\item Cap negative baseline values to zero:
+\begin{verbatim}
+replace W_main = 0 if W_main < 0 & W_main != .
+\end{verbatim}
+\item Build robustness discrepancy regressors:
+\begin{verbatim}
+W_nonzero = 1{W_main != 0}
+W_abovemed = 1{W_main > median(W_main)}
+W_topquart = 1{W_main >= p75(W_main)}
+\end{verbatim}
+where \(\text{median}(W_{\text{main}})\) and \(p75(W_{\text{main}})\) are single pooled moments from non-missing \(W_{\text{main}}\) in the regression-eligible sample.
+\item In exported regression tables, coefficient labels are:
+\textit{Downward revision (\% of notification)},
+\textit{Downward revision (\% of notification) $\neq 0$},
+\textit{Downward revision (\% of notification) $>$ median}, and
+\textit{Downward revision (\% of notification) in top quartile}.
 \item Build panel indicators:
 \begin{verbatim}
 selfreported_audit = 1 if q28a in [2018,2021] or q29a in [2018,2021]
 \end{verbatim}
-Panel A uses \texttt{q1 != . \& selfreported_audit == 1}; Panel B uses \texttt{q1 != .}.
+Panel A uses \texttt{q1 $\neq$ . AND selfreported  = 1}; Panel B uses \texttt{q1 $\neq$ .}.
 \item Build index outcomes as in taxpayer-survey code:
 \begin{verbatim}
 index_efficiency  from q31 q33 q41
 index_corruption  from q32_inverted q42 q34   (swindex)
 \end{verbatim}
-\item Estimate Table 6 / D7-style columns by audit type (full, desk, all) with regressors:
+\item Estimate Table 6 / D7-style columns by audit type (full, desk, all), using method controls:
 \begin{verbatim}
 W_main algorithm overlap random safeties horsprogramme
 \end{verbatim}
-Index outcomes use \texttt{a(selectionyear center)}; question outcomes (\texttt{q34 q35 q32 q42}) use \texttt{a(inspectorclusteryear)}.
+Index outcomes use \texttt{a(selectionyear center)}; question outcomes (\texttt{q34 q35 q32 q42}) use \texttt{a(inspectorclusteryear)}. The same backbone is used for the three robustness \(W\) variants.
 \end{enumerate}
 
 \subsection{Regression equation and notation}
 
-Let \(i\) index a firm-audit observation in the merged administrative audit and taxpayer-survey data.
-For each outcome \(o\), panel \(p\in\{A,B\}\), and column \(c\in\{\text{Full},\text{Desk},\text{All}\}\), we estimate:
+Our empirical exercise studies whether larger discrepancies between the notified and confirmed audit amounts are associated with taxpayer-reported perceptions of the audit process. Concretely, for each taxpayer-survey outcome, we estimate the following model via Ordinary Least Squares:
 \[
-Y_{iopc}
-= \beta_{opc} W_i
-+ \boldsymbol{\theta}_{opc}^{\prime}\mathbf{M}_i
-+ \lambda_{opc}(i)
-+ \varepsilon_{iopc},
+y_{ig}
+=
+\beta_0
++ \beta_1 W_i
++ \beta_2 \text{Algorithm}_i
++ \beta_3 \text{Overlap}_i
++ \beta_4 \text{Random}_i
++ \beta_5 \text{Safeties}_i
++ \beta_6 \text{Horsprogramme}_i
++ \gamma_g
++ \varepsilon_{ig},
 \]
-where
-\[
-\mathbf{M}_i=
-\big(\texttt{algorithm}_i,\texttt{overlap}_i,\texttt{random}_i,\texttt{safeties}_i,\texttt{horsprogramme}_i\big)'.
-\]
+where \(y_{ig}\) is the taxpayer-survey outcome for firm-audit observation \(i\), and \(\gamma_g\) denotes the relevant fixed effects. The unit of observation is a firm-audit observation in the merged administrative audit and taxpayer-survey data, so a given firm may appear more than once if it is associated with multiple audit cases.
 
-We use:
-\begin{itemize}
-\item \(W_i=(\text{notificationvalue}_i-\text{confirmationvalue}_i)/\text{notificationvalue}_i\), defined when both values are strictly positive (operationally, \texttt{d4==1 \& d5==1 \& y2==1}).
-\item Panel \(A\): \texttt{q1!=. \& selfreported\_audit==1}; Panel \(B\): \texttt{q1!=.}.
-\item Column Full: \texttt{x2==1}; Column Desk: \texttt{x2==0}; Column All: no \texttt{x2} restriction.
-\item Outcomes \(o\): indexes \(\{\texttt{index\_efficiency},\texttt{index\_corruption}\}\) and questions \(\{\texttt{q34},\texttt{q35},\texttt{q32},\texttt{q42}\}\).
-\item Fixed effects \(\lambda_{opc}(i)\): \texttt{a(selectionyear center)} for index outcomes, and \texttt{a(inspectorclusteryear)} for question outcomes.
-\end{itemize}
+Our main discrepancy regressor is
+\[
+W_i
+=
+\max\left\{
+\frac{\text{Notification}_i-\text{Confirmation}_i}{\text{Notification}_i},
+\,0
+\right\},
+\]
+defined for observations with strictly positive notified and confirmed amounts and an executed audit. Thus, \(W_i=0\) both when there is no positive discrepancy and when the confirmed amount is at least as large as the notified amount.
+
+The indicators \(\text{Algorithm}_i\), \(\text{Overlap}_i\), \(\text{Random}_i\), \(\text{Safeties}_i\), and \(\text{Horsprogramme}_i\) capture the audit-case classification. The dummy for random selection is applicable only to desk-audit specifications. The coefficient of interest is \(\beta_1\), which captures the association between the capped discrepancy measure and the taxpayer-reported outcome.
+
+We estimate this equation separately by panel and audit type. Panel A restricts the sample to firms that report having been audited recently,
+\[
+\texttt{q1 != . \& selfreported\_audit == 1},
+\]
+while Panel B includes all surveyed firms with non-missing \texttt{q1},
+\[
+\texttt{q1 != .}.
+\]
+For audit type, we estimate the specification separately for full audits (\texttt{x2 == 1}), desk audits (\texttt{x2 == 0}), and the pooled sample with no restriction on \texttt{x2}.
+
+The outcomes are the taxpayer-survey indices
+\[
+\texttt{index\_efficiency}, \quad \texttt{index\_corruption},
+\]
+and the individual survey questions
+\[
+\texttt{q34}, \quad \texttt{q35}, \quad \texttt{q32}, \quad \texttt{q42}.
+\]
+For index outcomes, the fixed effects \(\gamma_g\) correspond to \texttt{selectionyear} \(\times\) \texttt{center}. For question-level outcomes, \(\gamma_g\) corresponds to \texttt{inspectorclusteryear}. We use robust standard errors to perform inference.
+
+In robustness checks, we also replace \(W_i\) with indicator versions:
+\[
+W_i^{\neq 0}=\mathbf{1}\{W_i\neq 0\},
+\qquad
+W_i^{>\mathrm{med}}=\mathbf{1}\{W_i>\widetilde{W}\},
+\qquad
+W_i^{\ge q75}=\mathbf{1}\{W_i\ge\widetilde{W}_{75}\},
+\]
+where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the pooled 75th percentile of non-missing \(W_i\) in the relevant regression sample.
 
 \subsection{Coverage and \(W\) diagnostics}
 
 \begin{table}[!htbp]
 \centering
-\caption{Regression-sample coverage counts by panel and audit type}
+\resizebox{\textwidth}{!}{%
+\begin{threeparttable}
+\caption{Informative regression-sample coverage by panel and audit type (counts and \% of base)}
 \begin{tabular}{l*{6}{c}}
 \input{Output/w_main_coverage_by_method.tex}
 \end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: Coverage rows report counts and percentages relative to the base surveyed sample in each panel-column cell (base \(=\) firms with \(q1\) observed). Panels are defined as in the regression tables.
+\end{tablenotes}
+\end{threeparttable}
+}
 \end{table}
 
 \begin{figure}[!htbp]
@@ -91,32 +150,138 @@ We use:
 
 \begin{table}[!htbp]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{threeparttable}
-\caption{Selection method, \(W\), and survey indexes: two panels (Recent audit / All surveyed firms)}
-\resizebox{\textwidth}{!}{
+\caption{Selection method, capped \(W\), and survey indexes: two panels (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
 \input{Output/w_main_table_indices_recent_all.tex}
 \end{tabular}
-}
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This table reports OLS estimates of how the audit discrepancy measure \(W\) is associated with taxpayer-reported index outcomes. The unit of observation is a firm-audit observation in the merged administrative audit and taxpayer-survey data. Panel A includes surveyed firms self-reporting a recent audit, and Panel B includes all surveyed firms. The explanatory variables are \(W\), indicators for selection method (algorithm, overlap, random, replacement, and ad hoc), and fixed effects for selection year and tax office. Columns (1)--(3) report Full audits, Desk audits, and All audits for the Efficiency Index; columns (4)--(6) report the same audit-type split for the Corruption Index. Robust standard errors (Huber-White) are reported in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
+\item Notes: OLS results for the Efficiency Index and Corruption Index. The specification is \(y_{ig}=\beta_0+\beta_1 W_i+\beta_2 \text{Algorithm}_i+\beta_3 \text{Overlap}_i+\beta_4 \text{Random}_i+\beta_5 \text{Safeties}_i+\beta_6 \text{Horsprogramme}_i+\gamma_g+\varepsilon_{ig}\). Here \(W_i=W_{\text{main},i}=\max\{(notificationvalue_i-confirmationvalue_i)/notificationvalue_i,0\}\). The control set follows Table D7 (algorithm-selection, overlap, random-selection, replacement, and ad hoc indicators), with the addition of \(W_i\). Panel A includes surveyed firms that report having been audited recently; Panel B includes all surveyed firms. Within each panel, columns report full audits, desk audits, and all audits. Fixed effects are at the selection-year \(\times\) tax-office level. Robust standard errors (Huber-White) are in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
 \end{tablenotes}
 \end{threeparttable}
+}
 \end{table}
 
+\begin{landscape}
 \begin{table}[!htbp]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{threeparttable}
-\caption{Selection method, \(W\), and survey questions (\texttt{q34 q35 q32 q42}): two panels (Recent audit / All surveyed firms)}
-\resizebox{\textwidth}{!}{
+\caption{Selection method, capped \(W\), and survey-question outcomes: two panels (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
 \input{Output/w_main_table_questions_recent_all.tex}
 \end{tabular}
-}
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This table reports OLS results with fixed effects at the year \(\times\) tax office level for outcomes from the taxpayer survey. Given the low number of observations in the taxpayer survey, it is not possible to run the regression with year \(\times\) inspector fixed effects for desk audits, as is done with outcomes extracted from administrative data. The unit of observation is a firm-audit observation in the merged administrative audit and taxpayer-survey data. Panel A includes surveyed firms self-reporting a recent audit, whereas Panel B includes all surveyed firms. The outcomes are as follows: ``Corruption in General'' (Columns 1 to 3) is the declared belief about the percentage of audits in Senegal affected by corruption; ``Corruption Experience'' (Columns 4 to 6) indicates that the respondent declared an instance of bribery to obtain tax favors; ``Grade on Honesty'' (Columns 7 to 9) is a grade from 0 to 10 for the honesty of the inspector with whom the respondent last interacted during a full audit; and ``Friend at Tax Authority'' (Columns 10 to 12) captures agreement with the statement that if the firm's owner has a friend at the tax authority, the firm will rarely be audited. This table is connected to Table 6 discussed in Section 5.3. Robust standard errors (Huber-White) are reported in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
+\item Notes: OLS results for four taxpayer-survey outcomes: Corruption in general (Columns 1 to 3), Corruption experience (Columns 4 to 6), Grade on honesty (Columns 7 to 9), and Friend at tax authority (Columns 10 to 12). The specification is \(y_{ig}=\beta_0+\beta_1 W_i+\beta_2 \text{Algorithm}_i+\beta_3 \text{Overlap}_i+\beta_4 \text{Random}_i+\beta_5 \text{Safeties}_i+\beta_6 \text{Horsprogramme}_i+\gamma_g+\varepsilon_{ig}\). Here \(W_i=W_{\text{main},i}=\max\{(notificationvalue_i-confirmationvalue_i)/notificationvalue_i,0\}\). The control set follows Table D7 (algorithm-selection, overlap, random-selection, replacement, and ad hoc indicators), with the addition of \(W_i\). Panel A includes surveyed firms that report having been audited recently; Panel B includes all surveyed firms. Within each panel, columns report full audits, desk audits, and all audits. Corruption in general is the declared belief about the percentage of audits in Senegal affected by corruption; Corruption experience indicates that the respondent declared an instance of bribery to obtain tax favors; Grade on honesty is a 0-to-10 grade for the honesty of the inspector with whom the respondent last interacted during a full audit; and Friend at tax authority captures agreement with the statement that if the firm's owner has a friend at the tax authority, the firm will rarely be audited. Fixed effects are at the inspector-cluster-year level. Robust standard errors (Huber-White) are in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
 \end{tablenotes}
 \end{threeparttable}
+}
 \end{table}
+\end{landscape}
+
+\subsection{Robustness regression tables}
+
+\begin{table}[!htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{threeparttable}
+\caption{Robustness: \(W_{\neq 0}\) and survey indexes (Recent audit / All surveyed firms)}
+\begin{tabular}{l*{6}{c}}
+\input{Output/w_robust_nonzero_table_indices_recent_all.tex}
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: OLS results for the Efficiency Index and Corruption Index. The specification is \(y_{ig}=\beta_0+\beta_1 W_i^{\neq 0}+\beta_2 \text{Algorithm}_i+\beta_3 \text{Overlap}_i+\beta_4 \text{Random}_i+\beta_5 \text{Safeties}_i+\beta_6 \text{Horsprogramme}_i+\gamma_g+\varepsilon_{ig}\). Here \(W_i^{\neq 0}=\mathbf{1}\{W_{\text{main},i}\neq 0\}\). The control set follows Table D7 (algorithm-selection, overlap, random-selection, replacement, and ad hoc indicators), with the addition of the discrepancy term \(W_i^{\neq 0}\). Panel A includes surveyed firms that report having been audited recently; Panel B includes all surveyed firms. Within each panel, columns report full audits, desk audits, and all audits. Fixed effects are at the selection-year \(\times\) tax-office level. Robust standard errors (Huber-White) are in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
+
+\begin{landscape}
+\begin{table}[!htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{threeparttable}
+\caption{Robustness: \(W_{\neq 0}\) and survey questions (Recent audit / All surveyed firms)}
+\begin{tabular}{l*{12}{c}}
+\input{Output/w_robust_nonzero_table_questions_recent_all.tex}
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: OLS results for four taxpayer-survey outcomes: Corruption in general (Columns 1 to 3), Corruption experience (Columns 4 to 6), Grade on honesty (Columns 7 to 9), and Friend at tax authority (Columns 10 to 12). The specification is \(y_{ig}=\beta_0+\beta_1 W_i^{\neq 0}+\beta_2 \text{Algorithm}_i+\beta_3 \text{Overlap}_i+\beta_4 \text{Random}_i+\beta_5 \text{Safeties}_i+\beta_6 \text{Horsprogramme}_i+\gamma_g+\varepsilon_{ig}\). Here \(W_i^{\neq 0}=\mathbf{1}\{W_{\text{main},i}\neq 0\}\). The control set follows Table D7 (algorithm-selection, overlap, random-selection, replacement, and ad hoc indicators), with the addition of the discrepancy term \(W_i^{\neq 0}\). Panel A includes surveyed firms that report having been audited recently; Panel B includes all surveyed firms. Within each panel, columns report full audits, desk audits, and all audits. Corruption in general is the declared belief about the percentage of audits in Senegal affected by corruption; Corruption experience indicates that the respondent declared an instance of bribery to obtain tax favors; Grade on honesty is a 0-to-10 grade for the honesty of the inspector with whom the respondent last interacted during a full audit; and Friend at tax authority captures agreement with the statement that if the firm's owner has a friend at the tax authority, the firm will rarely be audited. Fixed effects are at the inspector-cluster-year level. Robust standard errors (Huber-White) are in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
+\end{landscape}
+
+\begin{table}[!htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{threeparttable}
+\caption{Robustness: \(W_{>\mathrm{med}}\) and survey indexes (Recent audit / All surveyed firms)}
+\begin{tabular}{l*{6}{c}}
+\input{Output/w_robust_abovemedian_table_indices_recent_all.tex}
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: OLS results for the Efficiency Index and Corruption Index. The specification is \(y_{ig}=\beta_0+\beta_1 W_i^{>\mathrm{med}}+\beta_2 \text{Algorithm}_i+\beta_3 \text{Overlap}_i+\beta_4 \text{Random}_i+\beta_5 \text{Safeties}_i+\beta_6 \text{Horsprogramme}_i+\gamma_g+\varepsilon_{ig}\). Here \(W_i^{>\mathrm{med}}=\mathbf{1}\{W_{\text{main},i}>\widetilde{W}\}\), where \(\widetilde{W}\) is the pooled median of non-missing \(W_{\text{main}}\) in the regression-eligible sample. The control set follows Table D7 (algorithm-selection, overlap, random-selection, replacement, and ad hoc indicators), with the addition of the discrepancy term \(W_i^{>\mathrm{med}}\). Panel A includes surveyed firms that report having been audited recently; Panel B includes all surveyed firms. Within each panel, columns report full audits, desk audits, and all audits. Fixed effects are at the selection-year \(\times\) tax-office level. Robust standard errors (Huber-White) are in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
+
+\begin{landscape}
+\begin{table}[!htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{threeparttable}
+\caption{Robustness: \(W_{>\mathrm{med}}\) and survey questions (Recent audit / All surveyed firms)}
+\begin{tabular}{l*{12}{c}}
+\input{Output/w_robust_abovemedian_table_questions_recent_all.tex}
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: OLS results for four taxpayer-survey outcomes: Corruption in general (Columns 1 to 3), Corruption experience (Columns 4 to 6), Grade on honesty (Columns 7 to 9), and Friend at tax authority (Columns 10 to 12). The specification is \(y_{ig}=\beta_0+\beta_1 W_i^{>\mathrm{med}}+\beta_2 \text{Algorithm}_i+\beta_3 \text{Overlap}_i+\beta_4 \text{Random}_i+\beta_5 \text{Safeties}_i+\beta_6 \text{Horsprogramme}_i+\gamma_g+\varepsilon_{ig}\). Here \(W_i^{>\mathrm{med}}=\mathbf{1}\{W_{\text{main},i}>\widetilde{W}\}\), where \(\widetilde{W}\) is the pooled median of non-missing \(W_{\text{main}}\) in the regression-eligible sample. The control set follows Table D7 (algorithm-selection, overlap, random-selection, replacement, and ad hoc indicators), with the addition of the discrepancy term \(W_i^{>\mathrm{med}}\). Panel A includes surveyed firms that report having been audited recently; Panel B includes all surveyed firms. Within each panel, columns report full audits, desk audits, and all audits. Corruption in general is the declared belief about the percentage of audits in Senegal affected by corruption; Corruption experience indicates that the respondent declared an instance of bribery to obtain tax favors; Grade on honesty is a 0-to-10 grade for the honesty of the inspector with whom the respondent last interacted during a full audit; and Friend at tax authority captures agreement with the statement that if the firm's owner has a friend at the tax authority, the firm will rarely be audited. Fixed effects are at the inspector-cluster-year level. Robust standard errors (Huber-White) are in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
+\end{landscape}
+
+\begin{table}[!htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{threeparttable}
+\caption{Robustness: \(W_{\ge q75}\) and survey indexes (Recent audit / All surveyed firms)}
+\begin{tabular}{l*{6}{c}}
+\input{Output/w_robust_topquartile_table_indices_recent_all.tex}
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: OLS results for the Efficiency Index and Corruption Index. The specification is \(y_{ig}=\beta_0+\beta_1 W_i^{\ge q75}+\beta_2 \text{Algorithm}_i+\beta_3 \text{Overlap}_i+\beta_4 \text{Random}_i+\beta_5 \text{Safeties}_i+\beta_6 \text{Horsprogramme}_i+\gamma_g+\varepsilon_{ig}\). Here \(W_i^{\ge q75}=\mathbf{1}\{W_{\text{main},i}\ge\widetilde{W}_{75}\}\), where \(\widetilde{W}_{75}\) is the pooled 75th percentile of non-missing \(W_{\text{main}}\) in the regression-eligible sample. The control set follows Table D7 (algorithm-selection, overlap, random-selection, replacement, and ad hoc indicators), with the addition of the discrepancy term \(W_i^{\ge q75}\). Panel A includes surveyed firms that report having been audited recently; Panel B includes all surveyed firms. Within each panel, columns report full audits, desk audits, and all audits. Fixed effects are at the selection-year \(\times\) tax-office level. Robust standard errors (Huber-White) are in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
+
+\begin{landscape}
+\begin{table}[!htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{threeparttable}
+\caption{Robustness: \(W_{\ge q75}\) and survey questions (Recent audit / All surveyed firms)}
+\begin{tabular}{l*{12}{c}}
+\input{Output/w_robust_topquartile_table_questions_recent_all.tex}
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: OLS results for four taxpayer-survey outcomes: Corruption in general (Columns 1 to 3), Corruption experience (Columns 4 to 6), Grade on honesty (Columns 7 to 9), and Friend at tax authority (Columns 10 to 12). The specification is \(y_{ig}=\beta_0+\beta_1 W_i^{\ge q75}+\beta_2 \text{Algorithm}_i+\beta_3 \text{Overlap}_i+\beta_4 \text{Random}_i+\beta_5 \text{Safeties}_i+\beta_6 \text{Horsprogramme}_i+\gamma_g+\varepsilon_{ig}\). Here \(W_i^{\ge q75}=\mathbf{1}\{W_{\text{main},i}\ge\widetilde{W}_{75}\}\), where \(\widetilde{W}_{75}\) is the pooled 75th percentile of non-missing \(W_{\text{main}}\) in the regression-eligible sample. The control set follows Table D7 (algorithm-selection, overlap, random-selection, replacement, and ad hoc indicators), with the addition of the discrepancy term \(W_i^{\ge q75}\). Panel A includes surveyed firms that report having been audited recently; Panel B includes all surveyed firms. Within each panel, columns report full audits, desk audits, and all audits. Corruption in general is the declared belief about the percentage of audits in Senegal affected by corruption; Corruption experience indicates that the respondent declared an instance of bribery to obtain tax favors; Grade on honesty is a 0-to-10 grade for the honesty of the inspector with whom the respondent last interacted during a full audit; and Friend at tax authority captures agreement with the statement that if the firm's owner has a friend at the tax authority, the firm will rarely be audited. Fixed effects are at the inspector-cluster-year level. Robust standard errors (Huber-White) are in parentheses. Stars denote significance at \(^{*}p<0.10\), \(^{**}p<0.05\), \(^{***}p<0.01\).
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
+\end{landscape}
