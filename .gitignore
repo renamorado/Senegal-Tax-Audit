@@ -7,3 +7,6 @@
 *.bak
 *.swp
 *.dta
+.vscode/stata-runtime/
+.vscode/stata-tmp/
+.vscode/__pycache__/

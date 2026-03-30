@@ -124,45 +124,40 @@ twoway (kdensity evasionrate if selectionyear==2018) || ///
 graph export "$output/kdensity_evasionrate_syear_fullaudits_success.pdf", replace
 
 	
-**# 3. tag cases with above median and top quartile evasionrate within list 
+**# 3. tag cases with above median and top quintile evasionrate within bureau-year
 egen taglist= tag(bureau selectionyear) 
 
-*egen group= group(bureau selectionyear)
-count if taglist  ==1 // 272 list
+*egen group= group(bureau_detailed selectionyear)
+count if taglist  ==1 // 272 bureau-year groups
 
 
 
 *ssc install egenmore, replace
-*generate variable grouping algo + rand cases 
-gen alg_rand = (method=="Algorithm" | method=="Random") // there are no random cases for inspectors so actually this doesn't matter here
-
-*generate variable taging cluster + year + method (alg+rand or inspectors)
-egen selectionyearmethod = group(selectionyear alg_rand)
-
-egen quartiles_er= xtile(evasionrate), by(selectionyearmethod)  nq(4)   // or nquantiles(4)
+egen quartiles_er = xtile(evasionrate), by(selectionyear bureau_detailed) nq(4)
+egen quintiles_er = xtile(evasionrate), by(selectionyear bureau_detailed) nq(5)
 
 *above median 
 gen abovemedian_er = (quartiles_er==3 | quartiles_er==4)
 replace abovemedian_er =. if y2==0
 
-gen topquartile_er = (quartiles_er==4)
-replace topquartile_er = . if y2==0
+gen topquintile_er = (quintiles_er==5)
+replace topquintile_er = . if y2==0
 
 tab null_evasion abovemedian_er 
-tab topquartile_er
+tab topquintile_er
 
 
 **# Checking 
-* How many unique tax offices per year × group?
+* How many unique tax offices per year?
 preserve
-keep inspectorcluster selectionyear alg_rand
+keep bureau_detailed selectionyear
 duplicates drop
-tab selectionyear alg_rand
+tab selectionyear
 restore
 
-* Quartiles should vary within each year × group
-by selectionyear, sort: tab alg_rand quartiles_er, missing
-*tab selectionyear alg_rand quartiles_er, missing
+* Quartiles and quintiles should vary within each bureau-year group
+by selectionyear bureau_detailed, sort: tab quartiles_er, missing
+by selectionyear bureau_detailed, sort: tab quintiles_er, missing
 
 
 ***************
@@ -179,7 +174,7 @@ rename n total_assigned
 
 **# Flag tax offices that were observed during the whole period 
 *===============================
-* Bureau coverage flags (2018–2020) — robust version
+* Bureau coverage flags (2018-2020) - robust version
 *===============================
 preserve
     keep bureau_detailed selectionyear
@@ -224,7 +219,7 @@ forval sample = 1/3 {
 		*collapse (sum) total_assigned total_executed null_evasion `cond1'
 		*collapse (sum) total_assigned total_executed null_evasion `cond`sample''
 		*local sample = 3 `cond`sample'' 
-		collapse (sum) total_assigned total_executed detected_audit abovemedian_er topquartile_er `cond`sample'' , by(method groupbureau bureau selectionyear) 
+		collapse (sum) total_assigned total_executed detected_audit abovemedian_er topquintile_er `cond`sample'' , by(method groupbureau bureau selectionyear) 
 		
 		
 		*Collapsing at the inspector - bureau - selectionyear level
@@ -232,7 +227,7 @@ forval sample = 1/3 {
 		by(method groupbureau bureau selectionyear) 
 		
 		*reshaping to obtain the audit numbers (method as columns)
-		reshape wide total_assigned total_executed detected_audit abovemedian_er topquartile_er, ///
+		reshape wide total_assigned total_executed detected_audit abovemedian_er topquintile_er, ///
 		i(bureau groupbureau selectionyear) j(method, string)
 		
 		*encoding all missings to zero at this stage	
@@ -282,7 +277,7 @@ forval sample = 1/3 {
 
 		
 * collapse at the inspector year level		
-	collapse (sum) total_assigned* total_executed* detected_audit* topquartile_er* abovemedian_er*, by(bureau selectionyear)
+	collapse (sum) total_assigned* total_executed* detected_audit* topquintile_er* abovemedian_er*, by(bureau selectionyear)
 	egen tag_bureau = tag(bureau)
 		** Generating total
 		*Total execution
@@ -294,7 +289,7 @@ forval sample = 1/3 {
 
 		egen total_detected_audits = rowtotal(detected_audit*)
 		egen total_abvmed_er = rowtotal(abovemedian_er*)
-		egen total_topq_er = rowtotal(topquartile_er*)
+		egen total_topq_er = rowtotal(topquintile_er*)
 
 		**# Generating shares 
 		*total detected 
@@ -302,7 +297,7 @@ forval sample = 1/3 {
 
 		*total above-median evasion rate
 		gen share_abvmed_er_all= (total_abvmed_er/ total_executed_audits) * 100
-		*total top quartile audit cases 
+		*total top quintile audit cases 
 		gen share_topq_er_all= (total_topq_er/ total_executed_audits) * 100
 		*total execution
 		gen share_exec_all= (total_executed_audits / total_assigned_audits) * 100
@@ -319,7 +314,7 @@ forval sample = 1/3 {
 			
 			*share of audits above median evasion rate
 			gen share_abvmed_er_`met' = (abovemedian_er`met'/total_executed`met')*100  // it will be undefined when 0
-			gen share_topq_er_`met' = (topquartile_er`met'/total_executed`met')*100  // it will be undefined when 0
+			gen share_topq_er_`met' = (topquintile_er`met'/total_executed`met')*100  // it will be undefined when 0
 			
 			* share of total executed x selection method cases with with respect to total assigned cases by inspector
 			gen share_exec_`met'_all = (total_executed`met'/total_assigned_audits)*100 
@@ -395,7 +390,7 @@ forval sample = 1/3 {
 		rel_share_exec_Algorithm, ///
 		i(bureau) j(selectionyear)
 		
-		* Merge bureau coverage (built from full 2018–2020 sample)
+		* Merge bureau coverage (built from full 2018-2020 sample)
 		merge 1:1 bureau using `bureau_cov', nogen keep(match)
 
 		* btype: 2 = observed all 3 years, 1 = not observed all 3 years
@@ -463,11 +458,11 @@ forval sample = 1/3 {
 	cap label var share_abvmed_er_Inspectors_all2018  "Share of above-median evasion rate cases, Inspectors (all, 2018)"
 	cap label var share_abvmed_er_Inspectors2018      "Share of above-median evasion rate cases, Inspectors (2018)"
 
-	cap label var share_topq_er_Algorithm_all2018        "Share of top-quartile evasion rate cases, Algorithm (all, 2018)"
-	cap label var share_topq_er_Algorithm2018            "Share of top-quartile evasion rate cases, Algorithm (2018)"
-	cap label var share_topq_er_all2018            "Share of top-quartile evasion rate cases, all (2018)"
-	cap label var share_topq_er_Inspectors_all2018 "Share of top-quartile evasion rate cases, Inspectors (all, 2018)"
-	cap label var share_topq_er_Inspectors2018     "Share of top-quartile evasion rate cases, Inspectors (2018)"
+	cap label var share_topq_er_Algorithm_all2018        "Share of top-quintile evasion rate cases, Algorithm (all, 2018)"
+	cap label var share_topq_er_Algorithm2018            "Share of top-quintile evasion rate cases, Algorithm (2018)"
+	cap label var share_topq_er_all2018            "Share of top-quintile evasion rate cases, all (2018)"
+	cap label var share_topq_er_Inspectors_all2018 "Share of top-quintile evasion rate cases, Inspectors (all, 2018)"
+	cap label var share_topq_er_Inspectors2018     "Share of top-quintile evasion rate cases, Inspectors (2018)"
 
 
 	*========================================================
@@ -490,11 +485,11 @@ forval sample = 1/3 {
 	cap label var share_abvmed_er_Inspectors_all2019  "Share of above-median evasion rate cases, Inspectors (all, 2019)"
 	cap label var share_abvmed_er_Inspectors2019      "Share of above-median evasion rate cases, Inspectors (2019)"
 
-	cap label var share_topq_er_Algorithm_all2019        "Share of top-quartile evasion rate cases, Algorithm (all, 2019)"
-	cap label var share_topq_er_Algorithm2019            "Share of top-quartile evasion rate cases, Algorithm (2019)"
-	cap label var share_topq_er_all2019            "Share of top-quartile evasion rate cases, all (2019)"
-	cap label var share_topq_er_Inspectors_all2019 "Share of top-quartile evasion rate cases, Inspectors (all, 2019)"
-	cap label var share_topq_er_Inspectors2019     "Share of top-quartile evasion rate cases, Inspectors (2019)"
+	cap label var share_topq_er_Algorithm_all2019        "Share of top-quintile evasion rate cases, Algorithm (all, 2019)"
+	cap label var share_topq_er_Algorithm2019            "Share of top-quintile evasion rate cases, Algorithm (2019)"
+	cap label var share_topq_er_all2019            "Share of top-quintile evasion rate cases, all (2019)"
+	cap label var share_topq_er_Inspectors_all2019 "Share of top-quintile evasion rate cases, Inspectors (all, 2019)"
+	cap label var share_topq_er_Inspectors2019     "Share of top-quintile evasion rate cases, Inspectors (2019)"
 
 
 	*========================================================
@@ -517,11 +512,11 @@ forval sample = 1/3 {
 	cap label var share_abvmed_er_Inspectors_all2020  "Share of above-median evasion rate cases, Inspectors (all, 2020)"
 	cap label var share_abvmed_er_Inspectors2020      "Share of above-median evasion rate cases, Inspectors (2020)"
 
-	cap label var share_topq_er_Algorithm_all2020        "Share of top-quartile evasion rate cases, Algorithm (all, 2020)"
-	cap label var share_topq_er_Algorithm2020            "Share of top-quartile evasion rate cases, Algorithm (2020)"
-	cap label var share_topq_er_all2020            "Share of top-quartile evasion rate cases, all (2020)"
-	cap label var share_topq_er_Inspectors_all2020 "Share of top-quartile evasion rate cases, Inspectors (all, 2020)"
-	cap label var share_topq_er_Inspectors2020     "Share of top-quartile evasion rate cases, Inspectors (2020)"
+	cap label var share_topq_er_Algorithm_all2020        "Share of top-quintile evasion rate cases, Algorithm (all, 2020)"
+	cap label var share_topq_er_Algorithm2020            "Share of top-quintile evasion rate cases, Algorithm (2020)"
+	cap label var share_topq_er_all2020            "Share of top-quintile evasion rate cases, all (2020)"
+	cap label var share_topq_er_Inspectors_all2020 "Share of top-quintile evasion rate cases, Inspectors (all, 2020)"
+	cap label var share_topq_er_Inspectors2020     "Share of top-quintile evasion rate cases, Inspectors (2020)"
 
 
 	*========================================================
@@ -544,11 +539,11 @@ forval sample = 1/3 {
 	cap label var share_abvmed_er_Inspectors_allavg   "Share of above-median evasion rate cases, Inspectors (all,2019-2020)"
 	cap label var share_abvmed_er_Inspectorsavg       "Share of above-median evasion rate cases, Inspectors (2019-2020)"
 
-	cap label var share_topq_er_Algorithm_allavg         "Share of top-quartile evasion rate cases, Algorithm (all,2019-2020)"
-	cap label var share_topq_er_Algorithmavg             "Share of top-quartile evasion rate cases, Algorithm (2019-2020)"
-	cap label var share_topq_er_allavg             "Share of top-quartile evasion rate cases, all (2019-2020)"
-	cap label var share_topq_er_Inspectors_allavg  "Share of top-quartile evasion rate cases, Inspectors (all,2019-2020)"
-	cap label var share_topq_er_Inspectorsavg      "Share of top-quartile evasion rate cases, Inspectors (2019-2020)"
+	cap label var share_topq_er_Algorithm_allavg         "Share of top-quintile evasion rate cases, Algorithm (all,2019-2020)"
+	cap label var share_topq_er_Algorithmavg             "Share of top-quintile evasion rate cases, Algorithm (2019-2020)"
+	cap label var share_topq_er_allavg             "Share of top-quintile evasion rate cases, all (2019-2020)"
+	cap label var share_topq_er_Inspectors_allavg  "Share of top-quintile evasion rate cases, Inspectors (all,2019-2020)"
+	cap label var share_topq_er_Inspectorsavg      "Share of top-quintile evasion rate cases, Inspectors (2019-2020)"
 
 
 
@@ -723,19 +718,19 @@ foreach share in share_exec_all share_exec_Algorithm share_exec_Inspectors ///
     else if "`share'" == "share_topq_er_all" {
         local y_t     "share_exec_all`t'"
         local y_t1    "share_exec_all`t1'"
-        local x_title "% top quartile evasion rate cases - all audits, year t"
+        local x_title "% top quintile evasion rate cases - all audits, year t"
         local y_title "Execution rate - all audits, year t+1"
     }
     else if "`share'" == "share_topq_er_Algorithm" {
         local y_t     "share_exec_Algorithm`t'"
         local y_t1    "share_exec_Algorithm`t1'"
-        local x_title "% top quartile evasion rate cases - Algo audits, year t"
+        local x_title "% top quintile evasion rate cases - Algo audits, year t"
         local y_title "Execution rate - algo audits, year t+1"
     }
     else if "`share'" == "share_topq_er_Inspectors" {
         local y_t     "share_exec_Inspectors`t'"
         local y_t1    "share_exec_Inspectors`t1'"
-        local x_title "% top quartile evasion rate cases - Inspector audits, year t"
+        local x_title "% top quintile evasion rate cases - Inspector audits, year t"
         local y_title "Execution rate - inspector audits, year t+1"
     }
     else {
@@ -750,7 +745,7 @@ foreach share in share_exec_all share_exec_Algorithm share_exec_Inspectors ///
     local cond "!missing(`xvar', `y_t', `y_t1') & `y_t' != 0"
 
  *========================================================
-    * Show partial-coverage group ONLY for the 2019–2020 window
+    * Show partial-coverage group ONLY for the 2019-2020 window
     * (avoids legends for a group that cannot appear in 2018-based plots)
     *========================================================
     local show_partial = (`sample'==2)
@@ -802,7 +797,7 @@ local p = 0
 local plotcmd `"`plotcmd' (scatter `y_t1' `xvar' if `cond' & btype==2, mcolor(dknavy) msymbol(triangle))"'
 local p = `p' + 1
 local legorder "`legorder' `p'"
-local leglbls  `"`leglbls' label(`p' "Tax office observed 2018–2020 [N=`n_all3']")"'
+local leglbls  `"`leglbls' label(`p' "Tax office observed 2018-2020 [N=`n_all3']")"'
 
 if `n_all3' >= 2 {
     local plotcmd `"`plotcmd' (lfit `y_t1' `xvar' if `cond' & btype==2, lcolor(dknavy) lpattern(solid) lwidth(medthick))"'
@@ -828,9 +823,17 @@ if `show_partial' & `n_part' > 0 {
     }
 }
 
+quietly summarize `xvar' if `cond', meanonly
+local xlower = max(0, 20*floor(r(min)/20))
+local xupper = min(100, 20*ceil(r(max)/20))
+if `xlower' >= `xupper' {
+    if `xupper' < 100 local xupper = `xupper' + 20
+    else if `xlower' > 0 local xlower = `xlower' - 20
+}
+
 twoway `plotcmd', ///
     legend(order(`legorder') `leglbls' pos(6) ring(1) cols(2) size(vsmall)) ///
-    xscale(range(0 100)) xlabel(0(20)100) ///
+    xscale(range(`xlower' `xupper')) xlabel(`xlower'(20)`xupper') ///
     yscale(range(0 100)) ylabel(0(20)100) ///
     xtitle("`x_title'") ///
     ytitle("`y_title'")
@@ -942,11 +945,15 @@ foreach relshare in rel_share_exec_Algorithm rel_share_det_Algorithm ///
     }
 
     quietly summarize `xvar' if `cond', meanonly
+    local xlower = floor(2*r(min))/2
     local xupper = max(1, ceil(2*r(max))/2)
+    if `xlower' >= `xupper' {
+        local xupper = `xupper' + 0.5
+    }
 
     twoway `plotcmd', ///
         legend(order(`legorder') `leglbls' pos(6) ring(1) cols(2) size(vsmall)) ///
-        xscale(range(0 `xupper')) xlabel(0(0.5)`xupper', format(%3.1f)) ///
+        xscale(range(`xlower' `xupper')) xlabel(`xlower'(0.5)`xupper', format(%3.1f)) ///
         yscale(range(0 .)) ylabel(0, add) ///
         xtitle("`x_title'") ///
         ytitle("`y_title'")
@@ -969,7 +976,7 @@ esttab bureau_stats_1 ///
     main(sum) noobs nonote ///
     varlabels( tag_bureau  "Total Bureaux" ///
                bureau_consec       "Inspectors observable two periods" ) ///
-        mtitles("2018–2019" "2019–2020" "2018 – avg(2019–2020)") ///
+        mtitles("2018-2019" "2019-2020" "2018 - avg(2019-2020)") ///
     booktabs 
 	
 * Table: Inspectors that executed / detected algo vs inspectors / all (t and t+1)
@@ -999,9 +1006,9 @@ esttab bureau_has_1 ///
         has_abvmed_er_all_t          "Reported any above-median evasion rate" ///
         has_abvmed_er_Algorithm_t          "Reported above-median evasion rate algo audit" ///
         has_abvmed_er_Inspectors_t   "Reported above-median evasion rate inspector audit" ///
-        has_topq_er_all_t          "Reported any top-quartile evasion rate" ///
-        has_topq_er_Algorithm_t          "Reported top-quartile  evasion rate algo audit" ///
-        has_topq_er_Inspectors_t   "Reported top-quartile  evasion rate  inspector audit" ///
+        has_topq_er_all_t          "Reported any top-quintile evasion rate" ///
+        has_topq_er_Algorithm_t          "Reported top-quintile  evasion rate algo audit" ///
+        has_topq_er_Inspectors_t   "Reported top-quintile  evasion rate  inspector audit" ///
 		has_executed_all_t1        "Executed any audit" ///
         has_executed_Algorithm_t1        "Executed algo-selected audit" ///
         has_executed_Inspectors_t1 "Executed inspector-selected audit" ///
@@ -1011,11 +1018,11 @@ esttab bureau_has_1 ///
 		has_abvmed_er_all_t1          "Reported any above-median evasion rate" ///
         has_abvmed_er_Algorithm_t1          "Reported above-median evasion rate algo audit" ///
         has_abvmed_er_Inspectors_t1   "Reported above-median evasion rate inspector audit" ///
-        has_topq_er_all_t1          "Reported any top-quartile evasion rate" ///
-        has_topq_er_Algorithm_t1          "Reported top-quartile  evasion rate algo audit" ///
-        has_topq_er_Inspectors_t1   "Reported top-quartile  evasion rate  inspector audit" ///
+        has_topq_er_all_t1          "Reported any top-quintile evasion rate" ///
+        has_topq_er_Algorithm_t1          "Reported top-quintile  evasion rate algo audit" ///
+        has_topq_er_Inspectors_t1   "Reported top-quintile  evasion rate  inspector audit" ///
     ) ///
-    mtitles("2018–2019" "2019–2020" "2018 – avg(2019–2020)") ///
+    mtitles("2018-2019" "2019-2020" "2018 - avg(2019-2020)") ///
     booktabs
 	
 
@@ -1048,9 +1055,9 @@ esttab bureau_share_1 ///
         share_abvmed_er_all_t      "Share of above median ev. rate, all audits" ///
         share_abvmed_er_Algorithm_t      "Share of above median ev. rate, algo audits" ///
         share_abvmed_er_Inspectors_t "Share of above median ev. rate, inspector audits" ///
-		share_topq_er_all_t      "Share of top quartile ev. rate, all audits" ///
-        share_topq_er_Algorithm_t      "Share of top quartile ev. rate, algo audits" ///
-        share_topq_er_Inspectors_t "Share of top quartile ev. rate, inspector audits" ///
+		share_topq_er_all_t      "Share of top quintile ev. rate, all audits" ///
+        share_topq_er_Algorithm_t      "Share of top quintile ev. rate, algo audits" ///
+        share_topq_er_Inspectors_t "Share of top quintile ev. rate, inspector audits" ///
         share_exec_all_t1        "Exec rate, all audits" ///
         share_exec_Algorithm_t1        "Exec rate, algo audits" ///
         share_exec_Inspectors_t1 "Exec rate, inspector audits" ///
@@ -1060,12 +1067,15 @@ esttab bureau_share_1 ///
         share_abvmed_er_all_t1      "Share of above median ev. rate, all audits" ///
         share_abvmed_er_Algorithm_t1      "Share of above median ev. rate, algo audits" ///
         share_abvmed_er_Inspectors_t1 "Share of above median ev. rate, inspector audits" ///
-		share_topq_er_all_t1      "Share of top quartile ev. rate, all audits" ///
-        share_topq_er_Algorithm_t1     "Share of top quartile ev. rate, algo audits" ///
-        share_topq_er_Inspectors_t1 "Share of top quartile ev. rate, inspector audits" ///
+		share_topq_er_all_t1      "Share of top quintile ev. rate, all audits" ///
+        share_topq_er_Algorithm_t1     "Share of top quintile ev. rate, algo audits" ///
+        share_topq_er_Inspectors_t1 "Share of top quintile ev. rate, inspector audits" ///
     ) ///
-    mtitles("2018–2019" "2019–2020" "2018 – avg(2019–2020)") ///
+    mtitles("2018-2019" "2019-2020" "2018 - avg(2019-2020)") ///
     booktabs
+
+
+
 
 
 

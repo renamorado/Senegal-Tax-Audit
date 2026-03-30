@@ -1,0 +1,105 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Stata: Run selection",
+      "type": "process",
+      "command": "py",
+      "args": [
+        "${workspaceFolder}\\.vscode\\run_stata.py",
+        "--mode",
+        "selection",
+        "--source-file",
+        "${file}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "VSCODE_SELECTED_TEXT": "${selectedText}"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stata: Run selection (keep Stata open)",
+      "type": "process",
+      "command": "py",
+      "args": [
+        "${workspaceFolder}\\.vscode\\run_stata.py",
+        "--mode",
+        "selection",
+        "--source-file",
+        "${file}",
+        "--keep-open"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "VSCODE_SELECTED_TEXT": "${selectedText}"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stata: Run current do-file",
+      "type": "process",
+      "command": "py",
+      "args": [
+        "${workspaceFolder}\\.vscode\\run_stata.py",
+        "--mode",
+        "file",
+        "--source-file",
+        "${file}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Stata: Run current do-file (keep Stata open)",
+      "type": "process",
+      "command": "py",
+      "args": [
+        "${workspaceFolder}\\.vscode\\run_stata.py",
+        "--mode",
+        "file",
+        "--source-file",
+        "${file}",
+        "--keep-open"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

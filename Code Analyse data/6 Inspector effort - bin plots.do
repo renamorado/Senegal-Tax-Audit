@@ -60,6 +60,7 @@ if $check == 1 {
 }
 di "$output"
 
+
 ********************************************************************************
 ** MAIN LOOP: Full vs Desk
 ********************************************************************************
@@ -95,70 +96,128 @@ foreach audtype in 1 0 {
 		* x-axis title
 		if "`b'" == "yhatrf" {
 			local xti "Predicted evasion (log FCFA)"
+
 		}
 		else if "`b'" == "turnover_mean" {
 			local xti "Firm Size (Mean turnover 2014-2020)"
+
 		}
 
 		********************************************************************************
-		** LOOP over bin definition
+		** LOOP over bin definition and bin scope
 		********************************************************************************
 		foreach bin_def in `bin_defs' {
+			foreach bin_scope in within_method pooled_sample {
 
-			local tail_cut = 12
+				local tail_cut = 12
+				local export_suffix ""
+				if "`bin_scope'" == "pooled_sample" local export_suffix "_whole_sample"
 
-			* Clear prior bin vars
-			capture drop bin_`b'
-			capture drop mid_bin_`b'
+				* Clear prior bin vars
+				capture drop bin_`b'
+				capture drop mid_bin_`b'
 
-			* Bins are computed within selection method (Algorithm vs Inspectors).
-			* --- QUANTILE BINS (ADDED quintile) ---
-			if "`bin_def'" == "decile" {
-				bysort algorithm: egen bin_`b' = xtile(`b'), nq(10)
-				bysort algorithm bin_`b': egen mid_bin_`b' = mean(`b')
-				local nq = 10
-				local bin_family "quantile"
-				local bin_tag "decile"
-				if "`b'" == "yhatrf" {
-					local xti_bin "Decile of Predicted evasion (log FCFA)"
+				* Bins are computed either within selection method or on the pooled sample.
+				* For pooled-sample outputs, the bin thresholds are estimated on executed cases
+				* only, then applied back to the full selected sample.
+				if "`bin_def'" == "decile" {
+					local nq = 10
+					if "`bin_scope'" == "within_method" {
+						bysort algorithm: egen bin_`b' = xtile(`b'), nq(10)
+						bysort algorithm bin_`b': egen mid_bin_`b' = mean(`b')
+					}
+					else {
+						tempvar exec_bin
+						egen `exec_bin' = xtile(`b') if y2==1, nq(`nq')
+						gen bin_`b' = .
+						local last_cut = `nq' - 1
+						forvalues q = 1/`last_cut' {
+							quietly summarize `b' if `exec_bin'==`q', meanonly
+							local cut`q' = r(max)
+						}
+						replace bin_`b' = 1 if !missing(`b') & `b' <= `cut1'
+						forvalues q = 2/`last_cut' {
+							local prev = `q' - 1
+							replace bin_`b' = `q' if !missing(`b') & `b' > `cut`prev'' & `b' <= `cut`q''
+						}
+						replace bin_`b' = `nq' if !missing(`b') & `b' > `cut`last_cut''
+						bysort bin_`b': egen mid_bin_`b' = mean(`b')
+					}
+					local bin_family "quantile"
+					local bin_tag "decile"
+					if "`b'" == "yhatrf" {
+						if "`bin_scope'" == "within_method" local xti_bin "Decile of Predicted evasion (log FCFA)"
+						else local xti_bin "Executed-case pooled decile of Predicted evasion (log FCFA)"
+					}
+					else if "`b'" == "turnover_mean" {
+						if "`bin_scope'" == "within_method" local xti_bin "Decile of Firm Size (Mean turnover 2014-2020)"
+						else local xti_bin "Executed-case pooled decile of Firm Size (Mean turnover 2014-2020)"
+					}
 				}
-				else if "`b'" == "turnover_mean" {
-					local xti_bin "Decile of Firm Size (Mean turnover 2014-2020)"
+				else if "`bin_def'" == "quintile" {
+					local nq = 5
+					if "`bin_scope'" == "within_method" {
+						bysort algorithm: egen bin_`b' = xtile(`b'), nq(5)
+						bysort algorithm bin_`b': egen mid_bin_`b' = mean(`b')
+					}
+					else {
+						tempvar exec_bin
+						egen `exec_bin' = xtile(`b') if y2==1, nq(`nq')
+						gen bin_`b' = .
+						local last_cut = `nq' - 1
+						forvalues q = 1/`last_cut' {
+							quietly summarize `b' if `exec_bin'==`q', meanonly
+							local cut`q' = r(max)
+						}
+						replace bin_`b' = 1 if !missing(`b') & `b' <= `cut1'
+						forvalues q = 2/`last_cut' {
+							local prev = `q' - 1
+							replace bin_`b' = `q' if !missing(`b') & `b' > `cut`prev'' & `b' <= `cut`q''
+						}
+						replace bin_`b' = `nq' if !missing(`b') & `b' > `cut`last_cut''
+						bysort bin_`b': egen mid_bin_`b' = mean(`b')
+					}
+					local bin_family "quantile"
+					local bin_tag "quintile"
+					if "`b'" == "yhatrf" {
+						if "`bin_scope'" == "within_method" local xti_bin "Quintile of Predicted evasion (log FCFA)"
+						else local xti_bin "Executed-case pooled quintile of Predicted evasion (log FCFA)"
+					}
+					else if "`b'" == "turnover_mean" {
+						if "`bin_scope'" == "within_method" local xti_bin "Quintile of Firm Size (Mean turnover 2014-2020)"
+						else local xti_bin "Executed-case pooled quintile of Firm Size (Mean turnover 2014-2020)"
+					}
 				}
-			}
-			else if "`bin_def'" == "quintile" {
-				bysort algorithm: egen bin_`b' = xtile(`b'), nq(5)
-				bysort algorithm bin_`b': egen mid_bin_`b' = mean(`b')
-				local nq = 5
-				local bin_family "quantile"
-				local bin_tag "quintile"
-				if "`b'" == "yhatrf" {
-					local xti_bin "Quintile of Predicted evasion (log FCFA)"
+				else {
+					* --- FIXED-WIDTH BINS ---
+					local w = real(substr("`bin_def'",2,.))
+					if "`bin_scope'" == "within_method" {
+						bysort algorithm: egen min_raw_`b' = min(`b')
+						bysort algorithm: egen max_raw_`b' = max(`b')
+					}
+					else {
+						tempvar exec_x
+						gen `exec_x' = `b' if y2==1
+						egen min_raw_`b' = min(`exec_x')
+						egen max_raw_`b' = max(`exec_x')
+					}
+					gen min_v_`b' = floor(min_raw_`b')
+					gen max_v_`b' = ceil(max_raw_`b')
+					gen bin_`b' = floor((`b' - min_v_`b')/`w')*`w' + min_v_`b'
+					replace bin_`b' = max_v_`b' if bin_`b' > max_v_`b'
+					gen mid_bin_`b' = bin_`b' + (`w'/2)
+					drop min_raw_`b' max_raw_`b' min_v_`b' max_v_`b'
+					local bin_family "fixed"
+					local bin_tag "`w'u"
+					if "`b'" == "yhatrf" {
+						if "`bin_scope'" == "within_method" local xti_bin "Bins of Predicted evasion (log FCFA), width = `w'"
+						else local xti_bin "Executed-case pooled bins of Predicted evasion (log FCFA), width = `w'"
+					}
+					else if "`b'" == "turnover_mean" {
+						if "`bin_scope'" == "within_method" local xti_bin "Bins of Firm Size (Mean turnover 2014-2020), width = `w'"
+						else local xti_bin "Executed-case pooled bins of Firm Size (Mean turnover 2014-2020), width = `w'"
+					}
 				}
-				else if "`b'" == "turnover_mean" {
-					local xti_bin "Quintile of Firm Size (Mean turnover 2014-2020)"
-				}
-			}
-			else {
-				* --- FIXED-WIDTH BINS ---
-				local w = real(substr("`bin_def'",2,.))
-				bysort algorithm: egen min_raw_`b' = min(`b')
-				bysort algorithm: egen max_raw_`b' = max(`b')
-				gen min_v_`b' = floor(min_raw_`b')
-				gen max_v_`b' = ceil(max_raw_`b')
-				gen bin_`b' = floor((`b' - min_v_`b')/`w')*`w' + min_v_`b'
-				replace bin_`b' = max_v_`b' if bin_`b' > max_v_`b'
-				gen mid_bin_`b' = bin_`b' + (`w'/2)
-				drop min_raw_`b' max_raw_`b' min_v_`b' max_v_`b'
-				local bin_family "fixed"
-				local bin_tag "`w'u"
-				if "`b'" == "yhatrf" {
-					local xti_bin "Bins of Predicted evasion (log FCFA), width = `w'"
-				}
-				else if "`b'" == "turnover_mean" {
-					local xti_bin "Bins of Firm Size (Mean turnover 2014-2020), width = `w'"
-				}
-			}
 
 			********************************************************************************
 			** EXECUTION RATE (all selected cases; not conditional on execution)
@@ -235,6 +294,7 @@ foreach audtype in 1 0 {
 					local xscale_opt "xscale(range(`xlo' `xhi') noextend)"
 				}
 
+
 				local col_alg "#0072B2"
 				local col_ins "#D55E00"
 				local band_a 20
@@ -278,7 +338,7 @@ foreach audtype in 1 0 {
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
-				graph export "$output\exec_rate_binplot_`b'_`audit_type'_`bin_tag'.pdf", replace
+				graph export "$output\exec_rate_binplot_`b'_`audit_type'_`bin_tag'`export_suffix'.pdf", replace
 			restore
 
 			********************************************************************************
@@ -364,6 +424,7 @@ foreach audtype in 1 0 {
 					local xscale_opt "xscale(range(`xlo' `xhi') noextend)"
 				}
 
+
 				********************************************************************************
 				** PLOT STYLE (keep same colors, improve CI visibility)
 				********************************************************************************
@@ -416,7 +477,7 @@ foreach audtype in 1 0 {
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
-				graph export "$output\avg_ninspectors_binplot_`b'_`audit_type'_`bin_tag'.pdf", replace
+				graph export "$output\avg_ninspectors_binplot_`b'_`audit_type'_`bin_tag'`export_suffix'.pdf", replace
 
 				********************************************************************************
 				** (2) Duration (Admin data) y19
@@ -456,7 +517,7 @@ foreach audtype in 1 0 {
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
-				graph export "$output\avg_duration_admin_binplot_`b'_`audit_type'_`bin_tag'.pdf", replace
+				graph export "$output\avg_duration_admin_binplot_`b'_`audit_type'_`bin_tag'`export_suffix'.pdf", replace
 
 				********************************************************************************
 				** (3) Duration (Taxpayer survey) q30
@@ -496,7 +557,7 @@ foreach audtype in 1 0 {
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
-				graph export "$output\avg_duration_tp_binplot_`b'_`audit_type'_`bin_tag'.pdf", replace
+				graph export "$output\avg_duration_tp_binplot_`b'_`audit_type'_`bin_tag'`export_suffix'.pdf", replace
 
 				********************************************************************************
 				** (4) Duration (Self-reported) y8
@@ -536,10 +597,10 @@ foreach audtype in 1 0 {
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
-				graph export "$output\avg_duration_self_binplot_`b'_`audit_type'_`bin_tag'.pdf", replace
+				graph export "$output\avg_duration_self_binplot_`b'_`audit_type'_`bin_tag'`export_suffix'.pdf", replace
 
 			restore
+			}
 		}
 	}
 }
-
