@@ -10,3 +10,5 @@
 .vscode/stata-runtime/
 .vscode/stata-tmp/
 .vscode/__pycache__/
+.codex_tmp/
+_codex_*
