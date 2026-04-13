@@ -435,3 +435,54 @@ Task: Add the baseline replicated Table 6 output to the report with the original
 
 ## Open issues / next steps
 - None for this Table 6 report insertion.
+
+---
+
+Date: 2026-04-13
+Task: Migrate the active `6*` and `7 Inspector_performance.do` workflows from the OneDrive repo to a local working repo outside OneDrive.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `Code Analyse data/6 Table 6 yhatrf control.do`
+- `Code Analyse data/7 Inspector_performance.do`
+- `Code Analyse data/6 Inspector effort - bin plots.do`
+- `Code Analyse data/6 Inspector effort - bin plots_executed_outcome_availability.do`
+- `Code Analyse data/6 Inspector effort - bin plots_whole-sample-selected-cases.do`
+- `Code Analyse data/6 Inspector effort - Case potential.do`
+- `Code Analyse data/6 Inspector effort - Case potential_wDeskaudits.do`
+- `Code Analyse data/6 Inspector effort - Case potential_wDeskaudits_v2.do`
+- `Code Analyse data/6 Inspector effort - Case potential_wDeskaudits_v3_inspector_exec_rate.do`
+- `Code Analyse data/6 Inspector effort - Corruption.do`
+- `Code Analyse data/6 Inspector effort 2.0.do`
+- `Code Analyse data/6 Inspector effort 3.0.do`
+- `Code Analyse data/6 Inspector effort 4.0.do`
+- `Code Analyse data/6 Inspector effort 4.2_evasionrates.do`
+- `Code Analyse data/6 Inspector effort 4.3_evasionrates.do`
+- `Code Analyse data/6 Inspector effort 4.3_evasionrates_fullaudits.do`
+- `Code Analyse data/6 Inspector effort 4.3_evasionrates_fullaudits_successrates.do`
+- `Code Analyse data/6 Inspector effort 4.3_evasionrates_fullaudits_successrates_selectionyear_algorithm.do`
+- `Code Analyse data/6 Inspector effort 4.4_evasionrates.do`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Preserved the pre-migration OneDrive repo state by committing and pushing the current `inspector_effort` branch before making path changes.
+- Updated the active `6*` and `7 Inspector_performance.do` workflows so their `check == 1` output overrides now point to `C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output` instead of the OneDrive-backed repo.
+- Updated the active helper scripts that rely on the repo-local `ado` folder so they now point to `C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\ado`.
+- Replaced the one direct hardcoded predicted-data load in `6 Inspector effort - Case potential.do` with the existing `$analysisdata` macro so the Dropbox-based input path remains consistent with the rest of the active workflow.
+- Created the new local working clone at `C:\Users\wb648862\Documents\Projects\Senegal Tax Audits` on branch `inspector_effort`.
+
+## Output files affected
+- Active `6*` workflow outputs now write to `C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output` when `global check = 1`.
+- `6 Table 6 yhatrf control.do` regenerated the local `table6_indices_replicated.tex`, `table6_indices_yhatrf_control.tex`, and `table6_indices_yhatrf_quadratic_control.tex` outputs in the new local clone.
+- `7 Inspector_performance.do` regenerated the local `w_*` tables and related figure outputs in the new local clone.
+
+## Validation performed
+- Verified that the new local clone exists at `C:\Users\wb648862\Documents\Projects\Senegal Tax Audits`, is a Git repository, and is on `inspector_effort` at commit `d2f085e` before this notes update.
+- Ran `Code Analyse data\6 Table 6 yhatrf control.do` from the new local clone with Stata batch mode.
+- Ran `Code Analyse data\7 Inspector_performance.do` from the new local clone with Stata batch mode.
+- Confirmed that the regenerated `table6_*` outputs and `w_*` outputs were written under the new local `Output` folder.
+- Confirmed that the local clone remained clean after validation, indicating the checked-in path edits matched the validated run state.
+
+## Open issues / next steps
+- The old OneDrive repo remains on disk and still contains the historical working copy; avoid using it for active edits.
+- Older non-active Stata scripts outside the `6*` / `7` scope still keep their legacy path logic and may need similar updates if they are brought back into active use.
