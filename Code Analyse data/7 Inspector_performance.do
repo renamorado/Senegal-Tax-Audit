@@ -1,4 +1,4 @@
-*****************************************************************************************
+﻿*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TEX AUDIT SELECTION IN SENEGAL
 **		   Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **		   October 2025
@@ -35,7 +35,7 @@ global check = 1 // to save outside official replication folder
 	
 	
 	if $check == 1 {
-	global output "C:\Users\User\OneDrive\World Bank\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 	
@@ -44,14 +44,14 @@ global check = 1 // to save outside official replication folder
 		global rootdir "...\Senegal tax audits"				// Insert path to shared Dropbox folder "Senegal Tax Audits"
 	}
 */	
-		global ados "$rootdir\Analysis all data\replication_package\ado"
+		global ados "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\ado"
 		global rawdata "$rootdir"
 		global analysisdata "$rootdir\Analysis all data\replication_package\Working data"
 		global wastedata "$rootdir\Analysis all data\replication_package\Intermediate data"
 		global output "$rootdir\Analysis all data\replication_package\Output"
 		
 		if $check == 1 {
-	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 
@@ -353,7 +353,7 @@ local estlist ""
 local mtitles ""
 
 *******************************************************
-* 2) Loop over samples → collapse → regress outcomes
+* 2) Loop over samples â†’ collapse â†’ regress outcomes
 *******************************************************
 foreach s of local samples {
 
@@ -442,7 +442,7 @@ verificateur* groupbureau logturnover lognemployees_avg logfirmage riskscore x2
 
 drop verificateur_selection
 
-* 1) Inspector–case long file
+* 1) Inspectorâ€“case long file
 reshape long verificateur, i(firmid raisonsociale selectionyear controle x2 groupbureau) j(slot)
 drop if verificateur == ""
 

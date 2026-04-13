@@ -1,4 +1,4 @@
-*****************************************************************************************
+﻿*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TAX AUDIT SELECTION IN SENEGAL
 **         Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **         RA: Roldan Enamorado
@@ -54,7 +54,7 @@ global wastedata    "$rootdir\Analysis all data\replication_package\Intermediate
 global output       "$rootdir\Analysis all data\replication_package\Output"
 
 if $check == 1 {
-    global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
+    global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 }
 
 ***************************

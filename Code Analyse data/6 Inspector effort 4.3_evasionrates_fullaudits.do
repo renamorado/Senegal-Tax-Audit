@@ -1,4 +1,4 @@
-*****************************************************************************************
+﻿*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TEX AUDIT SELECTION IN SENEGAL
 **		   Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **		   October 2025
@@ -33,7 +33,7 @@ global check = 1 // to save outside official replication folder
 	
 	
 	if $check == 1 {
-	global output "C:\Users\User\OneDrive\World Bank\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 	
@@ -49,7 +49,7 @@ global check = 1 // to save outside official replication folder
 		global output "$rootdir\Analysis all data\replication_package\Output"
 		
 		if $check == 1 {
-	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 
@@ -151,14 +151,14 @@ tab bottomquartile_er
 
 
 **# Checking 
-* How many unique tax offices per year × group?
+* How many unique tax offices per year Ã— group?
 preserve
 keep inspectorcluster selectionyear alg_rand
 duplicates drop
 tab selectionyear alg_rand
 restore
 
-* Quartiles should vary within each year × group
+* Quartiles should vary within each year Ã— group
 by selectionyear, sort: tab alg_rand quartiles_er, missing
 *tab selectionyear alg_rand quartiles_er, missing
 
@@ -177,7 +177,7 @@ rename n total_assigned
 
 **# Flag tax offices that were observed during the whole period 
 *===============================
-* Bureau coverage flags (2018–2020) — robust version
+* Bureau coverage flags (2018â€“2020) â€” robust version
 *===============================
 preserve
     keep bureau_detailed selectionyear
@@ -393,7 +393,7 @@ forval sample = 1/3 {
 		rel_share_exec_Algorithm, ///
 		i(bureau) j(selectionyear)
 		
-		* Merge bureau coverage (built from full 2018–2020 sample)
+		* Merge bureau coverage (built from full 2018â€“2020 sample)
 		merge 1:1 bureau using `bureau_cov', nogen keep(match)
 
 		* btype: 2 = observed all 3 years, 1 = not observed all 3 years
@@ -748,7 +748,7 @@ foreach share in share_exec_all share_exec_Algorithm share_exec_Inspectors ///
     local cond "!missing(`xvar', `y_t', `y_t1') & `y_t' != 0"
 
  *========================================================
-    * Show partial-coverage group ONLY for the 2019–2020 window
+    * Show partial-coverage group ONLY for the 2019â€“2020 window
     * (avoids legends for a group that cannot appear in 2018-based plots)
     *========================================================
     local show_partial = (`sample'==2)
@@ -800,7 +800,7 @@ local p = 0
 local plotcmd `"`plotcmd' (scatter `y_t1' `xvar' if `cond' & btype==2, mcolor(dknavy) msymbol(triangle))"'
 local p = `p' + 1
 local legorder "`legorder' `p'"
-local leglbls  `"`leglbls' label(`p' "Tax office observed 2018–2020 [N=`n_all3']")"'
+local leglbls  `"`leglbls' label(`p' "Tax office observed 2018â€“2020 [N=`n_all3']")"'
 
 if `n_all3' >= 2 {
     local plotcmd `"`plotcmd' (lfit `y_t1' `xvar' if `cond' & btype==2, lcolor(dknavy) lpattern(solid) lwidth(medthick))"'
@@ -962,7 +962,7 @@ esttab bureau_stats_1 ///
     main(sum) noobs nonote ///
     varlabels( tag_bureau  "Total Bureaux" ///
                bureau_consec       "Inspectors observable two periods" ) ///
-        mtitles("2018–2019" "2019–2020" "2018 – avg(2019–2020)") ///
+        mtitles("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)") ///
     booktabs 
 	
 * Table: Inspectors that executed / voided algo vs inspectors / all (t and t+1)
@@ -1008,7 +1008,7 @@ esttab bureau_has_1 ///
         has_botq_er_Algorithm_t1          "Reported bot-quartile  evasion rate algo audit" ///
         has_botq_er_Inspectors_t1   "Reported bot-quartile  evasion rate  inspector audit" ///
     ) ///
-    mtitles("2018–2019" "2019–2020" "2018 – avg(2019–2020)") ///
+    mtitles("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)") ///
     booktabs
 	
 
@@ -1057,6 +1057,6 @@ esttab bureau_share_1 ///
         share_botq_er_Algorithm_t1     "Share of bottom quartile ev. rate, algo audits" ///
         share_botq_er_Inspectors_t1 "Share of bottom quartile ev. rate, inspector audits" ///
     ) ///
-    mtitles("2018–2019" "2019–2020" "2018 – avg(2019–2020)") ///
+    mtitles("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)") ///
     booktabs
 

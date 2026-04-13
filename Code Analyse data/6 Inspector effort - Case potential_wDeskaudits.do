@@ -1,4 +1,4 @@
-*****************************************************************************************
+﻿*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TEX AUDIT SELECTION IN SENEGAL
 **		   Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **		   RA: Roldan Enamorado
@@ -39,7 +39,7 @@ global check = 1 // to save outside official replication folder
 	
 	
 	if $check == 1 {
-	global output "C:\Users\User\OneDrive\World Bank\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 	
@@ -55,7 +55,7 @@ global check = 1 // to save outside official replication folder
 		global output "$rootdir\Analysis all data\replication_package\Output"
 		
 		if $check == 1 {
-	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 
@@ -720,7 +720,7 @@ esttab ry2_full ry2_desk1 ry2_desk2 ///
         span prefix(\multicolumn{@span}{c}{) suffix(}) ///
         erepeat(\cmidrule(lr){@span})) ///
     stats(pp N taxcenteryear inspectoryear, ///
-        labels("Mean of dep. var." "N" "Tax center × year FE" "Inspector × year FE") ///
+        labels("Mean of dep. var." "N" "Tax center Ã— year FE" "Inspector Ã— year FE") ///
         fmt(%9.2f %9.0f %9s %9s)) ///
     booktabs nonotes compress
 

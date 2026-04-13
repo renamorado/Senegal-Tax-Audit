@@ -1,4 +1,4 @@
-*****************************************************************************************
+﻿*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TEX AUDIT SELECTION IN SENEGAL
 **		   Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **		   October 2025
@@ -33,7 +33,7 @@ global check = 1 // to save outside official replication folder
 	
 	
 	if $check == 1 {
-	global output "C:\Users\User\OneDrive\World Bank\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 	
@@ -49,7 +49,7 @@ global check = 1 // to save outside official replication folder
 		global output "$rootdir\Analysis all data\replication_package\Output"
 		
 		if $check == 1 {
-	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 
@@ -96,7 +96,7 @@ gen penalite_droit =.
 	replace penalite_droit = . if y2==0
 
 tab penalite_droit 
-label define pd 1 "has penalités only" 2 "has droit simples only" 3 "has both" 4 "has neither"
+label define pd 1 "has penalitÃ©s only" 2 "has droit simples only" 3 "has both" 4 "has neither"
 label values penalite_droit pd
 
 eststo desk_pd: estpost tab penalite_droit method if x2==0

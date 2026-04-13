@@ -1,4 +1,4 @@
-*****************************************************************************************
+﻿*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TEX AUDIT SELECTION IN SENEGAL
 **		   Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **		   October 2025
@@ -33,7 +33,7 @@ global check = 1 // to save outside official replication folder
 	
 	
 	if $check == 1 {
-	global output "C:\Users\User\OneDrive\World Bank\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 	
@@ -49,7 +49,7 @@ global check = 1 // to save outside official replication folder
 		global output "$rootdir\Analysis all data\replication_package\Output"
 		
 		if $check == 1 {
-	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 
@@ -96,7 +96,7 @@ gen penalite_droit =.
 	replace penalite_droit = . if y2==0
 
 tab penalite_droit 
-label define pd 1 "has penalités only" 2 "has droit simples only" 3 "has both" 4 "has neither"
+label define pd 1 "has penalitÃ©s only" 2 "has droit simples only" 3 "has both" 4 "has neither"
 label values penalite_droit pd
 
 eststo desk_pd: estpost tab penalite_droit method if x2==0
@@ -662,7 +662,7 @@ foreach share in share_exec_all share_exec_ALG share_exec_Inspectors ///
 				 share_botq_er_all share_botq_er_ALG share_botq_er_Inspectors {
 
 * ==========================================================
-* ALL CASES (1–10) with SE + sign + lfitci band
+* ALL CASES (1â€“10) with SE + sign + lfitci band
 * ==========================================================
 
 * x-variable always uses the share at time t
@@ -815,7 +815,7 @@ esttab insp_stats_1_u1 insp_stats_1_u0 insp_stats_1_total ///
     mtitles("Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total") ///
-    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+    mgroups("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)", ///
             pattern(1 0 0 1 0 0 1 0 0) ///
             span ///
             prefix(\multicolumn{@span}{c}{) suffix(}) ///
@@ -868,7 +868,7 @@ esttab insp_has_1_u1 insp_has_1_u0 insp_has_1_tot ///
     mtitles("Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total") ///
-    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+    mgroups("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)", ///
             pattern(1 0 0 1 0 0 1 0 0) ///
             span ///
             prefix(\multicolumn{@span}{c}{) suffix(}) ///
@@ -924,7 +924,7 @@ esttab insp_share_1_u1 insp_share_1_u0 insp_share_1_tot ///
     mtitles("Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total") ///
-    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+    mgroups("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)", ///
             pattern(1 0 0 1 0 0 1 0 0) ///
             span ///
             prefix(\multicolumn{@span}{c}{) suffix(}) ///

@@ -1,4 +1,4 @@
-*****************************************************************************************
+﻿*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TEX AUDIT SELECTION IN SENEGAL
 **		   Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **		   October 2025
@@ -33,7 +33,7 @@ global check = 1 // to save outside official replication folder
 	
 	
 	if $check == 1 {
-	global output "C:\Users\User\OneDrive\World Bank\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 	
@@ -49,7 +49,7 @@ global check = 1 // to save outside official replication folder
 		global output "$rootdir\Analysis all data\replication_package\Output"
 		
 		if $check == 1 {
-	global output "C:\Users\wb648862\OneDrive - WBG\Documents\GitHub\Senegal-Tax-Audit\Output"
+	global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
 	}
 	di "$output"
 
@@ -96,7 +96,7 @@ gen penalite_droit =.
 	replace penalite_droit = . if y2==0
 
 tab penalite_droit 
-label define pd 1 "has penalités only" 2 "has droit simples only" 3 "has both" 4 "has neither"
+label define pd 1 "has penalitÃ©s only" 2 "has droit simples only" 3 "has both" 4 "has neither"
 label values penalite_droit pd
 
 eststo desk_pd: estpost tab penalite_droit method if x2==0
@@ -461,7 +461,7 @@ foreach share in share_exec_all share_exec_ALG share_exec_Inspectors ///
                  share_v_all   share_v_ALG   share_v_Inspectors {
 
     * ------------------------------------------------------------------
-    * Case 1: All void cases – v-share (all) vs exec_all in t+1
+    * Case 1: All void cases â€“ v-share (all) vs exec_all in t+1
     * ------------------------------------------------------------------
     if "`share'" == "share_v_all" {
 
@@ -533,7 +533,7 @@ foreach share in share_exec_all share_exec_ALG share_exec_Inspectors ///
     }
 
     * ------------------------------------------------------------------
-    * Case 2: Void algo cases – v-share (ALG) vs exec_ALG in t+1
+    * Case 2: Void algo cases â€“ v-share (ALG) vs exec_ALG in t+1
     * ------------------------------------------------------------------
     else if "`share'" == "share_v_ALG" {
 
@@ -602,7 +602,7 @@ foreach share in share_exec_all share_exec_ALG share_exec_Inspectors ///
     }
 
     * ------------------------------------------------------------------
-    * Case 3: Void inspector cases – v-share (Inspectors) vs exec_Inspectors in t+1
+    * Case 3: Void inspector cases â€“ v-share (Inspectors) vs exec_Inspectors in t+1
     * ------------------------------------------------------------------
     else if "`share'" == "share_v_Inspectors" {
 
@@ -671,7 +671,7 @@ foreach share in share_exec_all share_exec_ALG share_exec_Inspectors ///
     }
 
     * ------------------------------------------------------------------
-    * Case 4: Execution (or void) rates t vs t+1 – same measure both axes
+    * Case 4: Execution (or void) rates t vs t+1 â€“ same measure both axes
     * ------------------------------------------------------------------
     else {
 
@@ -761,7 +761,7 @@ esttab insp_stats_1_u1 insp_stats_1_u0 insp_stats_1_total ///
     mtitles("Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total") ///
-    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+    mgroups("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)", ///
             pattern(1 0 0 1 0 0 1 0 0) ///
             span ///
             prefix(\multicolumn{@span}{c}{) suffix(}) ///
@@ -798,7 +798,7 @@ esttab insp_has_1_u1 insp_has_1_u0 insp_has_1_tot ///
     mtitles("Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total") ///
-    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+    mgroups("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)", ///
             pattern(1 0 0 1 0 0 1 0 0) ///
             span ///
             prefix(\multicolumn{@span}{c}{) suffix(}) ///
@@ -838,7 +838,7 @@ esttab insp_share_1_u1 insp_share_1_u0 insp_share_1_tot ///
     mtitles("Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total" ///
             "Same bureau" "Changed bureau" "Total") ///
-    mgroups("2018–2019" "2019–2020" "2018 – avg(2019–2020)", ///
+    mgroups("2018â€“2019" "2019â€“2020" "2018 â€“ avg(2019â€“2020)", ///
             pattern(1 0 0 1 0 0 1 0 0) ///
             span ///
             prefix(\multicolumn{@span}{c}{) suffix(}) ///
