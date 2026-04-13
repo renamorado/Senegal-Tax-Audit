@@ -55,3 +55,383 @@ Create a standalone Stata workflow that replicates the full-audit version of Tab
 ## 7) Remaining issues / next steps
 - Baseline full-audit Table 5 now matches the screenshot on the visible numeric cells.
 - Next natural extension is to apply the same workflow to desk audits if needed.
+
+---
+
+Date: 2026-03-31
+Task: Refactor Table 5 full-audit export flow to an integrated `esttab` body plus a lightweight `threeparttable` wrapper.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Removed the raw regression-fragment exports from the standalone Table 5 do-file so the export logic now focuses on the manuscript-facing outputs.
+- Kept the regression design unchanged and retained the two-step `esttab` pattern that writes one integrated body file with Panel A and Panel B already combined.
+- Updated the wrapper output contract so the final manuscript-ready wrappers are named:
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+- Kept the wrapper logic minimal: it only adds `table`, `threeparttable`, caption, label, `\input{}` of the body file, and a draft Table 5-style note.
+
+## Output files affected
+- `Output/table5_fullaudits_replicated_body.tex`
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control_body.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+
+## Validation performed
+- Ran:
+- `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`
+- Confirmed by file inspection that:
+- the body files contain both panels in a single `tabular` block;
+- the wrapper files `\input{}` the correct body files and include `threeparttable`, caption, label, and draft notes.
+- Validation caveat:
+- the batch Stata call returned exit code 0 but did not provide a usable console trace in this environment, so final verification relied on direct inspection of the generated `.tex` files.
+
+## Open issues / next steps
+- Legacy `_snippets.tex` wrapper outputs remain in `Output/`; they are now redundant with the new wrapper filenames and can be cleaned up later if nothing else references them.
+
+---
+
+Date: 2026-03-31
+Task: Restructure the Table 5 standalone do-file so data import and preparation are explicit top-level steps.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Removed the program that combined data loading, sample construction, variable preparation, and table export inside a single helper.
+- Reorganized the do-file into a linear Stata workflow:
+- import the analysis data;
+- prepare the full-audit sample and derived variables once;
+- export the baseline Table 5 replication;
+- export the corresponding table with `yhatrf` as an additional control.
+- Kept the regression specifications and export format unchanged while making the script easier to read and debug in standard Stata order.
+
+## Output files affected
+- `Output/table5_fullaudits_replicated_body.tex`
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control_body.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+
+## Validation performed
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`
+- The do-file completed with exit code 0 after the restructuring.
+
+## Open issues / next steps
+- The current output folder still contains legacy `_snippets.tex` files from the earlier export naming scheme.
+
+---
+
+Date: 2026-04-01
+Task: Refactor standalone Table 5 full-audit exports to pure `esttab` outputs without `file write`.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Removed the helper program that used `file write` to build Table 5 wrappers.
+- Changed the standalone Table 5 do-file so each specification writes one complete manuscript-ready `.tex` table directly from `esttab`.
+- Kept the replicated full-audit Table 5 sample and regression logic unchanged, then applied the same export pattern to the `yhatrf`-control specification.
+- Preserved the explicit duplicated baseline / `yhatrf` export blocks so the original Table 5 replication remains easy to audit against `2 Regressions main results.do`.
+
+## Output files affected
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+
+## Validation performed
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`
+- Confirmed from the Stata log that the new `esttab` export blocks executed and wrote both final `.tex` files.
+- Inspected the regenerated outputs and confirmed that each file now contains the full table environment, `threeparttable`, both panels in one `tabular`, and the corresponding notes.
+- Validation required deleting the previously locked generated `.tex` outputs in `Output/` before rerunning, because Stata initially stopped with `r(608)` when those files could not be modified.
+
+## Open issues / next steps
+- Legacy `_body.tex` and `_snippets.tex` Table 5 outputs remain in `Output/` from the older export flow; they are now stale and no longer produced by this do-file.
+
+---
+
+Date: 2026-04-01
+Task: Clean legacy standalone Table 5 `.tex` outputs from `Output/`.
+
+## Files edited
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Removed the stale legacy Table 5 exports left over from the old wrapper-based flow:
+- `Output/table5_fullaudits_replicated_body.tex`
+- `Output/table5_fullaudits_replicated_snippets.tex`
+- `Output/table5_fullaudits_yhatrf_control_body.tex`
+- `Output/table5_fullaudits_yhatrf_control_snippets.tex`
+- Kept the new final pure-`esttab` outputs only:
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+
+## Output files affected
+- Deleted the four legacy Table 5 `_body.tex` / `_snippets.tex` files listed above.
+
+## Validation performed
+- Listed `Output/table5_fullaudits*.tex` after cleanup and confirmed that only the two final `.tex` tables remain.
+- Cleanup required elevated deletion because the OneDrive-backed files were locked for normal removal.
+
+## Open issues / next steps
+- None for the Table 5 output contract; `Output/` now matches the new pure-`esttab` workflow.
+
+---
+
+Date: 2026-04-01
+Task: Refocus standalone full-audit Table 5 exports on Panels A1/B1 and add nonlinear `yhatrf` robustness.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Refactored the standalone Table 5 do-file so the final manuscript-facing exports now include only the top panels of the full-audit table: A1 resource outcomes and B1 productivity outcomes.
+- Removed the appended A2/B2 availability-panel export blocks while leaving the sample construction, duration rebuilding, outcome definitions, and original `dummy1 dummy2 dummy3` controls unchanged.
+- Updated the baseline replication and linear-`yhatrf` notes and captions so they explicitly describe the top-panels-only export.
+- Added a third standalone robustness export that controls for both `yhatrf` and `yhatrf^2` via `c.yhatrf##c.yhatrf`.
+- Treated the quadratic specification as supplementary rather than default, matching the diagnostic conclusion that `yhatrf + yhatrf^2` is more defensible than `yhatrf^2` alone.
+
+## Output files affected
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+- `Output/table5_fullaudits_yhatrf_quadratic_control.tex`
+
+## Validation performed
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`
+- Confirmed that the regenerated `.tex` outputs now contain only Panels A1 and B1, keep the intended 8-column layout, and include the revised captions and notes.
+- Confirmed that the new quadratic robustness file was generated and that its note states the specification includes both `yhatrf` and `yhatrf^2`.
+- Validation initially failed because the old generated `.tex` files were locked and Stata stopped with `r(608)`; after removing those locked outputs, the do-file reran successfully and regenerated all three tables.
+
+## Open issues / next steps
+- None for the requested Table 5 top-panel refactor. If needed later, the same pattern can be applied to desk-audit exports or to a separate diagnostic comparison table.
+
+---
+
+Date: 2026-04-01
+Task: Move standalone full-audit Table 5 notes out of Stata and into `Inspector's Effort report.tex`.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Changed the standalone Table 5 do-file so the three full-audit outputs now export only the `tabular` fragment used by `\input{...}`, rather than writing full `table` / `threeparttable` wrappers and note text.
+- Kept the underlying sample, resource and productivity outcomes, `dummy1` to `dummy3` admin-duration controls, and the three regression specifications unchanged.
+- Added a new top-level `\section{Audit productivity}` to the inspector-effort report and inserted three manuscript-facing table wrappers there for:
+- `table5_fullaudits_replicated.tex`
+- `table5_fullaudits_yhatrf_control.tex`
+- `table5_fullaudits_yhatrf_quadratic_control.tex`
+- Moved the table notes into the report and tailored them to each variant while keeping the Table 5 language anchored on Panels A1 and B1 only.
+
+## Output files affected
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+- `Output/table5_fullaudits_yhatrf_quadratic_control.tex`
+
+## Validation performed
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`
+- The first rerun failed with `r(608)` because the three generated `.tex` outputs were locked and could not be overwritten.
+- Removed the locked generated files and reran the do-file successfully.
+- Confirmed by direct inspection that all three regenerated outputs now begin with `\begin{tabular}` and no longer contain `\begin{table}`, `\begin{threeparttable}`, or `tablenotes`.
+- Ran:
+- `pdflatex -interaction=nonstopmode -halt-on-error "Inspector's Effort report.tex"`
+- Full report compilation did not complete because of a pre-existing missing input earlier in the report: `Output/inspectors_reg_panels_Full_exec_rate.tex`. The new Audit productivity section therefore received static verification by file inspection rather than full-PDF confirmation in this run.
+
+## Open issues / next steps
+- If desired, the next cleanup step is to restore or regenerate `Output/inspectors_reg_panels_Full_exec_rate.tex` so the full report can compile end to end again.
+
+---
+
+Date: 2026-04-01
+Task: Add standalone Table 6 index exports with predicted evasion controls.
+
+## Files edited
+- `Code Analyse data/6 Table 6 yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Added a new standalone do-file that appends `fullaudits_predicted.dta` and `deskaudits_predicted.dta`, checks for `yhatrf`, and rebuilds the original taxpayer-survey Table 6 index workflow.
+- Recreated the original Table 6 sample preparation used for the survey-index exercise, including `selfreported_audit`, the `drop if selfreported_audit == 0` restriction, the `drop if q1 == .` restriction, the `q34` cleanup, `q32_inverted`, and the `swindex` construction of `index_efficiency` and `index_corruption`.
+- Exported three screenshot-style six-column index tables as `esttab` tabular fragments: the baseline replication, a linear `yhatrf` control specification, and a quadratic `yhatrf + yhatrf^2` robustness specification.
+- Added manuscript-facing report wrappers for the two new predicted-evasion Table 6 variants so captions and notes now live in LaTeX rather than in the Stata export step.
+
+## Output files affected
+- `Output/table6_indices_replicated.tex`
+- `Output/table6_indices_yhatrf_control.tex`
+- `Output/table6_indices_yhatrf_quadratic_control.tex`
+
+## Validation performed
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/6 Table 6 yhatrf control.do"`
+- Confirmed from direct diagnostics against `3 Analysis taxpayer survey.do` that the baseline Table 6 sample and regression backbone are reproduced correctly when the standalone workflow applies the same sample restrictions. In particular, the baseline index regressions reproduce the screenshot-style Ns:
+- Panel A: 199 / 273 / 472 for `index_efficiency`, and 199 / 272 / 471 for `index_corruption`
+- Panel B: 89 / 120 / 211 for `index_efficiency`, and 88 / 122 / 212 for `index_corruption`
+- Confirmed by separate diagnostics that the appended predicted-audit inputs (`fullaudits_predicted.dta` plus `deskaudits_predicted.dta`) deliver the same baseline Table 6 counts and `algorithm` coefficients as `datasetforanalysis.dta` once the original `3 Analysis taxpayer survey.do` restrictions are applied.
+- Inspected `Inspector's Effort report.tex` and confirmed that the two new report wrappers reference the linear and quadratic Table 6 fragment filenames and distinguish `yhatrf` from `yhatrf + yhatrf^2` in the notes.
+- Validation caveat:
+- The mismatch observed during inspection came from stale or missing generated `.tex` fragments rather than from the regression sample itself. Stata repeatedly hit `r(608)` when trying to overwrite `Output/table6_indices_*.tex`, so the visible exported files could lag behind the successfully estimated regressions.
+
+## Open issues / next steps
+- Resolve the file-lock / overwrite issue affecting `Output/table6_indices_*.tex` so the regenerated fragments reflect the already-matching regression results from the standalone do-file.
+
+---
+
+Date: 2026-04-01
+Task: Diagnose and clear the Output-file lock blocking Table 6 regeneration.
+
+## Files edited
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Confirmed by direct comparison against `3 Analysis taxpayer survey.do` that the standalone Table 6 baseline regressions were already matching the original screenshot specification and sample counts.
+- Traced the apparent mismatch to a file-lock problem on `Output/table6_indices_*.tex`: Stata was hitting `r(608)` when trying to overwrite the generated fragments, so the inspected files were stale.
+- Temporarily paused OneDrive, reran the standalone Table 6 do-file, and verified that the regenerated exported fragments now reflect the correct baseline regression results.
+
+## Output files affected
+- `Output/table6_indices_replicated.tex`
+- `Output/table6_indices_yhatrf_control.tex`
+- `Output/table6_indices_yhatrf_quadratic_control.tex`
+
+## Validation performed
+- Paused the running OneDrive processes temporarily.
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/6 Table 6 yhatrf control.do"`
+- Confirmed from the regenerated `Output/table6_indices_replicated.tex` that the baseline export now matches the original Table 6 screenshot on the visible rows, including:
+- Panel A Ns `199 / 273 / 472` and `199 / 272 / 471`
+- Panel B Ns `89 / 120 / 211` and `88 / 122 / 212`
+- Confirmed that the linear and quadratic `yhatrf` variants were also regenerated successfully after the lock was cleared.
+
+## Open issues / next steps
+- If OneDrive resumes locking generated `.tex` outputs, reruns may again require pausing sync or writing to temporary filenames before replacing the final files.
+
+---
+
+Date: 2026-04-01
+Task: Tighten Table 6 report notes and compile-check the report after regenerating locked outputs.
+
+## Files edited
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Updated the standalone Table 6 subsection in the report so the introductory text and both table notes now explicitly reference the confirmed baseline source file `3 Analysis taxpayer survey.do`.
+- Clarified in the notes that the Table 6 variants use the original selected non-safety sample with `recent == selectionyear`, the original survey-index construction, Panel A defined by self-reported recent audits, and Panel B defined by administratively recorded audited firms (`y2 == 1`).
+- Temporarily paused OneDrive again to avoid the output-file lock that had been preventing clean regeneration of the standalone Table 6 `.tex` fragments.
+
+## Output files affected
+- `Output/table6_indices_replicated.tex`
+- `Output/table6_indices_yhatrf_control.tex`
+- `Output/table6_indices_yhatrf_quadratic_control.tex`
+
+## Validation performed
+- Reran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/6 Table 6 yhatrf control.do"`
+- Confirmed by direct inspection that `Output/table6_indices_replicated.tex` now matches the original Table 6 screenshot on the visible baseline rows and sample counts after the lock was cleared.
+- Ran:
+- `pdflatex -interaction=nonstopmode -halt-on-error "Inspector's Effort report.tex"`
+- The full report still does not compile end to end because of a pre-existing missing input earlier in the document:
+- `Output/inspectors_reg_panels_Full_exec_rate.tex`
+- This failure occurs before the new Table 6 subsection, so the Table 6 integration was verified by static inspection rather than by a complete PDF build.
+
+## Open issues / next steps
+- Restart OneDrive when convenient if normal sync behavior is needed again.
+- Full report compilation still requires restoring or regenerating `Output/inspectors_reg_panels_Full_exec_rate.tex`.
+
+---
+
+Date: 2026-04-01
+Task: Harmonize Table 5/Table 6 predicted-evasion notes and expose predicted-evasion coefficients in the standalone robustness tables.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `Code Analyse data/6 Table 6 yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Updated the standalone Table 5 robustness exports so the linear predicted-evasion variant now displays a `Predicted evasion` row, and the quadratic variant displays both `Predicted evasion` and `Predicted evasion squared`, after the main treatment coefficients and before the summary statistics.
+- Updated the standalone Table 6 robustness exports the same way, keeping the original treatment rows first and then showing the predicted-evasion control coefficients in both Panel A and Panel B.
+- Rewrote the four new Table 5/Table 6 robustness notes in `Inspector's Effort report.tex` to use manuscript-style language rather than code-facing references, and cleaned the nearby section-intro prose to describe the robustness tables in plain language.
+- Kept the underlying regression specifications unchanged; only the displayed coefficient rows and the report prose/notes were revised.
+
+## Output files affected
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+- `Output/table5_fullaudits_yhatrf_quadratic_control.tex`
+- `Output/table6_indices_replicated.tex`
+- `Output/table6_indices_yhatrf_control.tex`
+- `Output/table6_indices_yhatrf_quadratic_control.tex`
+
+## Validation performed
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/6 Table 6 yhatrf control.do"`
+- Initial reruns were blocked by `r(608)` because the existing generated `.tex` outputs were locked and could not be overwritten.
+- Removed the six affected generated output files and reran both standalone scripts successfully.
+- Confirmed by direct inspection that:
+- `Output/table5_fullaudits_yhatrf_control.tex` includes `Predicted evasion`;
+- `Output/table5_fullaudits_yhatrf_quadratic_control.tex` includes `Predicted evasion` and `Predicted evasion squared`;
+- `Output/table6_indices_yhatrf_control.tex` includes `Predicted evasion` in both panels;
+- `Output/table6_indices_yhatrf_quadratic_control.tex` includes `Predicted evasion` and `Predicted evasion squared` in both panels.
+- Checked the revised Table 5/Table 6 robustness notes in `Inspector's Effort report.tex` and confirmed that the edited notes no longer mention do-files or raw variable names.
+
+## Open issues / next steps
+- The baseline replicated Table 5 note in `Inspector's Effort report.tex` still contains older code-facing wording; this was left unchanged because the requested scope was limited to the new robustness-table notes and nearby intro prose.
+
+---
+
+Date: 2026-04-01
+Task: Reword the new Table 5 and Table 6 robustness footnotes to track the original manuscript notes more closely.
+
+## Files edited
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Rewrote the four predicted-evasion robustness notes for Table 5 and Table 6 so they now follow the original manuscript note language much more closely.
+- Kept the new content limited to the robustness-specific additions that the specifications include predicted evasion, or predicted evasion and its square.
+- Preserved the earlier coefficient-row additions in the exported tables; this update only changed the report footnote wording.
+
+## Output files affected
+- `Code Analyse data/Inspector's Effort report.tex`
+
+## Validation performed
+- Checked the edited note text in `Inspector's Effort report.tex` by direct inspection.
+- No Stata rerun was needed because this update only changed LaTeX report text.
+
+## Open issues / next steps
+- None for this wording update.
+
+---
+
+Date: 2026-04-01
+Task: Add the baseline replicated Table 6 output to the report with the original manuscript footnote.
+
+## Files edited
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Confirmed that `Code Analyse data/6 Table 6 yhatrf control.do` exports the baseline replicated Table 6 fragment in addition to the linear and quadratic predicted-evasion variants.
+- Added the baseline replicated Table 6 to `Inspector's Effort report.tex` using `Output/table6_indices_replicated.tex`.
+- Inserted the original-style Table 6 manuscript note for the baseline replication and adjusted the subsection intro so it now introduces the baseline table plus the robustness variants.
+
+## Output files affected
+- `Code Analyse data/Inspector's Effort report.tex`
+
+## Validation performed
+- Confirmed by inspection of `Code Analyse data/6 Table 6 yhatrf control.do` that the do-file exports `table6_indices_replicated.tex` in its baseline block.
+- Confirmed that `Output/table6_indices_replicated.tex` exists and is available for inclusion in the report.
+- No Stata rerun was needed for this report-integration update.
+
+## Open issues / next steps
+- None for this Table 6 report insertion.

@@ -312,7 +312,7 @@
 
 \begin{figure}[H]
     \centering
-    \caption{Predicted evasion vs. number of inspectors and duration, Full audits}
+    \caption{Predicted evasion vs. number of inspectors and duration, Full audits [Executed cases sample -- preferred]}
     \label{fig:binplots_pred_evasion_effort_full_whole_sample}
     \begin{threeparttable}
     \setlength{\tabcolsep}{2pt}
@@ -336,11 +336,44 @@
     \includegraphics[width=0.46\linewidth]{Output/avg_duration_self_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
     \end{tabular}
     \begin{tablenotes}
-    \scriptsize \item Notes: This figure shows full audits only. Predicted-evasion bins are constructed on the pooled selected full-audit sample and then held fixed when outcomes are computed for executed cases. Panels report mean outcomes by selection method and predicted-evasion bin, comparing algorithm-selected and inspector-selected cases. Panel A uses the number of inspectors (\texttt{numberagents}); Panel B uses administrative duration (\texttt{y19}), excluding zero durations in the plot construction; Panel C uses taxpayer-reported duration (\texttt{q30}); and Panel D uses inspector/self-reported duration (\texttt{y8}). For outcome panels, only executed audits contribute to the plotted means and confidence intervals. The bands report 95\% confidence intervals by method-bin cell. Column 1 uses deciles of predicted evasion, and Column 2 uses quintiles of predicted evasion.
+    
+    \tiny \item Notes: Predicted-evasion bins are defined using the pooled sample of selected full audits and are then kept fixed when computing outcomes for executed cases. Each panel reports mean outcomes by selection method and predicted-evasion bin, comparing algorithm-selected and inspector-selected cases. Panel A shows the number of inspectors; Panel B administrative duration; Panel C taxpayer-reported duration; and Panel D inspector/self-reported duration. Shaded bands indicate 95\% confidence intervals for each method-by-bin cell. Column 1 uses predicted-evasion deciles, while Column 2 uses predicted-evasion quintiles.
     \end{tablenotes}
     \end{threeparttable}
 \end{figure}
 
+%% same figure but with bins constructed on executed audits  + outcome availability subsample:
+\begin{figure}[H]
+    \centering
+    \caption{Predicted evasion vs. number of inspectors and duration, Full audits [Outcome-specific executed sample]}
+    \label{fig:binplots_pred_evasion_effort_full_outcomeavail}
+    \begin{threeparttable}
+    \setlength{\tabcolsep}{2pt}
+    \renewcommand{\arraystretch}{0.95}
+    \begin{tabular}{@{}cc@{}}
+    \multicolumn{2}{c}{A: Average number of inspectors} \\
+    A1: Deciles of predicted evasion     &  A2: Quintiles of predicted evasion\\
+    \includegraphics[width=0.46\linewidth]{Output/avg_ninspectors_binplot_yhatrf_Full_decile_outcomeavail.pdf}  &
+    \includegraphics[width=0.46\linewidth]{Output/avg_ninspectors_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
+    \multicolumn{2}{c}{B: Average duration [Admin. data]} \\
+    B1: Deciles of predicted evasion     &  B2: Quintiles of predicted evasion\\
+    \includegraphics[width=0.46\linewidth]{Output/avg_duration_admin_binplot_yhatrf_Full_decile_outcomeavail.pdf}  &
+    \includegraphics[width=0.46\linewidth]{Output/avg_duration_admin_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
+    \multicolumn{2}{c}{C: Average duration [Taxpayer data]} \\
+    C1: Deciles of predicted evasion     &  C2: Quintiles of predicted evasion\\
+    \includegraphics[width=0.46\linewidth]{Output/avg_duration_tp_binplot_yhatrf_Full_decile_outcomeavail.pdf} &
+    \includegraphics[width=0.46\linewidth]{Output/avg_duration_tp_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
+    \multicolumn{2}{c}{D: Average duration [Inspector survey]} \\
+    D1: Deciles of predicted evasion     &  D2: Quintiles of predicted evasion\\
+    \includegraphics[width=0.46\linewidth]{Output/avg_duration_self_binplot_yhatrf_Full_decile_outcomeavail.pdf} &
+    \includegraphics[width=0.46\linewidth]{Output/avg_duration_self_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
+    \end{tabular}
+    \begin{tablenotes}
+    
+    \tiny \item Notes: Predicted-evasion bins are defined separately for each outcome using the pooled eligible sample of executed full audits with non-missing predicted evasion and non-missing outcome data, and these outcome-specific cutoffs are then applied to both algorithm-selected and inspector-selected cases. Panel A shows the number of inspectors; Panel B administrative duration; Panel C taxpayer-reported duration; and Panel D inspector/self-reported duration. Shaded bands indicate 95\% confidence intervals for each method-by-bin cell. Column 1 uses predicted-evasion deciles, while Column 2 uses predicted-evasion quintiles.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -452,6 +485,120 @@
 \end{figure}
 \end{comment}
 
+
+\section{Audit productivity}
+
+This section presents the full-audit Table 5 top-panel variants for the audit-productivity discussion. The tables below keep the original sample and layout and add predicted-evasion controls in the robustness specifications.
+
+\begin{landscape}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Table 5: Resources Allocated to Audits and Audit Productivity, Full Audits (Panels A1 and B1 only)}
+\label{tab:table5_fullaudits_replicated}
+
+\footnotesize
+\input{Output/table5_fullaudits_replicated.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table replicates the top panels (A1 and B1) of the full-audit version of Table 5 using the source-code specification in \texttt{2 Regressions main results.do}. Panel A1 reports resource outcomes and Panel B1 reports productivity outcomes. The sample includes selected full audits and excludes safety cases. Column 1 reports the number of agents recorded on the case. Column 2 uses the taxpayer-survey duration measure. Column 3 uses the administrative measure of days from the start of the audit to confirmation and includes the original date-availability controls \texttt{dummy1} to \texttt{dummy3}. Column 4 uses inspectors' self-reported days worked on the case. Columns 5 to 8 use the log of evasion divided by the corresponding resource measure. All regressions include Algorithm, Inspectors x Overlap, Random, and Replacement indicators and absorb inspectorclusteryear fixed effects. Robust standard errors are shown in parentheses. Stars denote significance at $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Table 5: Resources Allocated to Audits and Audit Productivity, Full Audits, with Predicted Evasion Control (Panels A1 and B1 only)}
+\label{tab:table5_fullaudits_yhatrf_control}
+
+\footnotesize
+\input{Output/table5_fullaudits_yhatrf_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted evasion. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Table 5: Resources Allocated to Audits and Audit Productivity, Full Audits, with Predicted Evasion Quadratic Control (Panels A1 and B1 only)}
+\label{tab:table5_fullaudits_yhatrf_quadratic_control}
+
+\footnotesize
+\input{Output/table5_fullaudits_yhatrf_quadratic_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted evasion and its square. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\end{landscape}
+
+\subsection{Table 6 with predicted evasion controls}
+
+This subsection presents the baseline Table 6 replication together with variants that keep the original sample and layout and add predicted-evasion controls.
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Table 6: Algorithm Selection, Perceived Audit Efficiency and Corruption}
+\label{tab:table6_indices_replicated}
+
+\footnotesize
+\input{Output/table6_indices_replicated.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Table 6: Algorithm Selection, Perceived Audit Efficiency and Corruption, with Predicted Evasion Control}
+\label{tab:table6_indices_yhatrf_control}
+
+\footnotesize
+\input{Output/table6_indices_yhatrf_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted evasion. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Table 6: Algorithm Selection, Perceived Audit Efficiency and Corruption, with Predicted Evasion Quadratic Control}
+\label{tab:table6_indices_yhatrf_quadratic_control}
+
+\footnotesize
+\input{Output/table6_indices_yhatrf_quadratic_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted evasion and its square. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
 
 \section{Inspector effort analysis}
 
