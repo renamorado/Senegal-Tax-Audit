@@ -1,4 +1,4 @@
-﻿*****************************************************************************************
+*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TAX AUDIT SELECTION IN SENEGAL
 **		   Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **		   RA: Roldan Enamorado
@@ -185,8 +185,24 @@ foreach audtype in 1 0 {
 					}
 					else if "`b'" == "turnover_mean" {
 						if "`bin_scope'" == "within_method" local xti_bin "Bins of Firm Size (Mean turnover 2014-2020), width = `w'"
-						else local xti_bin "Whole-sample bins of Firm Size (Mean turnover 2014-2020), width = `w'"
-					}
+						else local xti_bin "Whole-sample bins of Firm Size (Mean turnover 2014-2020), width = `w'"					}
+				}
+
+				* Support table for the preferred whole-sample full-audit predicted-evasion deciles
+				local make_support_table 0
+				if `audtype'==1 & "`b'"=="yhatrf" & "`bin_def'"=="decile" & "`bin_scope'"=="pooled_sample" {
+					local make_support_table 1
+					tempfile support_selected_counts support_outcomes
+
+					preserve
+						gen selected_n = 1
+						drop if missing(bin_`b')
+						collapse ///
+							(sum) selected_n=selected_n ///
+							(sum) executed_n=y2, ///
+							by(algorithm bin_`b')
+						save `support_selected_counts'
+					restore
 				}
 
 			********************************************************************************
@@ -313,6 +329,8 @@ foreach audtype in 1 0 {
 
 			********************************************************************************
 			** BIN-LEVEL DATASET (executed only) + FIXED CIs WITH OUTCOME-SPECIFIC n
+			********************************************************************************
+			** EXECUTION RATE (all selected cases; not conditional on execution)
 			********************************************************************************
 			preserve
 				gen n_total = 1
@@ -567,14 +585,77 @@ foreach audtype in 1 0 {
 					legend(order(4 "Algorithm cases" 8 "Inspector cases") pos(6) col(2) ring(1)) ///
 					graphregion(color(white)) plotregion(color(white))
 
-				graph export "$output\avg_duration_self_binplot_`b'_`audit_type'_`bin_tag'`export_suffix'.pdf", replace
+								graph export "$output\avg_duration_self_binplot_`b'_`audit_type'_`bin_tag'`export_suffix'.pdf", replace
 
+				if `make_support_table' {
+					save `support_outcomes', replace
+
+					use `support_selected_counts', clear
+					merge 1:1 algorithm bin_`b' using `support_outcomes', nogen
+
+					gen method_order = cond(algorithm==1, 1, 2)
+					gen method_label = cond(algorithm==1, "Algorithm", "Inspector")
+					sort bin_`b' method_order
+
+					tempname support_table
+					file open `support_table' using "$output\bin_support_yhatrf_Full_decile_whole_sample.tex", write replace text
+
+					file write `support_table' "\begin{tabular}{llrr*{4}{rrrrrr}}" _n
+					file write `support_table' "\toprule" _n
+					file write `support_table' ///
+						" & & & & \multicolumn{6}{c}{Number of inspectors} & \multicolumn{6}{c}{Admin duration} & \multicolumn{6}{c}{Taxpayer duration} & \multicolumn{6}{c}{Self-reported duration} \\\\" _n
+					file write `support_table' ///
+						"\cmidrule(lr){5-10}\cmidrule(lr){11-16}\cmidrule(lr){17-22}\cmidrule(lr){23-28}" _n
+					file write `support_table' ///
+						"Decile & Method & Selected N & Executed N & N & Mean & SD & SE & CI low & CI high & N & Mean & SD & SE & CI low & CI high & N & Mean & SD & SE & CI low & CI high & N & Mean & SD & SE & CI low & CI high \\\\" _n
+					file write `support_table' "\midrule" _n
+
+					forvalues i = 1/`=_N' {
+						local decile = string(bin_`b'[`i'],"%9.0f")
+						local method = method_label[`i']
+						local selected = string(selected_n[`i'],"%9.0f")
+						local executed = string(executed_n[`i'],"%9.0f")
+
+						local n_ninspectors = cond(missing(n_ninspectors[`i']), "", string(n_ninspectors[`i'],"%9.0f"))
+						local avg_ninspectors = cond(missing(avg_ninspectors[`i']), "", string(avg_ninspectors[`i'],"%9.2f"))
+						local sd_ninspectors = cond(missing(sd_ninspectors[`i']), "", string(sd_ninspectors[`i'],"%9.2f"))
+						local se_ninspectors = cond(missing(se_ninspectors[`i']), "", string(se_ninspectors[`i'],"%9.2f"))
+						local ci_lower_ninspectors = cond(missing(ci_lower_ninspectors[`i']), "", string(ci_lower_ninspectors[`i'],"%9.2f"))
+						local ci_upper_ninspectors = cond(missing(ci_upper_ninspectors[`i']), "", string(ci_upper_ninspectors[`i'],"%9.2f"))
+
+						local n_y19 = cond(missing(n_y19[`i']), "", string(n_y19[`i'],"%9.0f"))
+						local avg_y19 = cond(missing(avg_y19[`i']), "", string(avg_y19[`i'],"%9.2f"))
+						local sd_y19 = cond(missing(sd_y19[`i']), "", string(sd_y19[`i'],"%9.2f"))
+						local se_y19 = cond(missing(se_y19[`i']), "", string(se_y19[`i'],"%9.2f"))
+						local ci_lower_y19 = cond(missing(ci_lower_y19[`i']), "", string(ci_lower_y19[`i'],"%9.2f"))
+						local ci_upper_y19 = cond(missing(ci_upper_y19[`i']), "", string(ci_upper_y19[`i'],"%9.2f"))
+
+						local n_q30 = cond(missing(n_q30[`i']), "", string(n_q30[`i'],"%9.0f"))
+						local avg_q30 = cond(missing(avg_q30[`i']), "", string(avg_q30[`i'],"%9.2f"))
+						local sd_q30 = cond(missing(sd_q30[`i']), "", string(sd_q30[`i'],"%9.2f"))
+						local se_q30 = cond(missing(se_q30[`i']), "", string(se_q30[`i'],"%9.2f"))
+						local ci_lower_q30 = cond(missing(ci_lower_q30[`i']), "", string(ci_lower_q30[`i'],"%9.2f"))
+						local ci_upper_q30 = cond(missing(ci_upper_q30[`i']), "", string(ci_upper_q30[`i'],"%9.2f"))
+
+						local n_y8 = cond(missing(n_y8[`i']), "", string(n_y8[`i'],"%9.0f"))
+						local avg_y8 = cond(missing(avg_y8[`i']), "", string(avg_y8[`i'],"%9.2f"))
+						local sd_y8 = cond(missing(sd_y8[`i']), "", string(sd_y8[`i'],"%9.2f"))
+						local se_y8 = cond(missing(se_y8[`i']), "", string(se_y8[`i'],"%9.2f"))
+						local ci_lower_y8 = cond(missing(ci_lower_y8[`i']), "", string(ci_lower_y8[`i'],"%9.2f"))
+						local ci_upper_y8 = cond(missing(ci_upper_y8[`i']), "", string(ci_upper_y8[`i'],"%9.2f"))
+
+						file write `support_table' ///
+							"`decile' & `method' & `selected' & `executed' & `n_ninspectors' & `avg_ninspectors' & `sd_ninspectors' & `se_ninspectors' & `ci_lower_ninspectors' & `ci_upper_ninspectors' & `n_y19' & `avg_y19' & `sd_y19' & `se_y19' & `ci_lower_y19' & `ci_upper_y19' & `n_q30' & `avg_q30' & `sd_q30' & `se_q30' & `ci_lower_q30' & `ci_upper_q30' & `n_y8' & `avg_y8' & `sd_y8' & `se_y8' & `ci_lower_y8' & `ci_upper_y8' \\\\" _n
+					}
+
+					file write `support_table' "\bottomrule" _n
+					file write `support_table' "\end{tabular}" _n
+					file close `support_table'
+				}
 			restore
-			}
 		}
 	}
 }
-
-
+}
 
 

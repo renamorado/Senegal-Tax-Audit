@@ -1,4 +1,4 @@
-﻿*****************************************************************************************
+*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TAX AUDIT SELECTION IN SENEGAL
 **         Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **         March 2026
@@ -11,7 +11,7 @@
 * This do-file recreates the top panels (A1 and B1) of the full-audit
 * version of Table 5 from "2 Regressions main results.do" and then
 * re-estimates the same table adding predicted evasion (yhatrf) as a
-* control and as a quadratic robustness check.
+* control, as a quadratic robustness check, and as decile/quintile controls.
 
 version 18
 set more off
@@ -51,6 +51,8 @@ global table5_inputdata "$analysisdata\fullaudits_predicted.dta"
 local table_replicated "$output\table5_fullaudits_replicated.tex"
 local table_yhatrf "$output\table5_fullaudits_yhatrf_control.tex"
 local table_yhatrf_quadratic "$output\table5_fullaudits_yhatrf_quadratic_control.tex"
+local table_yhatrf_deciles "$output\table5_fullaudits_yhatrf_deciles_control.tex"
+local table_yhatrf_quintiles "$output\table5_fullaudits_yhatrf_quintiles_control.tex"
 
 local panel_a_titles `"\multicolumn{1}{l}{} & \shortstack{Number of Agents} & \shortstack{Duration in Days\\(Taxpayer Survey)} & \shortstack{Days from Start to Conf.\\(Admin Data)} & \shortstack{Days Working on Case\\(Self-Reported)} & \shortstack{Evasion/ Number of\\Agents} & \shortstack{Evasion/Duration\\(Taxpayer Survey)} & \shortstack{Evasion/Duration\\(Admin. Data)} & \shortstack{Evasion/Days Working\\(Self-Reported)} \\"'
 local panel_numbers `"\multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) \\"'
@@ -149,6 +151,13 @@ foreach v in evasion_cost1 evasion_cost2 evasion_cost3 evasion_cost4 {
 	capture drop available_`v'
 	gen available_`v' = `v' != .
 }
+
+capture drop yhatrf_decile
+capture drop yhatrf_quintile
+* Pool predicted-evasion deciles over the regression-eligible sample so
+* the grouped-control specifications preserve the intended Table 5 sample.
+xtile yhatrf_decile = yhatrf if yhatrf != . , nq(10)
+xtile yhatrf_quintile = yhatrf if yhatrf != . , nq(5)
 
 tempfile table5_prepared
 save `table5_prepared', replace
@@ -329,3 +338,125 @@ esttab `main_estlist'
 	substitute(\_ _)
 ;
 #delim cr
+
+************************************************************
+* 6. Export Table 5 top panels with yhatrf decile controls
+************************************************************
+use `table5_prepared', clear
+estimates drop _all
+
+local version "yhatrf_deciles"
+local base_controls "ib1.yhatrf_decile"
+local main_estlist ""
+local colindex = 0
+
+foreach outcome in y16 q30 y19 y8 evasion_cost1 evasion_cost2 evasion_cost3 evasion_cost4 {
+	local ++colindex
+	local rhs_controls "`base_controls'"
+
+	if "`outcome'" != "q30" {
+		replace `outcome' = . if y2 == 0
+	}
+	if "`outcome'" == "y19" {
+		local rhs_controls "`rhs_controls' dummy1 dummy2 dummy3"
+	}
+
+	eststo m`colindex'_`version': reghdfe `outcome' algorithm overlap random safeties `rhs_controls', ///
+		a(inspectorclusteryear) vce(robust)
+	local main_estlist "`main_estlist' m`colindex'_`version'"
+
+	quietly summarize `outcome' if e(sample) == 1
+	estadd local meanoutcome = int(100 * `r(mean)') / 100
+	local meanoutcome = int(100 * `r(mean)') / 100
+	local meanoutcome : display %5.2f `meanoutcome'
+	estadd local pp `meanoutcome'
+	test algorithm == safeties
+	local pvalue : display %5.2f `r(p)'
+	estadd local pvalue = round(`pvalue', 0.01)
+	estadd local N = e(N), replace
+}
+
+#delim ;
+esttab `main_estlist'
+	using `"`table_yhatrf_deciles'"',
+	replace fragment booktabs
+	prehead("\begin{tabular}{lcccc|cccc} \toprule")
+	posthead("`panel_a_titles' `panel_numbers' \midrule")
+	postfoot("\bottomrule \end{tabular}")
+	order(algorithm overlap)
+	keep(algorithm overlap)
+	coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm")
+	mgroups("A1: Resource Outcomes" "B1: Productivity Outcomes",
+		pattern(1 0 0 0 1 0 0 0)
+		span prefix(\multicolumn{@span}{c}{\textbf{) suffix(}})
+		erepeat(\cmidrule(lr){@span}))
+	b(%5.2f) se(%5.2f)
+	stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+	star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+	nomtitles nonumbers collabels(none) nonotes
+	substitute(\_ _)
+;
+#delim cr
+
+
+
+
+************************************************************
+* 7. Export Table 5 top panels with yhatrf quintile controls
+************************************************************
+use `table5_prepared', clear
+estimates drop _all
+
+local version "yhatrf_quintiles"
+local base_controls "ib1.yhatrf_quintile"
+local main_estlist ""
+local colindex = 0
+
+foreach outcome in y16 q30 y19 y8 evasion_cost1 evasion_cost2 evasion_cost3 evasion_cost4 {
+	local ++colindex
+	local rhs_controls "`base_controls'"
+
+	if "`outcome'" != "q30" {
+		replace `outcome' = . if y2 == 0
+	}
+	if "`outcome'" == "y19" {
+		local rhs_controls "`rhs_controls' dummy1 dummy2 dummy3"
+	}
+
+	eststo m`colindex'_`version': reghdfe `outcome' algorithm overlap random safeties `rhs_controls', ///
+		a(inspectorclusteryear) vce(robust)
+	local main_estlist "`main_estlist' m`colindex'_`version'"
+
+	quietly summarize `outcome' if e(sample) == 1
+	estadd local meanoutcome = int(100 * `r(mean)') / 100
+	local meanoutcome = int(100 * `r(mean)') / 100
+	local meanoutcome : display %5.2f `meanoutcome'
+	estadd local pp `meanoutcome'
+	test algorithm == safeties
+	local pvalue : display %5.2f `r(p)'
+	estadd local pvalue = round(`pvalue', 0.01)
+	estadd local N = e(N), replace
+}
+
+#delim ;
+esttab `main_estlist'
+	using `"`table_yhatrf_quintiles'"',
+	replace fragment booktabs
+	prehead("\begin{tabular}{lcccc|cccc} \toprule")
+	posthead("`panel_a_titles' `panel_numbers' \midrule")
+	postfoot("\bottomrule \end{tabular}")
+	order(algorithm overlap)
+	keep(algorithm overlap)
+	coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm")
+	mgroups("A1: Resource Outcomes" "B1: Productivity Outcomes",
+		pattern(1 0 0 0 1 0 0 0)
+		span prefix(\multicolumn{@span}{c}{\textbf{) suffix(}})
+		erepeat(\cmidrule(lr){@span}))
+	b(%5.2f) se(%5.2f)
+	stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+	star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+	nomtitles nonumbers collabels(none) nonotes
+	substitute(\_ _)
+;
+#delim cr
+

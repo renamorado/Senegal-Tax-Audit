@@ -486,3 +486,171 @@ Task: Migrate the active `6*` and `7 Inspector_performance.do` workflows from th
 ## Open issues / next steps
 - The old OneDrive repo remains on disk and still contains the historical working copy; avoid using it for active edits.
 - Older non-active Stata scripts outside the `6*` / `7` scope still keep their legacy path logic and may need similar updates if they are brought back into active use.
+
+
+---
+
+Date: 2026-04-13
+Task: Add predicted-evasion decile-control robustness exports to the standalone Table 5 and Table 6 workflows.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `Code Analyse data/6 Table 6 yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a pooled-sample `yhatrf_decile` variable to the shared prep block of each standalone Stata workflow before outcome-specific restrictions are applied.
+- Added a fourth robustness export to the standalone full-audit Table 5 workflow that controls for predicted-evasion deciles via `ib1.yhatrf_decile` while keeping the displayed table rows limited to the original treatment coefficients.
+- Added a fourth robustness export to the standalone Table 6 workflow that controls for predicted-evasion deciles in both panels, again hiding the decile coefficients from the manuscript-facing table.
+- Added matching LaTeX wrappers to `Inspector's Effort report.tex` for the two new decile-control tables, reusing the existing robustness notes and changing only the control description to predicted-evasion deciles.
+- Re-saved the two edited `.do` files in plain ASCII after implementation so Stata would read them correctly in batch mode.
+
+## Output files affected
+- `Output/table5_fullaudits_replicated.tex`
+- `Output/table5_fullaudits_yhatrf_control.tex`
+- `Output/table5_fullaudits_yhatrf_quadratic_control.tex`
+- `Output/table5_fullaudits_yhatrf_deciles_control.tex`
+- `Output/table6_indices_replicated.tex`
+- `Output/table6_indices_yhatrf_control.tex`
+- `Output/table6_indices_yhatrf_quadratic_control.tex`
+- `Output/table6_indices_yhatrf_deciles_control.tex`
+
+## Validation performed
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/6 Table 6 yhatrf control.do"`
+- Confirmed that the new files `Output/table5_fullaudits_yhatrf_deciles_control.tex` and `Output/table6_indices_yhatrf_deciles_control.tex` were generated successfully.
+- Confirmed by direct inspection that the new decile-control exports keep the same table layouts as the existing robustness variants, hide the decile coefficients, and preserve the displayed treatment-row ordering.
+- Confirmed that the `N` rows in the new decile-control exports match the corresponding linear-`yhatrf` tables for both Table 5 and Table 6.
+- Confirmed by inspection that `Code Analyse data/Inspector's Effort report.tex` now includes the new decile-control wrappers, captions, labels, and note text for both tables.
+
+## Open issues / next steps
+- Full report compilation was not rerun here; the manuscript integration of the new tables was verified by static inspection of the LaTeX wrappers and successful regeneration of the `.tex` fragments.
+
+---
+
+Date: 2026-04-13
+Task: Redefine predicted-evasion deciles on executed cases in the standalone Table 5 and Table 6 robustness workflows.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `Code Analyse data/6 Table 6 yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Changed the shared `yhatrf_decile` construction in the standalone Table 5 workflow so deciles are now pooled over executed cases only (`y2 == 1`) rather than the broader prepared sample.
+- Made the same executed-case decile change in the standalone Table 6 workflow, keeping one pooled executed-case decile definition per prepared dataset and reusing it across the decile-control regressions.
+- Added short code comments in both do-files documenting that the decile controls now follow the executed-case logic used in the inspector-effort binning workflow.
+- Updated the decile-control notes in `Inspector's Effort report.tex` so the manuscript-facing text explicitly states that predicted-evasion deciles are formed among executed cases only.
+
+## Output files affected
+- `Output/table5_fullaudits_yhatrf_deciles_control.tex`
+- `Output/table6_indices_yhatrf_deciles_control.tex`
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`.
+- Ran `stata-mp /e do "Code Analyse data/6 Table 6 yhatrf control.do"`.
+- Confirmed that `Output/table5_fullaudits_yhatrf_deciles_control.tex` and `Output/table6_indices_yhatrf_deciles_control.tex` were regenerated successfully on 2026-04-13.
+- Confirmed by direct inspection that the report notes for the two decile-control tables now describe the executed-case decile rule.
+- Compared the current linear-`yhatrf` and decile-control `N` rows: in Table 5, the taxpayer-survey duration column falls from `N = 214` to `N = 105` once deciles are defined on executed cases only; the other Table 5 columns are unchanged. In the current Table 6 outputs, the decile-control `N` rows match the linear-`yhatrf` `N` rows.
+
+## Open issues / next steps
+- Full LaTeX compilation of `Inspector's Effort report.tex` was not rerun here; manuscript integration was validated through successful `.tex` regeneration and direct inspection of the updated note text.
+
+---
+
+Date: 2026-04-13
+Task: Add an appendix support table for the preferred whole-sample predicted-evasion decile effort plots.
+
+## Files edited
+- `Code Analyse data/6 Inspector effort - bin plots_whole-sample-selected-cases.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a support-table export to the whole-sample bin-plot workflow for full audits, predicted evasion, pooled deciles only.
+- Reused the same pooled selected-sample decile assignment as the preferred figure, then merged it with executed-case outcome moments so the support table aligns exactly with the plotted means and confidence intervals.
+- Exported a new landscape-style LaTeX fragment with selected counts, executed counts, and outcome-specific `N`, mean, SD, SE, and CI bounds for the four effort outcomes.
+- Added an appendix table wrapper in the report immediately after the preferred whole-sample predicted-evasion effort figures.
+- Made the table note explicit that bins are defined on the pooled selected sample but all effort outcomes are computed for executed cases only (`y2==1`).
+
+## Output files affected
+- `Output/bin_support_yhatrf_Full_decile_whole_sample.tex`
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/6 Inspector effort - bin plots_whole-sample-selected-cases.do"` via a logged wrapper and confirmed the do-file completed.
+- Confirmed that `Output/bin_support_yhatrf_Full_decile_whole_sample.tex` was generated successfully on 2026-04-13.
+- Confirmed that the support table contains exactly 20 method-by-decile rows.
+- Cross-checked the support counts against the preferred figure logic: top-decile inspector executed support (`62`) exceeds top-decile algorithm executed support (`17`).
+- Confirmed that the `numberagents` moments in the support table match the preferred plot construction, including top-decile means and CI bounds (`Algorithm: mean 3.24, CI [2.84, 3.63]`; `Inspector: mean 3.53, CI [3.31, 3.76]`).
+
+## Open issues / next steps
+- Full LaTeX compilation of `Code Analyse data/Inspector's Effort report.tex` was not rerun here; manuscript integration was validated by direct inspection of the new wrapper and successful support-table export.
+
+
+---
+
+Date: 2026-04-13
+Task: Restore pooled regression-sample predicted-evasion deciles in the standalone Table 5 and Table 6 robustness workflows.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `Code Analyse data/6 Table 6 yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Reversed the executed-case-only `yhatrf_decile` construction in the standalone Table 5 workflow and now form deciles on the pooled regression-eligible full-audit sample.
+- Reversed the executed-case-only `yhatrf_decile` construction in the standalone Table 6 workflow and now form deciles on the pooled prepared survey-analysis sample.
+- Updated the manuscript-facing notes for the two decile-control tables so the text matches the restored pooled-sample decile definition.
+- Dropped the planned no-`algorithm` predicted-evasion robustness extension for now, per user direction, and kept this pass focused on correcting the decile-spec sample distortion.
+
+## Output files affected
+- `Output/table5_fullaudits_yhatrf_deciles_control.tex`
+- `Output/table6_indices_yhatrf_deciles_control.tex`
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`.
+- Ran `stata-mp /e do "Code Analyse data/6 Table 6 yhatrf control.do"`.
+- Confirmed that `Output/table5_fullaudits_yhatrf_deciles_control.tex` now keeps the intended Table 5 decile-spec sample, including `N = 214` in the taxpayer-survey duration column.
+- Confirmed that `Output/table6_indices_yhatrf_deciles_control.tex` now preserves the intended Panel A sample and no longer duplicates Panel B counts; Panel A `N` values return to `199 / 273 / 472` and Panel B remains `89 / 120 / 211` for the efficiency index.
+- Confirmed by direct inspection that the corresponding report notes now describe pooled regression-eligible deciles rather than executed-case-only deciles.
+
+## Open issues / next steps
+- No new no-`algorithm` robustness tables were generated in this pass.
+- Full LaTeX compilation of `Code Analyse data/Inspector's Effort report.tex` was not rerun here; manuscript integration was validated through successful `.tex` regeneration and direct inspection of the updated notes.
+
+---
+
+Date: 2026-04-13
+Task: Add predicted-evasion quintile-control robustness exports to the standalone Table 5 and Table 6 workflows.
+
+## Files edited
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `Code Analyse data/6 Table 6 yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a pooled-sample `yhatrf_quintile` variable to the shared prep block of each standalone Stata workflow alongside the existing decile assignment.
+- Added a fifth robustness export to the standalone full-audit Table 5 workflow that controls for predicted-evasion quintiles via `ib1.yhatrf_quintile` while keeping the displayed table rows limited to the original treatment coefficients.
+- Added a fifth robustness export to the standalone Table 6 workflow that controls for predicted-evasion quintiles in both panels, again hiding the quintile coefficients from the manuscript-facing table.
+- Added matching LaTeX wrappers to `Inspector's Effort report.tex` for the two new quintile-control tables, reusing the existing robustness-note language and updating only the grouped-control description to predicted-evasion quintiles.
+
+## Output files affected
+- `Output/table5_fullaudits_yhatrf_quintiles_control.tex`
+- `Output/table6_indices_yhatrf_quintiles_control.tex`
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`.
+- Ran `stata-mp /e do "Code Analyse data/6 Table 6 yhatrf control.do"`.
+- Confirmed that `Output/table5_fullaudits_yhatrf_quintiles_control.tex` and `Output/table6_indices_yhatrf_quintiles_control.tex` were generated successfully on 2026-04-13.
+- Confirmed by direct inspection that both new quintile-control exports keep the same visible coefficient rows and table layouts as the corresponding decile-control variants while hiding the grouped-control coefficients.
+- Confirmed by inspection that `Code Analyse data/Inspector's Effort report.tex` now includes the two new quintile-control wrappers, captions, labels, and note text.
+
+## Open issues / next steps
+- Full LaTeX compilation of `Code Analyse data/Inspector's Effort report.tex` was not rerun here; manuscript integration was validated through successful `.tex` regeneration and direct inspection of the updated wrappers.
+
+

@@ -1,4 +1,4 @@
-﻿*****************************************************************************************
+*****************************************************************************************
 **         Project name: ALGORITHMS AND BUREAUCRATS: EVIDENCE FROM TAX AUDIT SELECTION IN SENEGAL
 **         Authors: Pierre Bachas, Anne Brockmeyer, Alipio Ferreira, Bassirou Sarr
 **         RA: Roldan Enamorado
@@ -11,7 +11,7 @@
 
 * This do-file recreates the screenshot-style Table 6 index specifications from
 * "3 Analysis taxpayer survey.do" and then re-estimates them adding predicted
-* evasion (yhatrf) linearly and quadratically.
+* evasion (yhatrf) linearly, quadratically, and via decile/quintile controls.
 
 version 18
 set more off
@@ -49,6 +49,8 @@ global table6_desk_input "$analysisdata\deskaudits_predicted.dta"
 local table_replicated "$output\table6_indices_replicated.tex"
 local table_yhatrf "$output\table6_indices_yhatrf_control.tex"
 local table_yhatrf_quadratic "$output\table6_indices_yhatrf_quadratic_control.tex"
+local table_yhatrf_deciles "$output\table6_indices_yhatrf_deciles_control.tex"
+local table_yhatrf_quintiles "$output\table6_indices_yhatrf_quintiles_control.tex"
 
 ************************************************************
 * Shared table metadata
@@ -113,6 +115,13 @@ if _rc {
 
 swindex q32_inverted q42 q34 if q1 != ., generate(index_corruption) fullrescale displayw
 swindex q31 q33 q41 if q1 != ., generate(index_efficiency) fullrescale displayw
+
+capture drop yhatrf_decile
+capture drop yhatrf_quintile
+* Pool predicted-evasion deciles over the prepared survey-analysis sample
+* so the grouped-control specifications preserve the intended Table 6 panels.
+xtile yhatrf_decile = yhatrf if yhatrf != . , nq(10)
+xtile yhatrf_quintile = yhatrf if yhatrf != . , nq(5)
 
 tempfile table6_prepared
 save `table6_prepared', replace
@@ -391,7 +400,98 @@ esttab `panel_b_models'
 #delim cr
 
 ************************************************************
-* 6. Light diagnostics
+* 6. Export Table 6 with yhatrf decile controls
+************************************************************
+use `table6_prepared', clear
+capture estimates drop _all
+
+local spec_tag "yhatrf_deciles"
+local extra_controls "ib1.yhatrf_decile"
+local panel_a_models ""
+local panel_b_models ""
+
+foreach outcome in index_efficiency index_corruption {
+	if "`outcome'" == "index_efficiency" local outtag "eff"
+	if "`outcome'" == "index_corruption" local outtag "cor"
+
+	forvalues col = 1/3 {
+		local sample_if "selfreported_audit == 1"
+		if `col' == 1 local sample_if "`sample_if' & x2 == 1"
+		if `col' == 2 local sample_if "`sample_if' & x2 == 0"
+
+		local estname = "d`outtag'A`col'"
+		eststo `estname': reghdfe `outcome' algorithm overlap random safeties horsprogramme `extra_controls' if `sample_if', ///
+			a(selectionyear center) vce(robust)
+		local panel_a_models "`panel_a_models' `estname'"
+
+		quietly summarize `outcome' if e(sample) == 1
+		local meanoutcome = int(100 * `r(mean)') / 100
+		local meanoutcome : display %5.2f `meanoutcome'
+		estadd local pp `meanoutcome'
+		estadd local N = e(N), replace
+	}
+}
+
+foreach outcome in index_efficiency index_corruption {
+	if "`outcome'" == "index_efficiency" local outtag "eff"
+	if "`outcome'" == "index_corruption" local outtag "cor"
+
+	forvalues col = 1/3 {
+		local sample_if "y2 == 1"
+		if `col' == 1 local sample_if "`sample_if' & x2 == 1"
+		if `col' == 2 local sample_if "`sample_if' & x2 == 0"
+
+		local estname = "d`outtag'B`col'"
+		eststo `estname': reghdfe `outcome' algorithm overlap random safeties horsprogramme `extra_controls' if `sample_if', ///
+			a(selectionyear center) vce(robust)
+		local panel_b_models "`panel_b_models' `estname'"
+
+		quietly summarize `outcome' if e(sample) == 1
+		local meanoutcome = int(100 * `r(mean)') / 100
+		local meanoutcome : display %5.2f `meanoutcome'
+		estadd local pp `meanoutcome'
+		estadd local N = e(N), replace
+	}
+}
+
+#delim ;
+esttab `panel_a_models'
+	using `"`table_yhatrf_deciles'"',
+	replace fragment booktabs
+	prehead("\begin{tabular}{lccc|ccc} \toprule")
+	posthead("`panel_a_title' `panel_outcomes' `panel_columns' `panel_numbers' \midrule")
+	postfoot("")
+	order(algorithm overlap random)
+	keep(algorithm overlap random)
+	coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random")
+	b(%5.2f) se(%5.2f)
+	stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+	star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+	nomtitles nonumbers collabels(none) nonotes
+	substitute(\_ _)
+;
+#delim cr
+
+#delim ;
+esttab `panel_b_models'
+	using `"`table_yhatrf_deciles'"',
+	append fragment booktabs
+	prehead("\midrule `panel_b_title' `panel_numbers' \midrule")
+	posthead("")
+	postfoot("\bottomrule \end{tabular}")
+	order(algorithm overlap random)
+	keep(algorithm overlap random)
+	coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random")
+	b(%5.2f) se(%5.2f)
+	stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+	star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+	nomtitles nonumbers collabels(none) nonotes
+	substitute(\_ _)
+;
+#delim cr
+
+************************************************************
+* 7. Light diagnostics
 ************************************************************
 quietly count if selfreported_audit == 1
 local n_panel_a = r(N)
@@ -400,3 +500,97 @@ local n_panel_b = r(N)
 
 di as text "Panel A sample after prep: `n_panel_a'"
 di as text "Panel B sample after prep: `n_panel_b'"
+
+
+
+
+************************************************************
+* 8. Export Table 6 with yhatrf quintile controls
+************************************************************
+use `table6_prepared', clear
+capture estimates drop _all
+
+local spec_tag "yhatrf_quintiles"
+local extra_controls "ib1.yhatrf_quintile"
+local panel_a_models ""
+local panel_b_models ""
+
+foreach outcome in index_efficiency index_corruption {
+	if "`outcome'" == "index_efficiency" local outtag "eff"
+	if "`outcome'" == "index_corruption" local outtag "cor"
+
+	forvalues col = 1/3 {
+		local sample_if "selfreported_audit == 1"
+		if `col' == 1 local sample_if "`sample_if' & x2 == 1"
+		if `col' == 2 local sample_if "`sample_if' & x2 == 0"
+
+		local estname = "v`outtag'A`col'"
+		eststo `estname': reghdfe `outcome' algorithm overlap random safeties horsprogramme `extra_controls' if `sample_if', ///
+			a(selectionyear center) vce(robust)
+		local panel_a_models "`panel_a_models' `estname'"
+
+		quietly summarize `outcome' if e(sample) == 1
+		local meanoutcome = int(100 * `r(mean)') / 100
+		local meanoutcome : display %5.2f `meanoutcome'
+		estadd local pp `meanoutcome'
+		estadd local N = e(N), replace
+	}
+}
+
+foreach outcome in index_efficiency index_corruption {
+	if "`outcome'" == "index_efficiency" local outtag "eff"
+	if "`outcome'" == "index_corruption" local outtag "cor"
+
+	forvalues col = 1/3 {
+		local sample_if "y2 == 1"
+		if `col' == 1 local sample_if "`sample_if' & x2 == 1"
+		if `col' == 2 local sample_if "`sample_if' & x2 == 0"
+
+		local estname = "v`outtag'B`col'"
+		eststo `estname': reghdfe `outcome' algorithm overlap random safeties horsprogramme `extra_controls' if `sample_if', ///
+			a(selectionyear center) vce(robust)
+		local panel_b_models "`panel_b_models' `estname'"
+
+		quietly summarize `outcome' if e(sample) == 1
+		local meanoutcome = int(100 * `r(mean)') / 100
+		local meanoutcome : display %5.2f `meanoutcome'
+		estadd local pp `meanoutcome'
+		estadd local N = e(N), replace
+	}
+}
+
+#delim ;
+esttab `panel_a_models'
+	using `"`table_yhatrf_quintiles'"',
+	replace fragment booktabs
+	prehead("\begin{tabular}{lccc|ccc} \toprule")
+	posthead("`panel_a_title' `panel_outcomes' `panel_columns' `panel_numbers' \midrule")
+	postfoot("")
+	order(algorithm overlap random)
+	keep(algorithm overlap random)
+	coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random")
+	b(%5.2f) se(%5.2f)
+	stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+	star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+	nomtitles nonumbers collabels(none) nonotes
+	substitute(\_ _)
+;
+#delim cr
+
+#delim ;
+esttab `panel_b_models'
+	using `"`table_yhatrf_quintiles'"',
+	append fragment booktabs
+	prehead("\midrule `panel_b_title' `panel_numbers' \midrule")
+	posthead("")
+	postfoot("\bottomrule \end{tabular}")
+	order(algorithm overlap random)
+	keep(algorithm overlap random)
+	coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random")
+	b(%5.2f) se(%5.2f)
+	stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+	star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+	nomtitles nonumbers collabels(none) nonotes
+	substitute(\_ _)
+;
+#delim cr
