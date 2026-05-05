@@ -488,6 +488,99 @@
 
 \section{Audit productivity}
 
+\subsection{Table 4 with predicted evasion controls}
+
+This subsection presents the Table 4 baseline replication together with variants that keep the original nine-column layout and add predicted-evasion controls.
+
+\newcommand{\TableFourRobustnessNotes}[1]{%
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of a regression of the main audit outcomes on the selection method of the case, for full and desk audits separately. Specifications for full audits control for tax office x year fixed effects, which corresponds to the selection list for full audits. For desk audits, we show specifications with tax office x year fixed effects, and inspector x year fixed effects, the latter corresponding to the list for desk audits. The first outcome (Columns 1 to 3) is the probability that the case on the list was actually executed by the inspectors. The second outcome (Columns 4 to 6) is the probability that the audit resulted in a penalty (initial or final notice), conditional on the case being conducted. The third outcome (Columns 7 to 9) is the log amount of the evasion plus penalties uncovered, conditional on the case ending in positive penalty. The evasion amount is obtained from the final notice, which we complement with the initial notice when the final notice is not available. The sample includes all cases selected in the 2018, 2019, and 2020 audit programs. The data includes the selection and audits of the Large Taxpayer Unit, Medium Taxpayer Units 1 and 2, Liberal Professionals, and the regional SME units of Dakar Plateau, Grand Dakar, Pikine Guediawaye, and Ngor Almadies. Robust standard errors (Huber-White) are shown in parentheses, and clustered at the inspector x year level when inspector fixed effects are included. Lee bounds are shown in brackets for the coefficient on the algorithm-selection dummy, computed based on the attrition between algorithm and inspector cases for variables after audit execution. #1 Table C.1 shows intent-to-treat effects, Table C.3 shows robustness to controlling for audit slot fixed effects, and Table C.4 shows the results when using the evasion rate (instead of the evasion amount) as the outcome. Figure D.1 shows the distribution of audit list (= inspector x year) fixed effects for columns 3, 6 and 9.
+}
+
+\begin{landscape}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes}
+\label{tab:table4_main_outcomes_replicated}
+
+\footnotesize
+\input{Output/table4_main_outcomes_replicated_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This replicated specification does not add predicted-evasion controls.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Predicted Evasion Control}
+\label{tab:table4_main_outcomes_yhatrf_control}
+
+\footnotesize
+\input{Output/table4_main_outcomes_yhatrf_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls linearly for the Random-Forest predicted evasion measure (\texttt{yhatrf}).}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Predicted Evasion Quadratic Control}
+\label{tab:table4_main_outcomes_yhatrf_quadratic_control}
+
+\footnotesize
+\input{Output/table4_main_outcomes_yhatrf_quadratic_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for the Random-Forest predicted evasion measure (\texttt{yhatrf}) and its square.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Predicted Evasion Decile Controls}
+\label{tab:table4_main_outcomes_yhatrf_deciles_control}
+
+\footnotesize
+\input{Output/table4_main_outcomes_yhatrf_deciles_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for pooled-sample deciles of the Random-Forest predicted evasion measure (\texttt{yhatrf}).}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Predicted Evasion Quintile Controls}
+\label{tab:table4_main_outcomes_yhatrf_quintiles_control}
+
+\footnotesize
+\input{Output/table4_main_outcomes_yhatrf_quintiles_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for pooled-sample quintiles of the Random-Forest predicted evasion measure (\texttt{yhatrf}).}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\end{landscape}
+
 \subsection{Table 5 with predicted evasion controls}
 
 This section presents the full-audit Table 5 top-panel variants for the audit-productivity discussion. The tables below keep the original sample and layout and add predicted-evasion controls in the robustness specifications.
@@ -670,6 +763,94 @@ This subsection presents the baseline Table 6 replication together with variants
 \end{adjustbox}
 \end{table}
 
+\subsection{Table 8 with predicted evasion controls}
+
+This subsection presents the full-audit Table 8 baseline replication together with variants that keep the original observable-characteristics ladder and add predicted-evasion controls in a sixth column.
+
+\newcommand{\TableEightRobustnessNotes}[1]{%
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of a regression of the main audit outcomes on the selection method of the case for full audits. We show specifications for full audits controlling for tax office x year fixed effects, which corresponds to the selection list for full audits. Each column progressively adds control variables at the firm level: Column 1 has no controls, Column 2 controls for turnover (log), Column 3 controls in addition for the profit rate (profit over turnover), Column 4 controls in addition for the firm productivity (turnover divided by the wage bill), and Column 5 controls in addition for further firm characteristics. #1 The first outcome (A) is the probability that the case on the list was conducted by the inspectors. The second outcome (B) is the probability that an audit results in a penalty (initial or final notice), conditional on the case being conducted. The third outcome (C) is the log amount of the evasion plus penalties, conditional on the case ending in positive penalty. The evasion amount is obtained from the final notice and complemented with the initial notice when the final notice is not available. The sample includes all full audt cases selected in the 2018, 2019, and 2020 audit programs. The data includes the selection and audits of the Large Taxpayer Unit, Medium Taxpayer Units 1 and 2, Liberal Professionals, and the regional SME units of Dakar Plateau, Grand Dakar, Pikine Guediawaye, and Ngor Almadies. Robust standard errors (Huber-White) are shown in parentheses, and inspector x year levels when inspector fixed effects are included.
+}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics}
+\label{tab:table8_fullaudits_replicated}
+
+\footnotesize
+\input{Output/table8_fullaudits_replicated.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Control}
+\label{tab:table8_fullaudits_yhatrf_control}
+
+\footnotesize
+\input{Output/table8_fullaudits_yhatrf_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls linearly for predicted evasion.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Quadratic Control}
+\label{tab:table8_fullaudits_yhatrf_quadratic_control}
+
+\footnotesize
+\input{Output/table8_fullaudits_yhatrf_quadratic_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for predicted evasion and its square.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Decile Controls}
+\label{tab:table8_fullaudits_yhatrf_deciles_control}
+
+\footnotesize
+\input{Output/table8_fullaudits_yhatrf_deciles_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for pooled-sample predicted-evasion deciles.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Quintile Controls}
+\label{tab:table8_fullaudits_yhatrf_quintiles_control}
+
+\footnotesize
+\input{Output/table8_fullaudits_yhatrf_quintiles_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for pooled-sample predicted-evasion quintiles.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
 \section{Inspector effort analysis}
 
 
@@ -2028,6 +2209,9 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 
 
 \end{document}
+
+
+
 
 
 

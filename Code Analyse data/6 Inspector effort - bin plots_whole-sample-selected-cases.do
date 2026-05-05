@@ -185,7 +185,8 @@ foreach audtype in 1 0 {
 					}
 					else if "`b'" == "turnover_mean" {
 						if "`bin_scope'" == "within_method" local xti_bin "Bins of Firm Size (Mean turnover 2014-2020), width = `w'"
-						else local xti_bin "Whole-sample bins of Firm Size (Mean turnover 2014-2020), width = `w'"					}
+						else local xti_bin "Whole-sample bins of Firm Size (Mean turnover 2014-2020), width = `w'"
+					}
 				}
 
 				* Support table for the preferred whole-sample full-audit predicted-evasion deciles
@@ -588,6 +589,7 @@ foreach audtype in 1 0 {
 								graph export "$output\avg_duration_self_binplot_`b'_`audit_type'_`bin_tag'`export_suffix'.pdf", replace
 
 				if `make_support_table' {
+
 					save `support_outcomes', replace
 
 					use `support_selected_counts', clear

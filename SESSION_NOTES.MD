@@ -654,3 +654,125 @@ Task: Add predicted-evasion quintile-control robustness exports to the standalon
 - Full LaTeX compilation of `Code Analyse data/Inspector's Effort report.tex` was not rerun here; manuscript integration was validated through successful `.tex` regeneration and direct inspection of the updated wrappers.
 
 
+
+---
+
+Date: 2026-04-14
+Task: Add a CI-decomposition diagnostic figure for the executed-only whole-sample predicted-evasion decile plot of average inspectors.
+
+## Files edited
+- `Code Analyse data/6 Inspector effort - bin plots_whole-sample-selected-cases.do`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a new diagnostic figure for the preferred full-audit, `yhatrf`, pooled-sample decile specification that decomposes the executed-only `numberagents` CI width into executed-case counts, within-decile SDs, and the implied SEs.
+- Reused the same executed-only collapsed dataset already used for the main `avg_ninspectors` bin plot so the diagnostic inherits the exact same sample restriction (`y2==1`), pooled deciles, and algorithm-versus-inspector split.
+- Kept the existing appendix support table logic unchanged and exported the new diagnostic as a companion PDF rather than replacing the table.
+
+## Output files affected
+- `Output/diag_ci_components_ninspectors_yhatrf_Full_decile_whole_sample.pdf`
+- `Output/bin_support_yhatrf_Full_decile_whole_sample.tex`
+
+## Validation performed
+- Launched `stata-mp /e do "Code Analyse data/6 Inspector effort - bin plots_whole-sample-selected-cases.do"` and confirmed that the run reached the preferred full-audit whole-sample decile branch before producing the new diagnostic PDF and regenerating the support table.
+- Confirmed that `Output/diag_ci_components_ninspectors_yhatrf_Full_decile_whole_sample.pdf` and `Output/bin_support_yhatrf_Full_decile_whole_sample.tex` were both written on 2026-04-14 at 11:55:46 AM.
+- Stopped the still-running Stata process after those target outputs were generated, since the remaining loops were outside the narrow validation target for this change.
+
+## Open issues / next steps
+- I did not wait for the full do-file to finish every other plot/export combination after the target diagnostic output was produced.
+- If needed for manuscript integration, the next step would be to decide whether this diagnostic stays as a coauthor note only or also gets a wrapper in `Code Analyse data/Inspector's Effort report.tex`.
+
+Update: 2026-04-14 (diagnostic figure clarification)
+- Clarified the CI diagnostic figure legend and SE panel wording in `Code Analyse data/6 Inspector effort - bin plots_whole-sample-selected-cases.do` so the third panel reads `SE = SD / sqrt(N)` with explicit `Algorithm cases` / `Inspector cases` labels.
+- Validated the refreshed wording by exporting `Output/diag_ci_components_ninspectors_yhatrf_Full_decile_whole_sample_v2.pdf` from a narrow Stata refresh script.
+- The original `Output/diag_ci_components_ninspectors_yhatrf_Full_decile_whole_sample.pdf` did not overwrite during validation, likely because the existing PDF was locked by another process; the corrected content is therefore confirmed in the `_v2` export.
+
+Update: 2026-04-14 (standalone diagnostic workflow)
+- Moved the CI-decomposition diagnostic for `numberagents` into a new quick-run do-file: `Code Analyse data/6 Inspector effort - diagnostic ninspectors ci.do`.
+- Removed the diagnostic-figure generation block from `Code Analyse data/6 Inspector effort - bin plots_whole-sample-selected-cases.do` so the main production script goes back to generating only the main figures and support table.
+- The new standalone script reproduces the preferred specification only: full audits, pooled `yhatrf` deciles on the selected sample, and executed-only moments for `numberagents`.
+- Validated by running `stata-mp /e do "Code Analyse data/6 Inspector effort - diagnostic ninspectors ci.do"` and confirming that `Output/diag_ci_components_ninspectors_yhatrf_Full_decile_whole_sample.pdf` was refreshed successfully with the clarified SE panel wording.
+
+---
+
+Date: 2026-04-14
+Task: Add a standalone Table 4 predicted-evasion robustness workflow with Lee-bounds exports and manuscript-style report wrappers.
+
+## Files edited
+- `Code Analyse data/2 Table 4 replication and yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Added a new standalone Stata do-file that appends `fullaudits_predicted.dta` and `deskaudits_predicted.dta`, rebuilds the baseline Table 4 sample, and exports five manuscript-facing variants: baseline replication, linear `yhatrf`, quadratic `yhatrf`, pooled-sample `yhatrf` deciles, and pooled-sample `yhatrf` quintiles.
+- Kept the main Table 4 regression backbone aligned with `2 Regressions main results.do` for the displayed nine columns (`ry2_1/4/5`, `ry3_1/4/5`, `ry4_1/4/5`), including the same outcome-specific missingness rules, FE indicator rows, and summary-stat rows.
+- Rebuilt the Table 4 Lee-bounds row for each variant as a separate `_with_lee` output by re-running the attrition-trimming logic on the corresponding estimation samples and inserting the bracket row ahead of `Inspectors x Overlap`.
+- Added a new Table 4 subsection to `Inspector's Effort report.tex` ahead of the existing Table 5/6 robustness section, with five wrappers that use notes closely matching the manuscript Table 4 language plus a one-sentence statement of the predicted-evasion specification used in each variant.
+- Simplified the exported table header text to plain `P(Detection | Execution)` and `log(Evasion) | Detection` labels so the standalone Stata export would not lose text through `$...$` parsing.
+
+## Output files affected
+- `Output/table4_main_outcomes_replicated.tex`
+- `Output/table4_main_outcomes_replicated_with_lee.tex`
+- `Output/table4_main_outcomes_yhatrf_control.tex`
+- `Output/table4_main_outcomes_yhatrf_control_with_lee.tex`
+- `Output/table4_main_outcomes_yhatrf_quadratic_control.tex`
+- `Output/table4_main_outcomes_yhatrf_quadratic_control_with_lee.tex`
+- `Output/table4_main_outcomes_yhatrf_deciles_control.tex`
+- `Output/table4_main_outcomes_yhatrf_deciles_control_with_lee.tex`
+- `Output/table4_main_outcomes_yhatrf_quintiles_control.tex`
+- `Output/table4_main_outcomes_yhatrf_quintiles_control_with_lee.tex`
+
+## Validation performed
+- Ran:
+- `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data/2 Table 4 replication and yhatrf control.do"`
+- Confirmed that all ten Table 4 output fragments listed above were written successfully on 2026-04-14.
+- Confirmed by direct inspection that the baseline replicated export matches the screenshot-style Table 4 backbone on the visible coefficient rows, statistic rows, and overall 9-column layout.
+- Confirmed by direct inspection that the linear and quadratic robustness tables show the `yhatrf` terms explicitly, while the decile and quintile variants keep only the original treatment rows visible.
+- Confirmed by direct inspection that the Lee-bounds row is inserted in columns 4, 6, 7, and 9 of the `_with_lee` outputs, consistent with the legacy Table 4 presentation.
+- Ran:
+- `pdflatex -interaction=nonstopmode -halt-on-error "Inspector's Effort report.tex"`
+- The report compile still stops on the pre-existing missing file `Output/inspectors_reg_panels_Full_exec_rate.tex` before reaching the new Table 4 subsection, so report integration was validated by successful `.tex` generation and direct inspection of the inserted LaTeX wrappers rather than full-PDF confirmation.
+
+## Open issues / next steps
+- Full PDF validation of `Inspector's Effort report.tex` still requires restoring or regenerating the pre-existing missing input `Output/inspectors_reg_panels_Full_exec_rate.tex`.
+- If desired, the next check is a cell-by-cell comparison of the new baseline fragment against a regenerated legacy `1 regression main outcomes with Lee.tex` export from `2 Regressions main results.do`.
+
+---
+
+Date: 2026-04-14
+Task: Add a standalone Table 8 predicted-evasion robustness workflow with manuscript-style report wrappers.
+
+## Files edited
+- `Code Analyse data/2 Table 8 full audits replication and yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a new standalone Stata do-file that uses `fullaudits_predicted.dta` as the single input source, rebuilds the full-audit Table 8 sample, and exports five manuscript-facing variants: the original five-column replication plus linear `yhatrf`, quadratic `yhatrf`, pooled-sample `yhatrf` decile, and pooled-sample `yhatrf` quintile specifications with a sixth robustness column.
+- Kept the original Table 8 control ladder unchanged in Columns 1 to 5 and added the predicted-evasion specification only in Column 6 of the robustness exports.
+- Preserved the original three-panel layout and visible treatment-coefficient focus by exporting only the `Algorithm` row in Panels A-C, while extending Panel C's control-indicator block with a `Predicted evasion` row to mark the new sixth column.
+- Added a new Table 8 subsection to `Code Analyse data/Inspector's Effort report.tex` with one baseline wrapper and four robustness wrappers, using notes closely modeled on the manuscript Table 8 wording and variant-specific sentences for the Column 6 predicted-evasion controls.
+
+## Output files affected
+- `Output/table8_fullaudits_replicated.tex`
+- `Output/table8_fullaudits_yhatrf_control.tex`
+- `Output/table8_fullaudits_yhatrf_quadratic_control.tex`
+- `Output/table8_fullaudits_yhatrf_deciles_control.tex`
+- `Output/table8_fullaudits_yhatrf_quintiles_control.tex`
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 8 full audits replication and yhatrf control.do"`.
+- Confirmed that all five Table 8 output fragments listed above were written successfully on 2026-04-14.
+- Confirmed by direct inspection that `Output/table8_fullaudits_replicated.tex` keeps the original three-panel, five-column Table 8 backbone and reproduces the visible `Algorithm`, `N`, `R2`, and mean-outcome rows.
+- Confirmed by direct inspection that each robustness export adds a sixth column, keeps grouped-control dummies hidden, and marks the new robustness specification through the `Predicted evasion` indicator row in Panel C.
+- Ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory '.codex_tmp\table8_report_check' "Inspector's Effort report.tex"` from `Code Analyse data`.
+- The report compile still stops on the pre-existing missing file `Output/inspectors_reg_panels_Full_exec_rate.tex` before reaching the new Table 8 subsection, so report integration was validated by successful `.tex` generation and direct inspection of the inserted LaTeX wrappers rather than full-PDF confirmation.
+
+## Open issues / next steps
+- Full PDF validation of `Code Analyse data/Inspector's Effort report.tex` still requires restoring or regenerating the pre-existing missing input `Output/inspectors_reg_panels_Full_exec_rate.tex`.
+- If desired, the next check is a side-by-side comparison of the new baseline Table 8 fragment against the legacy `1 regression execution/detection/evasion controls.tex` exports from `2 Regressions main results.do`.
+
+Update: 2026-04-14 (Table 8 baseline correction)
+- Switched `Code Analyse data/2 Table 8 full audits replication and yhatrf control.do` to build the baseline from `datasetforanalysis.dta` and then attach `yhatrf` from `fullaudits_predicted.dta` on the verified selected-full-audit row order.
+- This correction was necessary because the firm-control variables in `fullaudits_predicted.dta` do not exactly match the legacy Table 8 control values from `datasetforanalysis.dta`, which shifted the original Columns 2 to 5.
+- Re-ran `stata-mp /e do "Code Analyse data/2 Table 8 full audits replication and yhatrf control.do"` and confirmed that `Output/table8_fullaudits_replicated.tex` now matches the legacy `1 regression execution controls.tex`, `1 regression detection controls.tex`, and `1 regression evasion controls.tex` backbone for the visible coefficients and summary rows.
