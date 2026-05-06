@@ -1,5 +1,71 @@
 # Session Notes
 
+---
+
+Date: 2026-05-05
+Task: Add Anne-style 15-bin, 20-bin, and top-split predicted-evasion robustness tables.
+
+## Files edited
+- `Code Analyse data/2 Table 4 replication and yhatrf control.do`
+- `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`
+- `Code Analyse data/6 Table 6 yhatrf control.do`
+- `Code Analyse data/2 Table 8 full audits replication and yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added three nonlinear predicted-evasion control variants to Tables 4, 5, 6, and 8: 15 quantile bins, 20 quantile bins, and a top-split decile specification that keeps deciles 1--8 and splits deciles 9 and 10 into two bins each.
+- Kept bins defined on `yhatrf`, the Random Forest prediction of log evasion (`y4`), using the same pooled-sample logic as the existing decile and quintile controls.
+- Added bin-support TeX fragments for each table family, reporting total, algorithm-selected, and inspector-selected observations by bin and whether each bin contains both methods.
+- Added the new regression and support tables to the corresponding Table 4, 5, 6, and 8 sections of `Inspector's Effort report.tex`.
+
+## Output files affected
+- New Table 4 outputs: `Output/table4_main_outcomes_yhatrf_15bins_control*.tex`, `Output/table4_main_outcomes_yhatrf_20bins_control*.tex`, `Output/table4_main_outcomes_yhatrf_topsplit_control*.tex`, and `Output/table4_main_outcomes_yhatrf_bin_support.tex`.
+- New Table 5 outputs: `Output/table5_fullaudits_yhatrf_15bins_control.tex`, `Output/table5_fullaudits_yhatrf_20bins_control.tex`, `Output/table5_fullaudits_yhatrf_topsplit_control.tex`, and `Output/table5_fullaudits_yhatrf_bin_support.tex`.
+- New Table 6 outputs: `Output/table6_indices_yhatrf_15bins_control.tex`, `Output/table6_indices_yhatrf_20bins_control.tex`, `Output/table6_indices_yhatrf_topsplit_control.tex`, and `Output/table6_indices_yhatrf_bin_support.tex`.
+- New Table 8 outputs: `Output/table8_fullaudits_yhatrf_15bins_control.tex`, `Output/table8_fullaudits_yhatrf_20bins_control.tex`, `Output/table8_fullaudits_yhatrf_topsplit_control.tex`, and `Output/table8_fullaudits_yhatrf_bin_support.tex`.
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 4 replication and yhatrf control.do"`.
+- Ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`.
+- Ran `stata-mp /e do "Code Analyse data/6 Table 6 yhatrf control.do"`.
+- Ran `stata-mp /e do "Code Analyse data/2 Table 8 full audits replication and yhatrf control.do"`.
+- Confirmed all new report-referenced output fragments exist in `Output/`.
+- Inspected representative regression and support fragments, including Table 4 Lee-bounds output, Table 6 sparse-bin support rows, and Table 8 sixth-column bin-control output.
+
+## Open issues / next steps
+- Full PDF compilation of `Inspector's Effort report.tex` was not rechecked here because prior validation showed the report stops earlier on a pre-existing missing input before reaching these sections.
+- Table 6 support diagnostics intentionally show zero-count and one-method bins where the survey subsamples are sparse.
+
+Update: 2026-05-06 (audit-type-specific binning)
+- Corrected the Table 4 and Table 6 grouped-control construction so predicted-evasion quantile bins are formed separately within desk and full audits, pooling algorithm- and inspector-selected cases within each audit type.
+- Updated the corresponding report notes for Table 4 and Table 6 to describe within-audit-type binning rather than pooling full and desk audits together.
+- Re-ran `stata-mp /e do "Code Analyse data/2 Table 4 replication and yhatrf control.do"` and `stata-mp /e do "Code Analyse data/6 Table 6 yhatrf control.do"`.
+- Confirmed the regenerated support tables now show audit-type-specific equal-size bins, for example Table 4 15-bin support has roughly 63 full-audit observations per bin and roughly 182--184 desk-audit observations per bin.
+
+---
+
+Date: 2026-05-05
+Task: Convert Anne's 2026-04-22 regression-table reflections into a review task document.
+
+## Files edited
+- `Code Analyse data/Anne_Reflections_To_Dos_2026-04-22.md`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Created a documentation-only markdown file that breaks Anne's comments into review tasks for flexible predicted-evasion controls, subsample checks, number-of-inspectors diagnostics, interpretation checks, and validation steps.
+- Kept the note explicitly scoped as planning/review work; no Stata analysis scripts, regression specifications, or output tables were edited.
+
+## Output files affected
+- None. No tables, figures, or Stata outputs were regenerated.
+
+## Validation performed
+- Checked existing repository markdown conventions and the active Table 8 do-file context.
+- No Stata validation was run because this task only created a planning document.
+
+## Open issues / next steps
+- Future work should first map each proposed task to the exact do-file and output table before implementing any robustness checks.
+
 Date: 2026-03-31
 Project: Senegal Tax Audit replication / revisions
 

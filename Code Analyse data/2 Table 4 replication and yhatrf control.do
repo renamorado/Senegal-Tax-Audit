@@ -11,9 +11,9 @@
 
 * This do-file recreates the screenshot-style Table 4 main-outcome specifications
 * from "2 Regressions main results.do" and then re-estimates them adding
-* predicted evasion (yhatrf) linearly, quadratically, and via pooled decile
-* and quintile controls. It also rebuilds the Table 4 Lee-bounds row for
-* each exported variant.
+* predicted evasion (yhatrf) linearly, quadratically, and via pooled grouped
+* controls. It also rebuilds the Table 4 Lee-bounds row for each exported
+* variant.
 
 version 18
 set more off
@@ -58,6 +58,13 @@ local table_yhatrf_deciles "$output\table4_main_outcomes_yhatrf_deciles_control.
 local table_yhatrf_deciles_lee "$output\table4_main_outcomes_yhatrf_deciles_control_with_lee.tex"
 local table_yhatrf_quintiles "$output\table4_main_outcomes_yhatrf_quintiles_control.tex"
 local table_yhatrf_quintiles_lee "$output\table4_main_outcomes_yhatrf_quintiles_control_with_lee.tex"
+local table_yhatrf_bin15 "$output\table4_main_outcomes_yhatrf_15bins_control.tex"
+local table_yhatrf_bin15_lee "$output\table4_main_outcomes_yhatrf_15bins_control_with_lee.tex"
+local table_yhatrf_bin20 "$output\table4_main_outcomes_yhatrf_20bins_control.tex"
+local table_yhatrf_bin20_lee "$output\table4_main_outcomes_yhatrf_20bins_control_with_lee.tex"
+local table_yhatrf_topsplit "$output\table4_main_outcomes_yhatrf_topsplit_control.tex"
+local table_yhatrf_topsplit_lee "$output\table4_main_outcomes_yhatrf_topsplit_control_with_lee.tex"
+local table_yhatrf_bin_support "$output\table4_main_outcomes_yhatrf_bin_support.tex"
 
 ************************************************************
 * Shared table metadata
@@ -86,10 +93,93 @@ drop if safeties == 1
 
 capture drop yhatrf_decile
 capture drop yhatrf_quintile
-* Group predicted-evasion controls on the pooled selected sample so all
-* robustness variants keep the same baseline sample definition.
-xtile yhatrf_decile = yhatrf if yhatrf != . , nq(10)
-xtile yhatrf_quintile = yhatrf if yhatrf != . , nq(5)
+capture drop yhatrf_bin15
+capture drop yhatrf_bin20
+capture drop yhatrf_decile_topsplit
+capture drop yhatrf_decile9_half
+capture drop yhatrf_decile10_half
+* Group predicted-evasion controls within audit type, pooling algorithm and
+* inspector-selected cases inside full audits and inside desk audits separately.
+gen yhatrf_decile = .
+gen yhatrf_quintile = .
+gen yhatrf_bin15 = .
+gen yhatrf_bin20 = .
+gen yhatrf_decile_topsplit = .
+
+forvalues audit_type = 0/1 {
+    capture drop yhatrf_tmp
+    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(10)
+    replace yhatrf_decile = yhatrf_tmp if x2 == `audit_type'
+    drop yhatrf_tmp
+
+    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(5)
+    replace yhatrf_quintile = yhatrf_tmp if x2 == `audit_type'
+    drop yhatrf_tmp
+
+    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(15)
+    replace yhatrf_bin15 = yhatrf_tmp if x2 == `audit_type'
+    drop yhatrf_tmp
+
+    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(20)
+    replace yhatrf_bin20 = yhatrf_tmp if x2 == `audit_type'
+    drop yhatrf_tmp
+
+    * Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10.
+    replace yhatrf_decile_topsplit = yhatrf_decile if x2 == `audit_type'
+
+    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf_decile == 9, nq(2)
+    replace yhatrf_decile_topsplit = 9 if x2 == `audit_type' & yhatrf_decile == 9 & yhatrf_tmp == 1
+    replace yhatrf_decile_topsplit = 10 if x2 == `audit_type' & yhatrf_decile == 9 & yhatrf_tmp == 2
+    drop yhatrf_tmp
+
+    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf_decile == 10, nq(2)
+    replace yhatrf_decile_topsplit = 11 if x2 == `audit_type' & yhatrf_decile == 10 & yhatrf_tmp == 1
+    replace yhatrf_decile_topsplit = 12 if x2 == `audit_type' & yhatrf_decile == 10 & yhatrf_tmp == 2
+    drop yhatrf_tmp
+}
+
+file open support using `"`table_yhatrf_bin_support'"', write replace
+file write support "\begin{tabular}{llrrrrc}" _n
+file write support "\toprule" _n
+file write support "Specification & Sample & Bin & Total N & Algorithm N & Inspector N & Both methods \\" _n
+file write support "\midrule" _n
+foreach spec in bin15 bin20 topsplit {
+    if "`spec'" == "bin15" {
+        local binvar "yhatrf_bin15"
+        local speclabel "15 bins"
+    }
+    if "`spec'" == "bin20" {
+        local binvar "yhatrf_bin20"
+        local speclabel "20 bins"
+    }
+    if "`spec'" == "topsplit" {
+        local binvar "yhatrf_decile_topsplit"
+        local speclabel "Top-split deciles"
+    }
+    quietly levelsof `binvar', local(binlevels)
+    forvalues audit_type = 1/2 {
+        local sample_if "x2 == 1"
+        local sample_label "Full audits"
+        if `audit_type' == 2 {
+            local sample_if "x2 == 0"
+            local sample_label "Desk audits"
+        }
+        foreach b of local binlevels {
+            quietly count if `sample_if' & `binvar' == `b'
+            local total_n = r(N)
+            quietly count if `sample_if' & `binvar' == `b' & algorithm == 1
+            local alg_n = r(N)
+            quietly count if `sample_if' & `binvar' == `b' & algorithm == 0
+            local insp_n = r(N)
+            local both_methods "No"
+            if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
+            file write support "`speclabel' & `sample_label' & `b' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+        }
+    }
+}
+file write support "\bottomrule" _n
+file write support "\end{tabular}" _n
+file close support
 
 tempfile table4_prepared
 save `table4_prepared', replace
@@ -97,7 +187,7 @@ save `table4_prepared', replace
 ************************************************************
 * 3. Export Table 4 variants
 ************************************************************
-foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintiles {
+foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintiles yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
     use `table4_prepared', clear
     capture estimates drop _all
 
@@ -133,6 +223,21 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
         local extra_controls "ib1.yhatrf_quintile"
         local table_out "`table_yhatrf_quintiles'"
         local table_out_lee "`table_yhatrf_quintiles_lee'"
+    }
+    if "`spec'" == "yhatrf_bin15" {
+        local extra_controls "ib1.yhatrf_bin15"
+        local table_out "`table_yhatrf_bin15'"
+        local table_out_lee "`table_yhatrf_bin15_lee'"
+    }
+    if "`spec'" == "yhatrf_bin20" {
+        local extra_controls "ib1.yhatrf_bin20"
+        local table_out "`table_yhatrf_bin20'"
+        local table_out_lee "`table_yhatrf_bin20_lee'"
+    }
+    if "`spec'" == "yhatrf_topsplit" {
+        local extra_controls "ib1.yhatrf_decile_topsplit"
+        local table_out "`table_yhatrf_topsplit'"
+        local table_out_lee "`table_yhatrf_topsplit_lee'"
     }
 
     local estlist ""

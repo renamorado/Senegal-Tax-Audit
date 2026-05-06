@@ -11,7 +11,7 @@
 * This do-file recreates the top panels (A1 and B1) of the full-audit
 * version of Table 5 from "2 Regressions main results.do" and then
 * re-estimates the same table adding predicted evasion (yhatrf) as a
-* control, as a quadratic robustness check, and as decile/quintile controls.
+* control, as a quadratic robustness check, and as grouped-bin controls.
 
 version 18
 set more off
@@ -53,6 +53,10 @@ local table_yhatrf "$output\table5_fullaudits_yhatrf_control.tex"
 local table_yhatrf_quadratic "$output\table5_fullaudits_yhatrf_quadratic_control.tex"
 local table_yhatrf_deciles "$output\table5_fullaudits_yhatrf_deciles_control.tex"
 local table_yhatrf_quintiles "$output\table5_fullaudits_yhatrf_quintiles_control.tex"
+local table_yhatrf_bin15 "$output\table5_fullaudits_yhatrf_15bins_control.tex"
+local table_yhatrf_bin20 "$output\table5_fullaudits_yhatrf_20bins_control.tex"
+local table_yhatrf_topsplit "$output\table5_fullaudits_yhatrf_topsplit_control.tex"
+local table_yhatrf_bin_support "$output\table5_fullaudits_yhatrf_bin_support.tex"
 
 local panel_a_titles `"\multicolumn{1}{l}{} & \shortstack{Number of Agents} & \shortstack{Duration in Days\\(Taxpayer Survey)} & \shortstack{Days from Start to Conf.\\(Admin Data)} & \shortstack{Days Working on Case\\(Self-Reported)} & \shortstack{Evasion/ Number of\\Agents} & \shortstack{Evasion/Duration\\(Taxpayer Survey)} & \shortstack{Evasion/Duration\\(Admin. Data)} & \shortstack{Evasion/Days Working\\(Self-Reported)} \\"'
 local panel_numbers `"\multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) \\"'
@@ -154,10 +158,62 @@ foreach v in evasion_cost1 evasion_cost2 evasion_cost3 evasion_cost4 {
 
 capture drop yhatrf_decile
 capture drop yhatrf_quintile
+capture drop yhatrf_bin15
+capture drop yhatrf_bin20
+capture drop yhatrf_decile_topsplit
+capture drop yhatrf_decile9_half
+capture drop yhatrf_decile10_half
 * Pool predicted-evasion deciles over the regression-eligible sample so
 * the grouped-control specifications preserve the intended Table 5 sample.
 xtile yhatrf_decile = yhatrf if yhatrf != . , nq(10)
 xtile yhatrf_quintile = yhatrf if yhatrf != . , nq(5)
+xtile yhatrf_bin15 = yhatrf if yhatrf != . , nq(15)
+xtile yhatrf_bin20 = yhatrf if yhatrf != . , nq(20)
+
+* Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10.
+gen yhatrf_decile_topsplit = yhatrf_decile
+xtile yhatrf_decile9_half = yhatrf if yhatrf_decile == 9, nq(2)
+xtile yhatrf_decile10_half = yhatrf if yhatrf_decile == 10, nq(2)
+replace yhatrf_decile_topsplit = 9 if yhatrf_decile == 9 & yhatrf_decile9_half == 1
+replace yhatrf_decile_topsplit = 10 if yhatrf_decile == 9 & yhatrf_decile9_half == 2
+replace yhatrf_decile_topsplit = 11 if yhatrf_decile == 10 & yhatrf_decile10_half == 1
+replace yhatrf_decile_topsplit = 12 if yhatrf_decile == 10 & yhatrf_decile10_half == 2
+drop yhatrf_decile9_half yhatrf_decile10_half
+
+file open support using `"`table_yhatrf_bin_support'"', write replace
+file write support "\begin{tabular}{llrrrrc}" _n
+file write support "\toprule" _n
+file write support "Specification & Sample & Bin & Total N & Algorithm N & Inspector N & Both methods \\" _n
+file write support "\midrule" _n
+foreach spec in bin15 bin20 topsplit {
+	if "`spec'" == "bin15" {
+		local binvar "yhatrf_bin15"
+		local speclabel "15 bins"
+	}
+	if "`spec'" == "bin20" {
+		local binvar "yhatrf_bin20"
+		local speclabel "20 bins"
+	}
+	if "`spec'" == "topsplit" {
+		local binvar "yhatrf_decile_topsplit"
+		local speclabel "Top-split deciles"
+	}
+	quietly levelsof `binvar', local(binlevels)
+	foreach b of local binlevels {
+		quietly count if `binvar' == `b'
+		local total_n = r(N)
+		quietly count if `binvar' == `b' & algorithm == 1
+		local alg_n = r(N)
+		quietly count if `binvar' == `b' & algorithm == 0
+		local insp_n = r(N)
+		local both_methods "No"
+		if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
+		file write support "`speclabel' & Full audits & `b' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+	}
+}
+file write support "\bottomrule" _n
+file write support "\end{tabular}" _n
+file close support
 
 tempfile table5_prepared
 save `table5_prepared', replace
@@ -222,7 +278,77 @@ esttab `main_estlist'
 #delim cr
 
 ************************************************************
-* 4. Export Table 5 top panels with yhatrf as a control
+* 4. Export Table 5 top panels with additional grouped controls
+************************************************************
+foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
+	use `table5_prepared', clear
+	estimates drop _all
+
+	local version "`spec'"
+	local base_controls "ib1.yhatrf_bin15"
+	local table_out "`table_yhatrf_bin15'"
+	if "`spec'" == "yhatrf_bin20" {
+		local base_controls "ib1.yhatrf_bin20"
+		local table_out "`table_yhatrf_bin20'"
+	}
+	if "`spec'" == "yhatrf_topsplit" {
+		local base_controls "ib1.yhatrf_decile_topsplit"
+		local table_out "`table_yhatrf_topsplit'"
+	}
+	local main_estlist ""
+	local colindex = 0
+
+	foreach outcome in y16 q30 y19 y8 evasion_cost1 evasion_cost2 evasion_cost3 evasion_cost4 {
+		local ++colindex
+		local rhs_controls "`base_controls'"
+
+		if "`outcome'" != "q30" {
+			replace `outcome' = . if y2 == 0
+		}
+		if "`outcome'" == "y19" {
+			local rhs_controls "`rhs_controls' dummy1 dummy2 dummy3"
+		}
+
+		eststo m`colindex'_`version': reghdfe `outcome' algorithm overlap random safeties `rhs_controls', ///
+			a(inspectorclusteryear) vce(robust)
+		local main_estlist "`main_estlist' m`colindex'_`version'"
+
+		quietly summarize `outcome' if e(sample) == 1
+		estadd local meanoutcome = int(100 * `r(mean)') / 100
+		local meanoutcome = int(100 * `r(mean)') / 100
+		local meanoutcome : display %5.2f `meanoutcome'
+		estadd local pp `meanoutcome'
+		test algorithm == safeties
+		local pvalue : display %5.2f `r(p)'
+		estadd local pvalue = round(`pvalue', 0.01)
+		estadd local N = e(N), replace
+	}
+
+	#delim ;
+	esttab `main_estlist'
+		using `"`table_out'"',
+		replace fragment booktabs
+		prehead("\begin{tabular}{lcccc|cccc} \toprule")
+		posthead("`panel_a_titles' `panel_numbers' \midrule")
+		postfoot("\bottomrule \end{tabular}")
+		order(algorithm overlap)
+		keep(algorithm overlap)
+		coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm")
+		mgroups("A1: Resource Outcomes" "B1: Productivity Outcomes",
+			pattern(1 0 0 0 1 0 0 0)
+			span prefix(\multicolumn{@span}{c}{\textbf{) suffix(}})
+			erepeat(\cmidrule(lr){@span}))
+		b(%5.2f) se(%5.2f)
+		stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+		nomtitles nonumbers collabels(none) nonotes
+		substitute(\_ _)
+	;
+	#delim cr
+}
+
+************************************************************
+* 5. Export Table 5 top panels with yhatrf as a control
 ************************************************************
 use `table5_prepared', clear
 estimates drop _all
@@ -281,7 +407,7 @@ esttab `main_estlist'
 #delim cr
 
 ************************************************************
-* 5. Export Table 5 top panels with yhatrf and yhatrf^2
+* 6. Export Table 5 top panels with yhatrf and yhatrf^2
 ************************************************************
 use `table5_prepared', clear
 estimates drop _all
@@ -340,7 +466,7 @@ esttab `main_estlist'
 #delim cr
 
 ************************************************************
-* 6. Export Table 5 top panels with yhatrf decile controls
+* 7. Export Table 5 top panels with yhatrf decile controls
 ************************************************************
 use `table5_prepared', clear
 estimates drop _all
@@ -402,7 +528,7 @@ esttab `main_estlist'
 
 
 ************************************************************
-* 7. Export Table 5 top panels with yhatrf quintile controls
+* 8. Export Table 5 top panels with yhatrf quintile controls
 ************************************************************
 use `table5_prepared', clear
 estimates drop _all

@@ -11,8 +11,8 @@
 
 * This do-file recreates the full-audit version of Table 8 and then
 * re-estimates the same table adding a sixth column with predicted
-* evasion controls: linear yhatrf, quadratic yhatrf, pooled deciles,
-* and pooled quintiles.
+* evasion controls: linear yhatrf, quadratic yhatrf, and grouped-bin
+* robustness controls.
 
 version 18
 set more off
@@ -55,6 +55,10 @@ local table_yhatrf "$output\table8_fullaudits_yhatrf_control.tex"
 local table_yhatrf_quadratic "$output\table8_fullaudits_yhatrf_quadratic_control.tex"
 local table_yhatrf_deciles "$output\table8_fullaudits_yhatrf_deciles_control.tex"
 local table_yhatrf_quintiles "$output\table8_fullaudits_yhatrf_quintiles_control.tex"
+local table_yhatrf_bin15 "$output\table8_fullaudits_yhatrf_15bins_control.tex"
+local table_yhatrf_bin20 "$output\table8_fullaudits_yhatrf_20bins_control.tex"
+local table_yhatrf_topsplit "$output\table8_fullaudits_yhatrf_topsplit_control.tex"
+local table_yhatrf_bin_support "$output\table8_fullaudits_yhatrf_bin_support.tex"
 
 local panel_a_header_5 `"\multicolumn{6}{l}{\textbf{A: Outcome P(Execution)}} \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) \\ \midrule"'
 local panel_b_header_5 `"\midrule \multicolumn{6}{l}{\textbf{B: Outcome P(Detection|Execution)}} \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) \\ \midrule"'
@@ -111,11 +115,63 @@ if _rc {
 
 capture drop yhatrf_decile
 capture drop yhatrf_quintile
+capture drop yhatrf_bin15
+capture drop yhatrf_bin20
+capture drop yhatrf_decile_topsplit
+capture drop yhatrf_decile9_half
+capture drop yhatrf_decile10_half
 * The selected full-audit samples align row-for-row across datasetforanalysis
 * and fullaudits_predicted; rowid_table8 preserves the legacy Table 8 baseline
 * while attaching yhatrf for the sixth-column robustness variants.
 xtile yhatrf_decile = yhatrf if yhatrf != . , nq(10)
 xtile yhatrf_quintile = yhatrf if yhatrf != . , nq(5)
+xtile yhatrf_bin15 = yhatrf if yhatrf != . , nq(15)
+xtile yhatrf_bin20 = yhatrf if yhatrf != . , nq(20)
+
+* Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10.
+gen yhatrf_decile_topsplit = yhatrf_decile
+xtile yhatrf_decile9_half = yhatrf if yhatrf_decile == 9, nq(2)
+xtile yhatrf_decile10_half = yhatrf if yhatrf_decile == 10, nq(2)
+replace yhatrf_decile_topsplit = 9 if yhatrf_decile == 9 & yhatrf_decile9_half == 1
+replace yhatrf_decile_topsplit = 10 if yhatrf_decile == 9 & yhatrf_decile9_half == 2
+replace yhatrf_decile_topsplit = 11 if yhatrf_decile == 10 & yhatrf_decile10_half == 1
+replace yhatrf_decile_topsplit = 12 if yhatrf_decile == 10 & yhatrf_decile10_half == 2
+drop yhatrf_decile9_half yhatrf_decile10_half
+
+file open support using `"`table_yhatrf_bin_support'"', write replace
+file write support "\begin{tabular}{llrrrrc}" _n
+file write support "\toprule" _n
+file write support "Specification & Sample & Bin & Total N & Algorithm N & Inspector N & Both methods \\" _n
+file write support "\midrule" _n
+foreach spec in bin15 bin20 topsplit {
+    if "`spec'" == "bin15" {
+        local binvar "yhatrf_bin15"
+        local speclabel "15 bins"
+    }
+    if "`spec'" == "bin20" {
+        local binvar "yhatrf_bin20"
+        local speclabel "20 bins"
+    }
+    if "`spec'" == "topsplit" {
+        local binvar "yhatrf_decile_topsplit"
+        local speclabel "Top-split deciles"
+    }
+    quietly levelsof `binvar', local(binlevels)
+    foreach b of local binlevels {
+        quietly count if `binvar' == `b'
+        local total_n = r(N)
+        quietly count if `binvar' == `b' & algorithm == 1
+        local alg_n = r(N)
+        quietly count if `binvar' == `b' & algorithm == 0
+        local insp_n = r(N)
+        local both_methods "No"
+        if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
+        file write support "`speclabel' & Full audits & `b' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+    }
+}
+file write support "\bottomrule" _n
+file write support "\end{tabular}" _n
+file close support
 
 drop rowid_table8
 save `table8_prepared', replace
@@ -123,7 +179,7 @@ save `table8_prepared', replace
 ************************************************************
 * 3. Export Table 8 variants
 ************************************************************
-foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintiles {
+foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintiles yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
     local table_out "`table_replicated'"
     local extra_controls ""
     local maxcol 5
@@ -166,6 +222,36 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
     if "`spec'" == "yhatrf_quintiles" {
         local table_out "`table_yhatrf_quintiles'"
         local extra_controls "ib1.yhatrf_quintile"
+        local maxcol 6
+        local prehead "\begin{tabular}{lcccccc} \toprule"
+        local panel_a_header "`panel_a_header_6'"
+        local panel_b_header "`panel_b_header_6'"
+        local panel_c_header "`panel_c_header_6'"
+        local stats_panel_c "`stats_panel_c_6'"
+    }
+    if "`spec'" == "yhatrf_bin15" {
+        local table_out "`table_yhatrf_bin15'"
+        local extra_controls "ib1.yhatrf_bin15"
+        local maxcol 6
+        local prehead "\begin{tabular}{lcccccc} \toprule"
+        local panel_a_header "`panel_a_header_6'"
+        local panel_b_header "`panel_b_header_6'"
+        local panel_c_header "`panel_c_header_6'"
+        local stats_panel_c "`stats_panel_c_6'"
+    }
+    if "`spec'" == "yhatrf_bin20" {
+        local table_out "`table_yhatrf_bin20'"
+        local extra_controls "ib1.yhatrf_bin20"
+        local maxcol 6
+        local prehead "\begin{tabular}{lcccccc} \toprule"
+        local panel_a_header "`panel_a_header_6'"
+        local panel_b_header "`panel_b_header_6'"
+        local panel_c_header "`panel_c_header_6'"
+        local stats_panel_c "`stats_panel_c_6'"
+    }
+    if "`spec'" == "yhatrf_topsplit" {
+        local table_out "`table_yhatrf_topsplit'"
+        local extra_controls "ib1.yhatrf_decile_topsplit"
         local maxcol 6
         local prehead "\begin{tabular}{lcccccc} \toprule"
         local panel_a_header "`panel_a_header_6'"

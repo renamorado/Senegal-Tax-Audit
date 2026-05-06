@@ -11,7 +11,7 @@
 
 * This do-file recreates the screenshot-style Table 6 index specifications from
 * "3 Analysis taxpayer survey.do" and then re-estimates them adding predicted
-* evasion (yhatrf) linearly, quadratically, and via decile/quintile controls.
+* evasion (yhatrf) linearly, quadratically, and via grouped-bin controls.
 
 version 18
 set more off
@@ -51,6 +51,10 @@ local table_yhatrf "$output\table6_indices_yhatrf_control.tex"
 local table_yhatrf_quadratic "$output\table6_indices_yhatrf_quadratic_control.tex"
 local table_yhatrf_deciles "$output\table6_indices_yhatrf_deciles_control.tex"
 local table_yhatrf_quintiles "$output\table6_indices_yhatrf_quintiles_control.tex"
+local table_yhatrf_bin15 "$output\table6_indices_yhatrf_15bins_control.tex"
+local table_yhatrf_bin20 "$output\table6_indices_yhatrf_20bins_control.tex"
+local table_yhatrf_topsplit "$output\table6_indices_yhatrf_topsplit_control.tex"
+local table_yhatrf_bin_support "$output\table6_indices_yhatrf_bin_support.tex"
 
 ************************************************************
 * Shared table metadata
@@ -118,10 +122,109 @@ swindex q31 q33 q41 if q1 != ., generate(index_efficiency) fullrescale displayw
 
 capture drop yhatrf_decile
 capture drop yhatrf_quintile
-* Pool predicted-evasion deciles over the prepared survey-analysis sample
-* so the grouped-control specifications preserve the intended Table 6 panels.
-xtile yhatrf_decile = yhatrf if yhatrf != . , nq(10)
-xtile yhatrf_quintile = yhatrf if yhatrf != . , nq(5)
+capture drop yhatrf_bin15
+capture drop yhatrf_bin20
+capture drop yhatrf_decile_topsplit
+capture drop yhatrf_decile9_half
+capture drop yhatrf_decile10_half
+* Group predicted-evasion controls within audit type, pooling algorithm and
+* inspector-selected cases inside full audits and inside desk audits separately.
+gen yhatrf_decile = .
+gen yhatrf_quintile = .
+gen yhatrf_bin15 = .
+gen yhatrf_bin20 = .
+gen yhatrf_decile_topsplit = .
+
+forvalues audit_type = 0/1 {
+	capture drop yhatrf_tmp
+	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(10)
+	replace yhatrf_decile = yhatrf_tmp if x2 == `audit_type'
+	drop yhatrf_tmp
+
+	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(5)
+	replace yhatrf_quintile = yhatrf_tmp if x2 == `audit_type'
+	drop yhatrf_tmp
+
+	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(15)
+	replace yhatrf_bin15 = yhatrf_tmp if x2 == `audit_type'
+	drop yhatrf_tmp
+
+	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(20)
+	replace yhatrf_bin20 = yhatrf_tmp if x2 == `audit_type'
+	drop yhatrf_tmp
+
+	* Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10.
+	replace yhatrf_decile_topsplit = yhatrf_decile if x2 == `audit_type'
+
+	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf_decile == 9, nq(2)
+	replace yhatrf_decile_topsplit = 9 if x2 == `audit_type' & yhatrf_decile == 9 & yhatrf_tmp == 1
+	replace yhatrf_decile_topsplit = 10 if x2 == `audit_type' & yhatrf_decile == 9 & yhatrf_tmp == 2
+	drop yhatrf_tmp
+
+	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf_decile == 10, nq(2)
+	replace yhatrf_decile_topsplit = 11 if x2 == `audit_type' & yhatrf_decile == 10 & yhatrf_tmp == 1
+	replace yhatrf_decile_topsplit = 12 if x2 == `audit_type' & yhatrf_decile == 10 & yhatrf_tmp == 2
+	drop yhatrf_tmp
+}
+
+file open support using `"`table_yhatrf_bin_support'"', write replace
+file write support "\begin{tabular}{llrrrrc}" _n
+file write support "\toprule" _n
+file write support "Specification & Sample & Bin & Total N & Algorithm N & Inspector N & Both methods \\" _n
+file write support "\midrule" _n
+foreach spec in bin15 bin20 topsplit {
+	if "`spec'" == "bin15" {
+		local binvar "yhatrf_bin15"
+		local speclabel "15 bins"
+	}
+	if "`spec'" == "bin20" {
+		local binvar "yhatrf_bin20"
+		local speclabel "20 bins"
+	}
+	if "`spec'" == "topsplit" {
+		local binvar "yhatrf_decile_topsplit"
+		local speclabel "Top-split deciles"
+	}
+	quietly levelsof `binvar', local(binlevels)
+	forvalues group = 1/6 {
+		local sample_if "selfreported_audit == 1 & x2 == 1"
+		local sample_label "Panel A full"
+		if `group' == 2 {
+			local sample_if "selfreported_audit == 1 & x2 == 0"
+			local sample_label "Panel A desk"
+		}
+		if `group' == 3 {
+			local sample_if "selfreported_audit == 1"
+			local sample_label "Panel A all"
+		}
+		if `group' == 4 {
+			local sample_if "y2 == 1 & x2 == 1"
+			local sample_label "Panel B full"
+		}
+		if `group' == 5 {
+			local sample_if "y2 == 1 & x2 == 0"
+			local sample_label "Panel B desk"
+		}
+		if `group' == 6 {
+			local sample_if "y2 == 1"
+			local sample_label "Panel B all"
+		}
+		foreach b of local binlevels {
+			quietly count if `sample_if' & `binvar' == `b'
+			local total_n = r(N)
+			quietly count if `sample_if' & `binvar' == `b' & algorithm == 1
+			local alg_n = r(N)
+			quietly count if `sample_if' & `binvar' == `b' & algorithm == 0
+			local insp_n = r(N)
+			local both_methods "No"
+			if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
+			file write support "`speclabel' & `sample_label' & `b' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+		}
+	}
+}
+file write support "\bottomrule" _n
+file write support "\end{tabular}" _n
+file close support
 
 tempfile table6_prepared
 save `table6_prepared', replace
@@ -199,6 +302,110 @@ esttab `panel_a_models'
 ;
 #delim cr
 
+************************************************************
+* 4. Export Table 6 with additional grouped controls
+************************************************************
+foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
+	use `table6_prepared', clear
+	capture estimates drop _all
+
+	local extra_controls "ib1.yhatrf_bin15"
+	local table_out "`table_yhatrf_bin15'"
+	local prefix "f"
+	if "`spec'" == "yhatrf_bin20" {
+		local extra_controls "ib1.yhatrf_bin20"
+		local table_out "`table_yhatrf_bin20'"
+		local prefix "w"
+	}
+	if "`spec'" == "yhatrf_topsplit" {
+		local extra_controls "ib1.yhatrf_decile_topsplit"
+		local table_out "`table_yhatrf_topsplit'"
+		local prefix "s"
+	}
+	local panel_a_models ""
+	local panel_b_models ""
+
+	foreach outcome in index_efficiency index_corruption {
+		if "`outcome'" == "index_efficiency" local outtag "eff"
+		if "`outcome'" == "index_corruption" local outtag "cor"
+
+		forvalues col = 1/3 {
+			local sample_if "selfreported_audit == 1"
+			if `col' == 1 local sample_if "`sample_if' & x2 == 1"
+			if `col' == 2 local sample_if "`sample_if' & x2 == 0"
+
+			local estname = "`prefix'`outtag'A`col'"
+			eststo `estname': reghdfe `outcome' algorithm overlap random safeties horsprogramme `extra_controls' if `sample_if', ///
+				a(selectionyear center) vce(robust)
+			local panel_a_models "`panel_a_models' `estname'"
+
+			quietly summarize `outcome' if e(sample) == 1
+			local meanoutcome = int(100 * `r(mean)') / 100
+			local meanoutcome : display %5.2f `meanoutcome'
+			estadd local pp `meanoutcome'
+			estadd local N = e(N), replace
+		}
+	}
+
+	foreach outcome in index_efficiency index_corruption {
+		if "`outcome'" == "index_efficiency" local outtag "eff"
+		if "`outcome'" == "index_corruption" local outtag "cor"
+
+		forvalues col = 1/3 {
+			local sample_if "y2 == 1"
+			if `col' == 1 local sample_if "`sample_if' & x2 == 1"
+			if `col' == 2 local sample_if "`sample_if' & x2 == 0"
+
+			local estname = "`prefix'`outtag'B`col'"
+			eststo `estname': reghdfe `outcome' algorithm overlap random safeties horsprogramme `extra_controls' if `sample_if', ///
+				a(selectionyear center) vce(robust)
+			local panel_b_models "`panel_b_models' `estname'"
+
+			quietly summarize `outcome' if e(sample) == 1
+			local meanoutcome = int(100 * `r(mean)') / 100
+			local meanoutcome : display %5.2f `meanoutcome'
+			estadd local pp `meanoutcome'
+			estadd local N = e(N), replace
+		}
+	}
+
+	#delim ;
+	esttab `panel_a_models'
+		using `"`table_out'"',
+		replace fragment booktabs
+		prehead("\begin{tabular}{lccc|ccc} \toprule")
+		posthead("`panel_a_title' `panel_outcomes' `panel_columns' `panel_numbers' \midrule")
+		postfoot("")
+		order(algorithm overlap random)
+		keep(algorithm overlap random)
+		coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random")
+		b(%5.2f) se(%5.2f)
+		stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+		nomtitles nonumbers collabels(none) nonotes
+		substitute(\_ _)
+	;
+	#delim cr
+
+	#delim ;
+	esttab `panel_b_models'
+		using `"`table_out'"',
+		append fragment booktabs
+		prehead("\midrule `panel_b_title' `panel_numbers' \midrule")
+		posthead("")
+		postfoot("\bottomrule \end{tabular}")
+		order(algorithm overlap random)
+		keep(algorithm overlap random)
+		coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random")
+		b(%5.2f) se(%5.2f)
+		stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+		nomtitles nonumbers collabels(none) nonotes
+		substitute(\_ _)
+	;
+	#delim cr
+}
+
 #delim ;
 esttab `panel_b_models'
 	using `"`table_replicated'"',
@@ -218,7 +425,7 @@ esttab `panel_b_models'
 #delim cr
 
 ************************************************************
-* 4. Export Table 6 with yhatrf control
+* 5. Export Table 6 with yhatrf control
 ************************************************************
 use `table6_prepared', clear
 capture estimates drop _all
@@ -309,7 +516,7 @@ esttab `panel_b_models'
 #delim cr
 
 ************************************************************
-* 5. Export Table 6 with yhatrf and yhatrf^2
+* 6. Export Table 6 with yhatrf and yhatrf^2
 ************************************************************
 use `table6_prepared', clear
 capture estimates drop _all
@@ -400,7 +607,7 @@ esttab `panel_b_models'
 #delim cr
 
 ************************************************************
-* 6. Export Table 6 with yhatrf decile controls
+* 7. Export Table 6 with yhatrf decile controls
 ************************************************************
 use `table6_prepared', clear
 capture estimates drop _all
@@ -491,7 +698,7 @@ esttab `panel_b_models'
 #delim cr
 
 ************************************************************
-* 7. Light diagnostics
+* 8. Light diagnostics
 ************************************************************
 quietly count if selfreported_audit == 1
 local n_panel_a = r(N)
@@ -505,7 +712,7 @@ di as text "Panel B sample after prep: `n_panel_b'"
 
 
 ************************************************************
-* 8. Export Table 6 with yhatrf quintile controls
+* 9. Export Table 6 with yhatrf quintile controls
 ************************************************************
 use `table6_prepared', clear
 capture estimates drop _all
