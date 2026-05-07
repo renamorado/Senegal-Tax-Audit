@@ -62,6 +62,10 @@ local table_yhatrf_bin15 "$output\table4_main_outcomes_yhatrf_15bins_control.tex
 local table_yhatrf_bin15_lee "$output\table4_main_outcomes_yhatrf_15bins_control_with_lee.tex"
 local table_yhatrf_bin20 "$output\table4_main_outcomes_yhatrf_20bins_control.tex"
 local table_yhatrf_bin20_lee "$output\table4_main_outcomes_yhatrf_20bins_control_with_lee.tex"
+local table_yhatrf_bin40 "$output\table4_main_outcomes_yhatrf_40bins_control.tex"
+local table_yhatrf_bin40_lee "$output\table4_main_outcomes_yhatrf_40bins_control_with_lee.tex"
+local table_yhatrf_bin50 "$output\table4_main_outcomes_yhatrf_50bins_control.tex"
+local table_yhatrf_bin50_lee "$output\table4_main_outcomes_yhatrf_50bins_control_with_lee.tex"
 local table_yhatrf_topsplit "$output\table4_main_outcomes_yhatrf_topsplit_control.tex"
 local table_yhatrf_topsplit_lee "$output\table4_main_outcomes_yhatrf_topsplit_control_with_lee.tex"
 local table_yhatrf_bin_support "$output\table4_main_outcomes_yhatrf_bin_support.tex"
@@ -91,90 +95,124 @@ if _rc {
 keep if selection == 1
 drop if safeties == 1
 
-capture drop yhatrf_decile
-capture drop yhatrf_quintile
-capture drop yhatrf_bin15
-capture drop yhatrf_bin20
-capture drop yhatrf_decile_topsplit
-capture drop yhatrf_decile9_half
-capture drop yhatrf_decile10_half
-* Group predicted-evasion controls within audit type, pooling algorithm and
-* inspector-selected cases inside full audits and inside desk audits separately.
-gen yhatrf_decile = .
-gen yhatrf_quintile = .
-gen yhatrf_bin15 = .
-gen yhatrf_bin20 = .
-gen yhatrf_decile_topsplit = .
+foreach suffix in full desk_tax desk_insp {
+    capture drop yhatrf_decile_`suffix'
+    capture drop yhatrf_quintile_`suffix'
+    capture drop yhatrf_bin15_`suffix'
+    capture drop yhatrf_bin20_`suffix'
+    capture drop yhatrf_bin40_`suffix'
+    capture drop yhatrf_bin50_`suffix'
+    capture drop yhatrf_decile_topsplit_`suffix'
+    capture drop yhatrf_decile9_half_`suffix'
+    capture drop yhatrf_decile10_half_`suffix'
+}
+capture drop table4_fe_full
+capture drop table4_fe_desk_tax
+capture drop table4_fe_desk_insp
 
-forvalues audit_type = 0/1 {
-    capture drop yhatrf_tmp
-    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(10)
-    replace yhatrf_decile = yhatrf_tmp if x2 == `audit_type'
-    drop yhatrf_tmp
+* Build grouped predicted-evasion controls within the FE strata used by each
+* Table 4 column: full audits, desk audits with tax-office/year FE, and desk
+* audits with inspector/year FE.
+egen table4_fe_full = group(inspectorclusteryear) if x2 == 1, missing
+egen table4_fe_desk_tax = group(controlbureauannee) if x2 == 0, missing
+egen table4_fe_desk_insp = group(inspectorclusteryear) if x2 == 0, missing
 
-    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(5)
-    replace yhatrf_quintile = yhatrf_tmp if x2 == `audit_type'
-    drop yhatrf_tmp
+foreach suffix in full desk_tax desk_insp {
+    local sample_if "x2 == 1"
+    local fevar "table4_fe_full"
+    if "`suffix'" == "desk_tax" {
+        local sample_if "x2 == 0"
+        local fevar "table4_fe_desk_tax"
+    }
+    if "`suffix'" == "desk_insp" {
+        local sample_if "x2 == 0"
+        local fevar "table4_fe_desk_insp"
+    }
 
-    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(15)
-    replace yhatrf_bin15 = yhatrf_tmp if x2 == `audit_type'
-    drop yhatrf_tmp
+    egen yhatrf_decile_`suffix' = xtile(yhatrf) if `sample_if' & yhatrf != ., by(`fevar') nq(10)
+    egen yhatrf_quintile_`suffix' = xtile(yhatrf) if `sample_if' & yhatrf != ., by(`fevar') nq(5)
+    egen yhatrf_bin15_`suffix' = xtile(yhatrf) if `sample_if' & yhatrf != ., by(`fevar') nq(15)
+    egen yhatrf_bin20_`suffix' = xtile(yhatrf) if `sample_if' & yhatrf != ., by(`fevar') nq(20)
+    egen yhatrf_bin40_`suffix' = xtile(yhatrf) if `sample_if' & yhatrf != ., by(`fevar') nq(40)
+    egen yhatrf_bin50_`suffix' = xtile(yhatrf) if `sample_if' & yhatrf != ., by(`fevar') nq(50)
 
-    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(20)
-    replace yhatrf_bin20 = yhatrf_tmp if x2 == `audit_type'
-    drop yhatrf_tmp
-
-    * Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10.
-    replace yhatrf_decile_topsplit = yhatrf_decile if x2 == `audit_type'
-
-    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf_decile == 9, nq(2)
-    replace yhatrf_decile_topsplit = 9 if x2 == `audit_type' & yhatrf_decile == 9 & yhatrf_tmp == 1
-    replace yhatrf_decile_topsplit = 10 if x2 == `audit_type' & yhatrf_decile == 9 & yhatrf_tmp == 2
-    drop yhatrf_tmp
-
-    xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf_decile == 10, nq(2)
-    replace yhatrf_decile_topsplit = 11 if x2 == `audit_type' & yhatrf_decile == 10 & yhatrf_tmp == 1
-    replace yhatrf_decile_topsplit = 12 if x2 == `audit_type' & yhatrf_decile == 10 & yhatrf_tmp == 2
-    drop yhatrf_tmp
+    gen yhatrf_decile_topsplit_`suffix' = yhatrf_decile_`suffix'
+    egen yhatrf_decile9_half_`suffix' = xtile(yhatrf) if `sample_if' & yhatrf_decile_`suffix' == 9, by(`fevar') nq(2)
+    egen yhatrf_decile10_half_`suffix' = xtile(yhatrf) if `sample_if' & yhatrf_decile_`suffix' == 10, by(`fevar') nq(2)
+    replace yhatrf_decile_topsplit_`suffix' = 9 if `sample_if' & yhatrf_decile_`suffix' == 9 & yhatrf_decile9_half_`suffix' == 1
+    replace yhatrf_decile_topsplit_`suffix' = 10 if `sample_if' & yhatrf_decile_`suffix' == 9 & yhatrf_decile9_half_`suffix' == 2
+    replace yhatrf_decile_topsplit_`suffix' = 11 if `sample_if' & yhatrf_decile_`suffix' == 10 & yhatrf_decile10_half_`suffix' == 1
+    replace yhatrf_decile_topsplit_`suffix' = 12 if `sample_if' & yhatrf_decile_`suffix' == 10 & yhatrf_decile10_half_`suffix' == 2
+    drop yhatrf_decile9_half_`suffix' yhatrf_decile10_half_`suffix'
 }
 
 file open support using `"`table_yhatrf_bin_support'"', write replace
-file write support "\begin{tabular}{llrrrrc}" _n
+file write support "\begin{tabular}{llrrrrrc}" _n
 file write support "\toprule" _n
-file write support "Specification & Sample & Bin & Total N & Algorithm N & Inspector N & Both methods \\" _n
+file write support "Specification & Sample & FE strata & Cells & Total N & Algorithm N & Inspector N & Both methods \\" _n
 file write support "\midrule" _n
-foreach spec in bin15 bin20 topsplit {
+foreach spec in deciles quintiles bin15 bin20 bin40 bin50 topsplit {
+    if "`spec'" == "deciles" {
+        local binprefix "yhatrf_decile"
+        local speclabel "Deciles"
+    }
+    if "`spec'" == "quintiles" {
+        local binprefix "yhatrf_quintile"
+        local speclabel "Quintiles"
+    }
     if "`spec'" == "bin15" {
-        local binvar "yhatrf_bin15"
+        local binprefix "yhatrf_bin15"
         local speclabel "15 bins"
     }
     if "`spec'" == "bin20" {
-        local binvar "yhatrf_bin20"
+        local binprefix "yhatrf_bin20"
         local speclabel "20 bins"
     }
+    if "`spec'" == "bin40" {
+        local binprefix "yhatrf_bin40"
+        local speclabel "40 bins"
+    }
+    if "`spec'" == "bin50" {
+        local binprefix "yhatrf_bin50"
+        local speclabel "50 bins"
+    }
     if "`spec'" == "topsplit" {
-        local binvar "yhatrf_decile_topsplit"
+        local binprefix "yhatrf_decile_topsplit"
         local speclabel "Top-split deciles"
     }
-    quietly levelsof `binvar', local(binlevels)
-    forvalues audit_type = 1/2 {
+    foreach suffix in full desk_tax desk_insp {
         local sample_if "x2 == 1"
-        local sample_label "Full audits"
-        if `audit_type' == 2 {
+        local sample_label "Full, inspector-year FE"
+        local fevar "table4_fe_full"
+        if "`suffix'" == "desk_tax" {
             local sample_if "x2 == 0"
-            local sample_label "Desk audits"
+            local sample_label "Desk, tax-office-year FE"
+            local fevar "table4_fe_desk_tax"
         }
-        foreach b of local binlevels {
-            quietly count if `sample_if' & `binvar' == `b'
-            local total_n = r(N)
-            quietly count if `sample_if' & `binvar' == `b' & algorithm == 1
-            local alg_n = r(N)
-            quietly count if `sample_if' & `binvar' == `b' & algorithm == 0
-            local insp_n = r(N)
-            local both_methods "No"
-            if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
-            file write support "`speclabel' & `sample_label' & `b' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+        if "`suffix'" == "desk_insp" {
+            local sample_if "x2 == 0"
+            local sample_label "Desk, inspector-year FE"
+            local fevar "table4_fe_desk_insp"
         }
+        local binvar "`binprefix'_`suffix'"
+
+        capture drop support_stratum_tag support_cell
+        egen support_stratum_tag = tag(`fevar') if `sample_if' & `binvar' != .
+        egen support_cell = group(`fevar' `binvar') if `sample_if' & `binvar' != .
+        quietly count if support_stratum_tag == 1
+        local strata_n = r(N)
+        quietly levelsof support_cell if support_cell != ., local(support_cells)
+        local cell_n : word count `support_cells'
+        quietly count if `sample_if' & `binvar' != .
+        local total_n = r(N)
+        quietly count if `sample_if' & `binvar' != . & algorithm == 1
+        local alg_n = r(N)
+        quietly count if `sample_if' & `binvar' != . & algorithm == 0
+        local insp_n = r(N)
+        local both_methods "No"
+        if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
+        file write support "`speclabel' & `sample_label' & `strata_n' & `cell_n' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+        drop support_stratum_tag support_cell
     }
 }
 file write support "\bottomrule" _n
@@ -187,11 +225,14 @@ save `table4_prepared', replace
 ************************************************************
 * 3. Export Table 4 variants
 ************************************************************
-foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintiles yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
+foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintiles yhatrf_bin15 yhatrf_bin20 yhatrf_bin40 yhatrf_bin50 yhatrf_topsplit {
     use `table4_prepared', clear
     capture estimates drop _all
 
     local extra_controls ""
+    local extra_controls_full ""
+    local extra_controls_desk_tax ""
+    local extra_controls_desk_insp ""
     local order_vars "algorithm overlap random"
     local keep_vars "algorithm overlap random"
     local coeflabels `"algorithm "Algorithm" overlap "Inspectors x Overlap" random "Algorithm x Random""'
@@ -200,6 +241,9 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
 
     if "`spec'" == "yhatrf" {
         local extra_controls "yhatrf"
+        local extra_controls_full "yhatrf"
+        local extra_controls_desk_tax "yhatrf"
+        local extra_controls_desk_insp "yhatrf"
         local order_vars "algorithm overlap random yhatrf"
         local keep_vars "algorithm overlap random yhatrf"
         local coeflabels `"algorithm "Algorithm" overlap "Inspectors x Overlap" random "Algorithm x Random" yhatrf "Predicted evasion""'
@@ -208,6 +252,9 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
     }
     if "`spec'" == "yhatrf_quadratic" {
         local extra_controls "c.yhatrf##c.yhatrf"
+        local extra_controls_full "c.yhatrf##c.yhatrf"
+        local extra_controls_desk_tax "c.yhatrf##c.yhatrf"
+        local extra_controls_desk_insp "c.yhatrf##c.yhatrf"
         local order_vars "algorithm overlap random yhatrf c.yhatrf#c.yhatrf"
         local keep_vars "algorithm overlap random yhatrf c.yhatrf#c.yhatrf"
         local coeflabels `"algorithm "Algorithm" overlap "Inspectors x Overlap" random "Algorithm x Random" yhatrf "Predicted evasion" c.yhatrf#c.yhatrf "Predicted evasion squared""'
@@ -215,27 +262,58 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
         local table_out_lee "`table_yhatrf_quadratic_lee'"
     }
     if "`spec'" == "yhatrf_deciles" {
-        local extra_controls "ib1.yhatrf_decile"
+        local extra_controls "ib1.yhatrf_decile_desk_insp"
+        local extra_controls_full "ib1.yhatrf_decile_full"
+        local extra_controls_desk_tax "ib1.yhatrf_decile_desk_tax"
+        local extra_controls_desk_insp "ib1.yhatrf_decile_desk_insp"
         local table_out "`table_yhatrf_deciles'"
         local table_out_lee "`table_yhatrf_deciles_lee'"
     }
     if "`spec'" == "yhatrf_quintiles" {
-        local extra_controls "ib1.yhatrf_quintile"
+        local extra_controls "ib1.yhatrf_quintile_desk_insp"
+        local extra_controls_full "ib1.yhatrf_quintile_full"
+        local extra_controls_desk_tax "ib1.yhatrf_quintile_desk_tax"
+        local extra_controls_desk_insp "ib1.yhatrf_quintile_desk_insp"
         local table_out "`table_yhatrf_quintiles'"
         local table_out_lee "`table_yhatrf_quintiles_lee'"
     }
     if "`spec'" == "yhatrf_bin15" {
-        local extra_controls "ib1.yhatrf_bin15"
+        local extra_controls "ib1.yhatrf_bin15_desk_insp"
+        local extra_controls_full "ib1.yhatrf_bin15_full"
+        local extra_controls_desk_tax "ib1.yhatrf_bin15_desk_tax"
+        local extra_controls_desk_insp "ib1.yhatrf_bin15_desk_insp"
         local table_out "`table_yhatrf_bin15'"
         local table_out_lee "`table_yhatrf_bin15_lee'"
     }
     if "`spec'" == "yhatrf_bin20" {
-        local extra_controls "ib1.yhatrf_bin20"
+        local extra_controls "ib1.yhatrf_bin20_desk_insp"
+        local extra_controls_full "ib1.yhatrf_bin20_full"
+        local extra_controls_desk_tax "ib1.yhatrf_bin20_desk_tax"
+        local extra_controls_desk_insp "ib1.yhatrf_bin20_desk_insp"
         local table_out "`table_yhatrf_bin20'"
         local table_out_lee "`table_yhatrf_bin20_lee'"
     }
+    if "`spec'" == "yhatrf_bin40" {
+        local extra_controls "ib1.yhatrf_bin40_desk_insp"
+        local extra_controls_full "ib1.yhatrf_bin40_full"
+        local extra_controls_desk_tax "ib1.yhatrf_bin40_desk_tax"
+        local extra_controls_desk_insp "ib1.yhatrf_bin40_desk_insp"
+        local table_out "`table_yhatrf_bin40'"
+        local table_out_lee "`table_yhatrf_bin40_lee'"
+    }
+    if "`spec'" == "yhatrf_bin50" {
+        local extra_controls "ib1.yhatrf_bin50_desk_insp"
+        local extra_controls_full "ib1.yhatrf_bin50_full"
+        local extra_controls_desk_tax "ib1.yhatrf_bin50_desk_tax"
+        local extra_controls_desk_insp "ib1.yhatrf_bin50_desk_insp"
+        local table_out "`table_yhatrf_bin50'"
+        local table_out_lee "`table_yhatrf_bin50_lee'"
+    }
     if "`spec'" == "yhatrf_topsplit" {
-        local extra_controls "ib1.yhatrf_decile_topsplit"
+        local extra_controls "ib1.yhatrf_decile_topsplit_desk_insp"
+        local extra_controls_full "ib1.yhatrf_decile_topsplit_full"
+        local extra_controls_desk_tax "ib1.yhatrf_decile_topsplit_desk_tax"
+        local extra_controls_desk_insp "ib1.yhatrf_decile_topsplit_desk_insp"
         local table_out "`table_yhatrf_topsplit'"
         local table_out_lee "`table_yhatrf_topsplit_lee'"
     }
@@ -252,7 +330,7 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
         }
 
         local ++colindex
-        eststo m`colindex': reghdfe `outcome' algorithm overlap random safeties `extra_controls' if x2 == 1, ///
+        eststo m`colindex': reghdfe `outcome' algorithm overlap random safeties `extra_controls_full' if x2 == 1, ///
             a(inspectorclusteryear) vce(robust)
         estadd local taxcenteryear "Yes"
         estadd local inspectoryear "No"
@@ -264,7 +342,7 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
         local estlist "`estlist' m`colindex'"
 
         local ++colindex
-        eststo m`colindex': reghdfe `outcome' algorithm overlap random safeties `extra_controls' if x2 == 0, ///
+        eststo m`colindex': reghdfe `outcome' algorithm overlap random safeties `extra_controls_desk_tax' if x2 == 0, ///
             a(controlbureauannee) vce(robust)
         estadd local taxcenteryear "Yes"
         estadd local inspectoryear "No"
@@ -276,7 +354,7 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
         local estlist "`estlist' m`colindex'"
 
         local ++colindex
-        eststo m`colindex': reghdfe `outcome' algorithm overlap random safeties `extra_controls' if x2 == 0, ///
+        eststo m`colindex': reghdfe `outcome' algorithm overlap random safeties `extra_controls_desk_insp' if x2 == 0, ///
             a(inspectorclusteryear) vce(robust)
         estadd local taxcenteryear "Yes"
         estadd local inspectoryear "Yes"
@@ -384,24 +462,24 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
         drop n
 
         local ++r
-        quietly reghdfe `y' algorithm overlap random `extra_controls' if x2 == 0 & sample_lower == 1, ///
+        quietly reghdfe `y' algorithm overlap random `extra_controls_desk_insp' if x2 == 0 & sample_lower == 1, ///
             a(inspectorclusteryear) vce(robust)
         matrix lee[`r', 1] = _b[algorithm]
         matrix lee[`r', 2] = _b[algorithm] / _se[algorithm]
 
-        quietly reghdfe `y' algorithm overlap random `extra_controls' if x2 == 0 & sample_upper == 1, ///
+        quietly reghdfe `y' algorithm overlap random `extra_controls_desk_insp' if x2 == 0 & sample_upper == 1, ///
             a(inspectorclusteryear) vce(robust)
         matrix lee[`r', 3] = _b[algorithm]
         matrix lee[`r', 4] = _b[algorithm] / _se[algorithm]
         matrix lee[`r', 5] = e(N)
 
         local ++r
-        quietly reghdfe `y' algorithm overlap random `extra_controls' if x2 == 1 & sample_lower == 1, ///
+        quietly reghdfe `y' algorithm overlap random `extra_controls_full' if x2 == 1 & sample_lower == 1, ///
             a(inspectorclusteryear) vce(robust)
         matrix lee[`r', 1] = _b[algorithm]
         matrix lee[`r', 2] = _b[algorithm] / _se[algorithm]
 
-        quietly reghdfe `y' algorithm overlap random `extra_controls' if x2 == 1 & sample_upper == 1, ///
+        quietly reghdfe `y' algorithm overlap random `extra_controls_full' if x2 == 1 & sample_upper == 1, ///
             a(inspectorclusteryear) vce(robust)
         matrix lee[`r', 3] = _b[algorithm]
         matrix lee[`r', 4] = _b[algorithm] / _se[algorithm]

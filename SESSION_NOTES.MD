@@ -43,6 +43,25 @@ Update: 2026-05-06 (audit-type-specific binning)
 - Re-ran `stata-mp /e do "Code Analyse data/2 Table 4 replication and yhatrf control.do"` and `stata-mp /e do "Code Analyse data/6 Table 6 yhatrf control.do"`.
 - Confirmed the regenerated support tables now show audit-type-specific equal-size bins, for example Table 4 15-bin support has roughly 63 full-audit observations per bin and roughly 182--184 desk-audit observations per bin.
 
+Update: 2026-05-06 (regression-FE-stratified binning)
+- Replaced the grouped `yhatrf` controls in the standalone Table 4, 5, 6, and 8 workflows so quantile bins are formed within the regression fixed-effect strata rather than within audit type or pooled full-audit samples.
+- Table 4 now uses separate grouped-control variables for the full-audit inspector-year columns, desk tax-office-year columns, and desk inspector-year columns; the Lee-bounds re-estimation uses the matching full-audit and desk inspector-year controls.
+- Table 5 and Table 8 now form grouped controls within `inspectorclusteryear`; Table 6 forms them within `center` by `selectionyear`.
+- Reworked the four bin-support fragments to report compact FE-stratified diagnostics: number of FE strata, nonempty stratum-by-bin cells, total observations, method-specific counts, and whether both methods appear.
+- Updated `Code Analyse data/Inspector's Effort report.tex` notes for Tables 4, 5, 6, and 8 so grouped-control descriptions match the new FE-stratified binning.
+- Regenerated the existing Table 4, 5, 6, and 8 predicted-evasion `.tex` fragments in `Output/`, keeping filenames unchanged.
+- Validation: ran all four narrow do-files successfully with `stata-mp /e do`; inspected representative support fragments and grouped-control regression tables to confirm diagnostics are populated and grouped-control coefficients remain hidden in manuscript-facing outputs.
+- Report validation: attempted `pdflatex -interaction=nonstopmode -halt-on-error -output-directory "..\.codex_tmp\report_check" "Inspector's Effort report.tex"` from `Code Analyse data`; compilation still stops before these sections on the pre-existing missing input `Output/inspectors_reg_panels_Full_exec_rate.tex`.
+
+Update: 2026-05-06 (40- and 50-bin FE-stratified controls)
+- Added two additional grouped predicted-evasion control variants to the standalone Table 4, 5, 6, and 8 workflows: 40 quantile bins and 50 quantile bins.
+- Kept the new controls aligned with the regression fixed-effect strata: Table 4 uses the full-audit inspector-year, desk tax-office-year, and desk inspector-year bin variables as appropriate by column; Tables 5 and 8 use `inspectorclusteryear`; Table 6 uses `center` by `selectionyear`.
+- Updated the four bin-support fragments so the FE-stratified diagnostics now include 40-bin and 50-bin rows.
+- Added the new 40-bin and 50-bin regression tables to `Code Analyse data/Inspector's Effort report.tex`, preserving the existing report structure and using the same manuscript-facing table conventions.
+- New output fragments: `Output/table4_main_outcomes_yhatrf_40bins_control*.tex`, `Output/table4_main_outcomes_yhatrf_50bins_control*.tex`, `Output/table5_fullaudits_yhatrf_40bins_control.tex`, `Output/table5_fullaudits_yhatrf_50bins_control.tex`, `Output/table6_indices_yhatrf_40bins_control.tex`, `Output/table6_indices_yhatrf_50bins_control.tex`, `Output/table8_fullaudits_yhatrf_40bins_control.tex`, and `Output/table8_fullaudits_yhatrf_50bins_control.tex`.
+- Validation: re-ran all four narrow do-files successfully with `stata-mp /e do`; confirmed the new `.tex` outputs exist; inspected representative 40-bin and 50-bin regression fragments to confirm visible coefficient rows remain unchanged and grouped-control coefficients stay hidden; inspected support fragments to confirm 40-bin and 50-bin diagnostics are populated.
+- Report validation: re-ran the same direct `pdflatex` check; compilation remains blocked before these table sections by the pre-existing missing input `Output/inspectors_reg_panels_Full_exec_rate.tex`.
+
 ---
 
 Date: 2026-05-05

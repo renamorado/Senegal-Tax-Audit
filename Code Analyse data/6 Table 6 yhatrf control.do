@@ -53,6 +53,8 @@ local table_yhatrf_deciles "$output\table6_indices_yhatrf_deciles_control.tex"
 local table_yhatrf_quintiles "$output\table6_indices_yhatrf_quintiles_control.tex"
 local table_yhatrf_bin15 "$output\table6_indices_yhatrf_15bins_control.tex"
 local table_yhatrf_bin20 "$output\table6_indices_yhatrf_20bins_control.tex"
+local table_yhatrf_bin40 "$output\table6_indices_yhatrf_40bins_control.tex"
+local table_yhatrf_bin50 "$output\table6_indices_yhatrf_50bins_control.tex"
 local table_yhatrf_topsplit "$output\table6_indices_yhatrf_topsplit_control.tex"
 local table_yhatrf_bin_support "$output\table6_indices_yhatrf_bin_support.tex"
 
@@ -124,55 +126,46 @@ capture drop yhatrf_decile
 capture drop yhatrf_quintile
 capture drop yhatrf_bin15
 capture drop yhatrf_bin20
+capture drop yhatrf_bin40
+capture drop yhatrf_bin50
 capture drop yhatrf_decile_topsplit
 capture drop yhatrf_decile9_half
 capture drop yhatrf_decile10_half
-* Group predicted-evasion controls within audit type, pooling algorithm and
-* inspector-selected cases inside full audits and inside desk audits separately.
-gen yhatrf_decile = .
-gen yhatrf_quintile = .
-gen yhatrf_bin15 = .
-gen yhatrf_bin20 = .
-gen yhatrf_decile_topsplit = .
+capture drop table6_fe_center_year
 
-forvalues audit_type = 0/1 {
-	capture drop yhatrf_tmp
-	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(10)
-	replace yhatrf_decile = yhatrf_tmp if x2 == `audit_type'
-	drop yhatrf_tmp
+* Build grouped predicted-evasion controls within the center/year FE used by
+* the Table 6 survey regressions.
+egen table6_fe_center_year = group(center selectionyear), missing
+egen yhatrf_decile = xtile(yhatrf) if yhatrf != ., by(table6_fe_center_year) nq(10)
+egen yhatrf_quintile = xtile(yhatrf) if yhatrf != ., by(table6_fe_center_year) nq(5)
+egen yhatrf_bin15 = xtile(yhatrf) if yhatrf != ., by(table6_fe_center_year) nq(15)
+egen yhatrf_bin20 = xtile(yhatrf) if yhatrf != ., by(table6_fe_center_year) nq(20)
+egen yhatrf_bin40 = xtile(yhatrf) if yhatrf != ., by(table6_fe_center_year) nq(40)
+egen yhatrf_bin50 = xtile(yhatrf) if yhatrf != ., by(table6_fe_center_year) nq(50)
 
-	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(5)
-	replace yhatrf_quintile = yhatrf_tmp if x2 == `audit_type'
-	drop yhatrf_tmp
-
-	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(15)
-	replace yhatrf_bin15 = yhatrf_tmp if x2 == `audit_type'
-	drop yhatrf_tmp
-
-	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf != . , nq(20)
-	replace yhatrf_bin20 = yhatrf_tmp if x2 == `audit_type'
-	drop yhatrf_tmp
-
-	* Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10.
-	replace yhatrf_decile_topsplit = yhatrf_decile if x2 == `audit_type'
-
-	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf_decile == 9, nq(2)
-	replace yhatrf_decile_topsplit = 9 if x2 == `audit_type' & yhatrf_decile == 9 & yhatrf_tmp == 1
-	replace yhatrf_decile_topsplit = 10 if x2 == `audit_type' & yhatrf_decile == 9 & yhatrf_tmp == 2
-	drop yhatrf_tmp
-
-	xtile yhatrf_tmp = yhatrf if x2 == `audit_type' & yhatrf_decile == 10, nq(2)
-	replace yhatrf_decile_topsplit = 11 if x2 == `audit_type' & yhatrf_decile == 10 & yhatrf_tmp == 1
-	replace yhatrf_decile_topsplit = 12 if x2 == `audit_type' & yhatrf_decile == 10 & yhatrf_tmp == 2
-	drop yhatrf_tmp
-}
+gen yhatrf_decile_topsplit = yhatrf_decile
+egen yhatrf_decile9_half = xtile(yhatrf) if yhatrf_decile == 9, by(table6_fe_center_year) nq(2)
+egen yhatrf_decile10_half = xtile(yhatrf) if yhatrf_decile == 10, by(table6_fe_center_year) nq(2)
+replace yhatrf_decile_topsplit = 9 if yhatrf_decile == 9 & yhatrf_decile9_half == 1
+replace yhatrf_decile_topsplit = 10 if yhatrf_decile == 9 & yhatrf_decile9_half == 2
+replace yhatrf_decile_topsplit = 11 if yhatrf_decile == 10 & yhatrf_decile10_half == 1
+replace yhatrf_decile_topsplit = 12 if yhatrf_decile == 10 & yhatrf_decile10_half == 2
+drop yhatrf_decile9_half yhatrf_decile10_half
 
 file open support using `"`table_yhatrf_bin_support'"', write replace
-file write support "\begin{tabular}{llrrrrc}" _n
+file write support "\begin{tabular}{llrrrrrc}" _n
 file write support "\toprule" _n
-file write support "Specification & Sample & Bin & Total N & Algorithm N & Inspector N & Both methods \\" _n
+file write support "Specification & Sample & FE strata & Cells & Total N & Algorithm N & Inspector N & Both methods \\" _n
 file write support "\midrule" _n
-foreach spec in bin15 bin20 topsplit {
+foreach spec in deciles quintiles bin15 bin20 bin40 bin50 topsplit {
+	if "`spec'" == "deciles" {
+		local binvar "yhatrf_decile"
+		local speclabel "Deciles"
+	}
+	if "`spec'" == "quintiles" {
+		local binvar "yhatrf_quintile"
+		local speclabel "Quintiles"
+	}
 	if "`spec'" == "bin15" {
 		local binvar "yhatrf_bin15"
 		local speclabel "15 bins"
@@ -181,11 +174,18 @@ foreach spec in bin15 bin20 topsplit {
 		local binvar "yhatrf_bin20"
 		local speclabel "20 bins"
 	}
+	if "`spec'" == "bin40" {
+		local binvar "yhatrf_bin40"
+		local speclabel "40 bins"
+	}
+	if "`spec'" == "bin50" {
+		local binvar "yhatrf_bin50"
+		local speclabel "50 bins"
+	}
 	if "`spec'" == "topsplit" {
 		local binvar "yhatrf_decile_topsplit"
 		local speclabel "Top-split deciles"
 	}
-	quietly levelsof `binvar', local(binlevels)
 	forvalues group = 1/6 {
 		local sample_if "selfreported_audit == 1 & x2 == 1"
 		local sample_label "Panel A full"
@@ -209,17 +209,24 @@ foreach spec in bin15 bin20 topsplit {
 			local sample_if "y2 == 1"
 			local sample_label "Panel B all"
 		}
-		foreach b of local binlevels {
-			quietly count if `sample_if' & `binvar' == `b'
-			local total_n = r(N)
-			quietly count if `sample_if' & `binvar' == `b' & algorithm == 1
-			local alg_n = r(N)
-			quietly count if `sample_if' & `binvar' == `b' & algorithm == 0
-			local insp_n = r(N)
-			local both_methods "No"
-			if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
-			file write support "`speclabel' & `sample_label' & `b' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
-		}
+
+		capture drop support_stratum_tag support_cell
+		egen support_stratum_tag = tag(table6_fe_center_year) if `sample_if' & `binvar' != .
+		egen support_cell = group(table6_fe_center_year `binvar') if `sample_if' & `binvar' != .
+		quietly count if support_stratum_tag == 1
+		local strata_n = r(N)
+		quietly levelsof support_cell if support_cell != ., local(support_cells)
+		local cell_n : word count `support_cells'
+		quietly count if `sample_if' & `binvar' != .
+		local total_n = r(N)
+		quietly count if `sample_if' & `binvar' != . & algorithm == 1
+		local alg_n = r(N)
+		quietly count if `sample_if' & `binvar' != . & algorithm == 0
+		local insp_n = r(N)
+		local both_methods "No"
+		if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
+		file write support "`speclabel' & `sample_label' & `strata_n' & `cell_n' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+		drop support_stratum_tag support_cell
 	}
 }
 file write support "\bottomrule" _n
@@ -305,7 +312,7 @@ esttab `panel_a_models'
 ************************************************************
 * 4. Export Table 6 with additional grouped controls
 ************************************************************
-foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
+foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_bin40 yhatrf_bin50 yhatrf_topsplit {
 	use `table6_prepared', clear
 	capture estimates drop _all
 
@@ -316,6 +323,16 @@ foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
 		local extra_controls "ib1.yhatrf_bin20"
 		local table_out "`table_yhatrf_bin20'"
 		local prefix "w"
+	}
+	if "`spec'" == "yhatrf_bin40" {
+		local extra_controls "ib1.yhatrf_bin40"
+		local table_out "`table_yhatrf_bin40'"
+		local prefix "r"
+	}
+	if "`spec'" == "yhatrf_bin50" {
+		local extra_controls "ib1.yhatrf_bin50"
+		local table_out "`table_yhatrf_bin50'"
+		local prefix "n"
 	}
 	if "`spec'" == "yhatrf_topsplit" {
 		local extra_controls "ib1.yhatrf_decile_topsplit"

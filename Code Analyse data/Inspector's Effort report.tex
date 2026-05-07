@@ -557,7 +557,7 @@ This subsection presents the Table 4 baseline replication together with variants
 \input{Output/table4_main_outcomes_yhatrf_deciles_control_with_lee.tex}
 
 \begin{tablenotes}[flushleft]
-\TableFourRobustnessNotes{This robustness specification additionally controls for predicted-evasion deciles formed separately within full and desk audits, pooling algorithm- and inspector-selected cases within audit type.}
+\TableFourRobustnessNotes{This robustness specification additionally controls for predicted-evasion deciles formed within the regression fixed-effect strata used in each column.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -573,7 +573,7 @@ This subsection presents the Table 4 baseline replication together with variants
 \input{Output/table4_main_outcomes_yhatrf_quintiles_control_with_lee.tex}
 
 \begin{tablenotes}[flushleft]
-\TableFourRobustnessNotes{This robustness specification additionally controls for predicted-evasion quintiles formed separately within full and desk audits, pooling algorithm- and inspector-selected cases within audit type.}
+\TableFourRobustnessNotes{This robustness specification additionally controls for predicted-evasion quintiles formed within the regression fixed-effect strata used in each column.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -589,7 +589,7 @@ This subsection presents the Table 4 baseline replication together with variants
 \input{Output/table4_main_outcomes_yhatrf_15bins_control_with_lee.tex}
 
 \begin{tablenotes}[flushleft]
-\TableFourRobustnessNotes{This robustness specification additionally controls for 15 predicted-evasion bins formed separately within full and desk audits, pooling algorithm- and inspector-selected cases within audit type.}
+\TableFourRobustnessNotes{This robustness specification additionally controls for 15 predicted-evasion bins formed within the regression fixed-effect strata used in each column.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -605,7 +605,39 @@ This subsection presents the Table 4 baseline replication together with variants
 \input{Output/table4_main_outcomes_yhatrf_20bins_control_with_lee.tex}
 
 \begin{tablenotes}[flushleft]
-\TableFourRobustnessNotes{This robustness specification additionally controls for 20 predicted-evasion bins formed separately within full and desk audits, pooling algorithm- and inspector-selected cases within audit type.}
+\TableFourRobustnessNotes{This robustness specification additionally controls for 20 predicted-evasion bins formed within the regression fixed-effect strata used in each column.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with 40 Predicted-Evasion Bin Controls}
+\label{tab:table4_main_outcomes_yhatrf_40bins_control}
+
+\footnotesize
+\input{Output/table4_main_outcomes_yhatrf_40bins_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for 40 predicted-evasion bins formed within the regression fixed-effect strata used in each column.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with 50 Predicted-Evasion Bin Controls}
+\label{tab:table4_main_outcomes_yhatrf_50bins_control}
+
+\footnotesize
+\input{Output/table4_main_outcomes_yhatrf_50bins_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for 50 predicted-evasion bins formed within the regression fixed-effect strata used in each column.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -621,7 +653,7 @@ This subsection presents the Table 4 baseline replication together with variants
 \input{Output/table4_main_outcomes_yhatrf_topsplit_control_with_lee.tex}
 
 \begin{tablenotes}[flushleft]
-\TableFourRobustnessNotes{This robustness specification controls for predicted-evasion deciles formed separately within full and desk audits, after splitting the ninth and tenth within-audit-type deciles into two equal-size bins each.}
+\TableFourRobustnessNotes{This robustness specification controls for predicted-evasion deciles formed within the regression fixed-effect strata used in each column, after splitting each stratum's ninth and tenth deciles into two equal-size bins each.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -638,7 +670,7 @@ This subsection presents the Table 4 baseline replication together with variants
 
 \begin{tablenotes}[flushleft]
 \scriptsize
-\item Notes: Bins are formed on \texttt{yhatrf} separately within full and desk audits in the selected Table 4 sample after excluding safety cases, pooling algorithm- and inspector-selected cases within audit type. Algorithm and inspector counts report the number of observations in each bin by selection method. ``Both methods'' equals Yes when the bin contains at least one algorithm-selected and one inspector-selected case.
+\item Notes: Bins are formed on \texttt{yhatrf} within the regression fixed-effect strata used in each Table 4 column. The support table reports the number of FE strata, nonempty stratum-by-bin cells, total observations, observations by selection method, and whether both methods appear in the relevant sample.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -714,7 +746,7 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted-evasion deciles formed on the pooled regression-eligible full-audit sample. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted-evasion deciles formed within inspector-cluster $\times$ year fixed-effect strata. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -731,7 +763,7 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted-evasion quintiles formed on the pooled regression-eligible full-audit sample. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted-evasion quintiles formed within inspector-cluster $\times$ year fixed-effect strata. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -748,7 +780,7 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 15 pooled-sample bins of predicted evasion.
+\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 15 predicted-evasion bins formed within inspector-cluster $\times$ year fixed-effect strata.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -765,7 +797,41 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 20 pooled-sample bins of predicted evasion.
+\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 20 predicted-evasion bins formed within inspector-cluster $\times$ year fixed-effect strata.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Resources Allocated to Audits and Audit Productivity, Full Audits, with 40 Predicted-Evasion Bin Controls (Panels A1 and B1 only)}
+\label{tab:table5_fullaudits_yhatrf_40bins_control}
+
+\footnotesize
+\input{Output/table5_fullaudits_yhatrf_40bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 40 predicted-evasion bins formed within inspector-cluster $\times$ year fixed-effect strata.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Resources Allocated to Audits and Audit Productivity, Full Audits, with 50 Predicted-Evasion Bin Controls (Panels A1 and B1 only)}
+\label{tab:table5_fullaudits_yhatrf_50bins_control}
+
+\footnotesize
+\input{Output/table5_fullaudits_yhatrf_50bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 50 predicted-evasion bins formed within inspector-cluster $\times$ year fixed-effect strata.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -782,7 +848,7 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This robustness specification matches the Table 5 top-panel specification above and controls for predicted-evasion deciles after splitting the ninth and tenth deciles into two equal-size bins each.
+\item Notes: This robustness specification matches the Table 5 top-panel specification above and controls for predicted-evasion deciles formed within inspector-cluster $\times$ year fixed-effect strata, after splitting each stratum's ninth and tenth deciles into two equal-size bins each.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -799,7 +865,7 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 
 \begin{tablenotes}[flushleft]
 \scriptsize
-\item Notes: Bins are formed on \texttt{yhatrf} in the selected full-audit Table 5 sample after excluding safety cases. Algorithm and inspector counts report the number of observations in each bin by selection method.
+\item Notes: Bins are formed on \texttt{yhatrf} within the inspector-cluster $\times$ year fixed-effect strata used in Table 5. The support table reports the number of FE strata, nonempty stratum-by-bin cells, total observations, observations by selection method, and whether both methods appear in the relevant sample.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -873,7 +939,7 @@ This subsection presents the baseline Table 6 replication together with variants
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted-evasion deciles formed separately within full and desk audits, pooling algorithm- and inspector-selected cases within audit type. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted-evasion deciles formed within center $\times$ selection-year fixed-effect strata. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -890,7 +956,7 @@ This subsection presents the baseline Table 6 replication together with variants
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted-evasion quintiles formed separately within full and desk audits, pooling algorithm- and inspector-selected cases within audit type. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted-evasion quintiles formed within center $\times$ selection-year fixed-effect strata. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -907,7 +973,7 @@ This subsection presents the baseline Table 6 replication together with variants
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 15 predicted-evasion bins formed separately within full and desk audits, pooling algorithm- and inspector-selected cases within audit type.
+\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 15 predicted-evasion bins formed within center $\times$ selection-year fixed-effect strata.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -924,7 +990,41 @@ This subsection presents the baseline Table 6 replication together with variants
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 20 predicted-evasion bins formed separately within full and desk audits, pooling algorithm- and inspector-selected cases within audit type.
+\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 20 predicted-evasion bins formed within center $\times$ selection-year fixed-effect strata.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 40 Predicted-Evasion Bin Controls}
+\label{tab:table6_indices_yhatrf_40bins_control}
+
+\footnotesize
+\input{Output/table6_indices_yhatrf_40bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 40 predicted-evasion bins formed within center $\times$ selection-year fixed-effect strata.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 50 Predicted-Evasion Bin Controls}
+\label{tab:table6_indices_yhatrf_50bins_control}
+
+\footnotesize
+\input{Output/table6_indices_yhatrf_50bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 50 predicted-evasion bins formed within center $\times$ selection-year fixed-effect strata.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -941,7 +1041,7 @@ This subsection presents the baseline Table 6 replication together with variants
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This robustness specification matches the Table 6 survey-index specification above and controls for predicted-evasion deciles formed separately within full and desk audits, after splitting the ninth and tenth within-audit-type deciles into two equal-size bins each.
+\item Notes: This robustness specification matches the Table 6 survey-index specification above and controls for predicted-evasion deciles formed within center $\times$ selection-year fixed-effect strata, after splitting each stratum's ninth and tenth deciles into two equal-size bins each.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -959,7 +1059,7 @@ This subsection presents the baseline Table 6 replication together with variants
 
 \begin{tablenotes}[flushleft]
 \scriptsize
-\item Notes: Bins are formed on \texttt{yhatrf} separately within full and desk audits in the prepared Table 6 survey-analysis sample, pooling algorithm- and inspector-selected cases within audit type. Panel A groups use the self-reported recent-audit sample, and Panel B groups use firms with an administratively confirmed executed audit. Algorithm and inspector counts report the number of observations in each bin by selection method.
+\item Notes: Bins are formed on \texttt{yhatrf} within the center $\times$ selection-year fixed-effect strata used in Table 6. The support table reports the number of FE strata, nonempty stratum-by-bin cells, total observations, observations by selection method, and whether both methods appear in each Panel A and Panel B sample.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -1033,7 +1133,7 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \input{Output/table8_fullaudits_yhatrf_deciles_control.tex}
 
 \begin{tablenotes}[flushleft]
-\TableEightRobustnessNotes{Column 6 additionally controls for pooled-sample predicted-evasion deciles.}
+\TableEightRobustnessNotes{Column 6 additionally controls for predicted-evasion deciles formed within inspector $\times$ year fixed-effect strata.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -1049,7 +1149,7 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \input{Output/table8_fullaudits_yhatrf_quintiles_control.tex}
 
 \begin{tablenotes}[flushleft]
-\TableEightRobustnessNotes{Column 6 additionally controls for pooled-sample predicted-evasion quintiles.}
+\TableEightRobustnessNotes{Column 6 additionally controls for predicted-evasion quintiles formed within inspector $\times$ year fixed-effect strata.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -1065,7 +1165,7 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \input{Output/table8_fullaudits_yhatrf_15bins_control.tex}
 
 \begin{tablenotes}[flushleft]
-\TableEightRobustnessNotes{Column 6 additionally controls for 15 pooled-sample predicted-evasion bins.}
+\TableEightRobustnessNotes{Column 6 additionally controls for 15 predicted-evasion bins formed within inspector $\times$ year fixed-effect strata.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -1081,7 +1181,39 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \input{Output/table8_fullaudits_yhatrf_20bins_control.tex}
 
 \begin{tablenotes}[flushleft]
-\TableEightRobustnessNotes{Column 6 additionally controls for 20 pooled-sample predicted-evasion bins.}
+\TableEightRobustnessNotes{Column 6 additionally controls for 20 predicted-evasion bins formed within inspector $\times$ year fixed-effect strata.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 40 Predicted-Evasion Bin Controls}
+\label{tab:table8_fullaudits_yhatrf_40bins_control}
+
+\footnotesize
+\input{Output/table8_fullaudits_yhatrf_40bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for 40 predicted-evasion bins formed within inspector $\times$ year fixed-effect strata.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 50 Predicted-Evasion Bin Controls}
+\label{tab:table8_fullaudits_yhatrf_50bins_control}
+
+\footnotesize
+\input{Output/table8_fullaudits_yhatrf_50bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for 50 predicted-evasion bins formed within inspector $\times$ year fixed-effect strata.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -1097,7 +1229,7 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \input{Output/table8_fullaudits_yhatrf_topsplit_control.tex}
 
 \begin{tablenotes}[flushleft]
-\TableEightRobustnessNotes{Column 6 additionally controls for predicted-evasion deciles after splitting the ninth and tenth deciles into two equal-size bins each.}
+\TableEightRobustnessNotes{Column 6 additionally controls for predicted-evasion deciles formed within inspector $\times$ year fixed-effect strata, after splitting each stratum's ninth and tenth deciles into two equal-size bins each.}
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -1114,7 +1246,7 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 
 \begin{tablenotes}[flushleft]
 \scriptsize
-\item Notes: Bins are formed on \texttt{yhatrf} in the selected full-audit Table 8 sample after excluding safety cases. Algorithm and inspector counts report the number of observations in each bin by selection method.
+\item Notes: Bins are formed on \texttt{yhatrf} within the inspector $\times$ year fixed-effect strata used in Table 8. The support table reports the number of FE strata, nonempty stratum-by-bin cells, total observations, observations by selection method, and whether both methods appear in the relevant sample.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -2477,9 +2609,6 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 
 
 \end{document}
-
-
-
 
 
 

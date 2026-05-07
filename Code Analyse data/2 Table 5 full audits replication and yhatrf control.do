@@ -55,6 +55,8 @@ local table_yhatrf_deciles "$output\table5_fullaudits_yhatrf_deciles_control.tex
 local table_yhatrf_quintiles "$output\table5_fullaudits_yhatrf_quintiles_control.tex"
 local table_yhatrf_bin15 "$output\table5_fullaudits_yhatrf_15bins_control.tex"
 local table_yhatrf_bin20 "$output\table5_fullaudits_yhatrf_20bins_control.tex"
+local table_yhatrf_bin40 "$output\table5_fullaudits_yhatrf_40bins_control.tex"
+local table_yhatrf_bin50 "$output\table5_fullaudits_yhatrf_50bins_control.tex"
 local table_yhatrf_topsplit "$output\table5_fullaudits_yhatrf_topsplit_control.tex"
 local table_yhatrf_bin_support "$output\table5_fullaudits_yhatrf_bin_support.tex"
 
@@ -160,20 +162,28 @@ capture drop yhatrf_decile
 capture drop yhatrf_quintile
 capture drop yhatrf_bin15
 capture drop yhatrf_bin20
+capture drop yhatrf_bin40
+capture drop yhatrf_bin50
 capture drop yhatrf_decile_topsplit
 capture drop yhatrf_decile9_half
 capture drop yhatrf_decile10_half
-* Pool predicted-evasion deciles over the regression-eligible sample so
-* the grouped-control specifications preserve the intended Table 5 sample.
-xtile yhatrf_decile = yhatrf if yhatrf != . , nq(10)
-xtile yhatrf_quintile = yhatrf if yhatrf != . , nq(5)
-xtile yhatrf_bin15 = yhatrf if yhatrf != . , nq(15)
-xtile yhatrf_bin20 = yhatrf if yhatrf != . , nq(20)
+capture drop table5_fe_inspector
 
-* Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10.
+* Build grouped predicted-evasion controls within the inspector/year FE used
+* by all Table 5 full-audit regressions.
+egen table5_fe_inspector = group(inspectorclusteryear), missing
+egen yhatrf_decile = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(10)
+egen yhatrf_quintile = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(5)
+egen yhatrf_bin15 = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(15)
+egen yhatrf_bin20 = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(20)
+egen yhatrf_bin40 = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(40)
+egen yhatrf_bin50 = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(50)
+
+* Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10
+* within each inspector/year FE stratum.
 gen yhatrf_decile_topsplit = yhatrf_decile
-xtile yhatrf_decile9_half = yhatrf if yhatrf_decile == 9, nq(2)
-xtile yhatrf_decile10_half = yhatrf if yhatrf_decile == 10, nq(2)
+egen yhatrf_decile9_half = xtile(yhatrf) if yhatrf_decile == 9, by(table5_fe_inspector) nq(2)
+egen yhatrf_decile10_half = xtile(yhatrf) if yhatrf_decile == 10, by(table5_fe_inspector) nq(2)
 replace yhatrf_decile_topsplit = 9 if yhatrf_decile == 9 & yhatrf_decile9_half == 1
 replace yhatrf_decile_topsplit = 10 if yhatrf_decile == 9 & yhatrf_decile9_half == 2
 replace yhatrf_decile_topsplit = 11 if yhatrf_decile == 10 & yhatrf_decile10_half == 1
@@ -181,35 +191,57 @@ replace yhatrf_decile_topsplit = 12 if yhatrf_decile == 10 & yhatrf_decile10_hal
 drop yhatrf_decile9_half yhatrf_decile10_half
 
 file open support using `"`table_yhatrf_bin_support'"', write replace
-file write support "\begin{tabular}{llrrrrc}" _n
+file write support "\begin{tabular}{llrrrrrc}" _n
 file write support "\toprule" _n
-file write support "Specification & Sample & Bin & Total N & Algorithm N & Inspector N & Both methods \\" _n
+file write support "Specification & Sample & FE strata & Cells & Total N & Algorithm N & Inspector N & Both methods \\" _n
 file write support "\midrule" _n
-foreach spec in bin15 bin20 topsplit {
-	if "`spec'" == "bin15" {
-		local binvar "yhatrf_bin15"
-		local speclabel "15 bins"
-	}
-	if "`spec'" == "bin20" {
-		local binvar "yhatrf_bin20"
-		local speclabel "20 bins"
-	}
-	if "`spec'" == "topsplit" {
-		local binvar "yhatrf_decile_topsplit"
-		local speclabel "Top-split deciles"
-	}
-	quietly levelsof `binvar', local(binlevels)
-	foreach b of local binlevels {
-		quietly count if `binvar' == `b'
-		local total_n = r(N)
-		quietly count if `binvar' == `b' & algorithm == 1
-		local alg_n = r(N)
-		quietly count if `binvar' == `b' & algorithm == 0
-		local insp_n = r(N)
-		local both_methods "No"
-		if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
-		file write support "`speclabel' & Full audits & `b' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
-	}
+foreach spec in deciles quintiles bin15 bin20 bin40 bin50 topsplit {
+    if "`spec'" == "deciles" {
+        local binvar "yhatrf_decile"
+        local speclabel "Deciles"
+    }
+    if "`spec'" == "quintiles" {
+        local binvar "yhatrf_quintile"
+        local speclabel "Quintiles"
+    }
+    if "`spec'" == "bin15" {
+        local binvar "yhatrf_bin15"
+        local speclabel "15 bins"
+    }
+    if "`spec'" == "bin20" {
+        local binvar "yhatrf_bin20"
+        local speclabel "20 bins"
+    }
+    if "`spec'" == "bin40" {
+        local binvar "yhatrf_bin40"
+        local speclabel "40 bins"
+    }
+    if "`spec'" == "bin50" {
+        local binvar "yhatrf_bin50"
+        local speclabel "50 bins"
+    }
+    if "`spec'" == "topsplit" {
+        local binvar "yhatrf_decile_topsplit"
+        local speclabel "Top-split deciles"
+    }
+
+    capture drop support_stratum_tag support_cell
+    egen support_stratum_tag = tag(table5_fe_inspector) if `binvar' != .
+    egen support_cell = group(table5_fe_inspector `binvar') if `binvar' != .
+    quietly count if support_stratum_tag == 1
+    local strata_n = r(N)
+    quietly levelsof support_cell if support_cell != ., local(support_cells)
+    local cell_n : word count `support_cells'
+    quietly count if `binvar' != .
+    local total_n = r(N)
+    quietly count if `binvar' != . & algorithm == 1
+    local alg_n = r(N)
+    quietly count if `binvar' != . & algorithm == 0
+    local insp_n = r(N)
+    local both_methods "No"
+    if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
+    file write support "`speclabel' & Full, inspector-year FE & `strata_n' & `cell_n' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+    drop support_stratum_tag support_cell
 }
 file write support "\bottomrule" _n
 file write support "\end{tabular}" _n
@@ -280,7 +312,7 @@ esttab `main_estlist'
 ************************************************************
 * 4. Export Table 5 top panels with additional grouped controls
 ************************************************************
-foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
+foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_bin40 yhatrf_bin50 yhatrf_topsplit {
 	use `table5_prepared', clear
 	estimates drop _all
 
@@ -290,6 +322,14 @@ foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_topsplit {
 	if "`spec'" == "yhatrf_bin20" {
 		local base_controls "ib1.yhatrf_bin20"
 		local table_out "`table_yhatrf_bin20'"
+	}
+	if "`spec'" == "yhatrf_bin40" {
+		local base_controls "ib1.yhatrf_bin40"
+		local table_out "`table_yhatrf_bin40'"
+	}
+	if "`spec'" == "yhatrf_bin50" {
+		local base_controls "ib1.yhatrf_bin50"
+		local table_out "`table_yhatrf_bin50'"
 	}
 	if "`spec'" == "yhatrf_topsplit" {
 		local base_controls "ib1.yhatrf_decile_topsplit"
