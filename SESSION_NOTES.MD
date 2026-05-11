@@ -861,3 +861,140 @@ Update: 2026-04-14 (Table 8 baseline correction)
 - Switched `Code Analyse data/2 Table 8 full audits replication and yhatrf control.do` to build the baseline from `datasetforanalysis.dta` and then attach `yhatrf` from `fullaudits_predicted.dta` on the verified selected-full-audit row order.
 - This correction was necessary because the firm-control variables in `fullaudits_predicted.dta` do not exactly match the legacy Table 8 control values from `datasetforanalysis.dta`, which shifted the original Columns 2 to 5.
 - Re-ran `stata-mp /e do "Code Analyse data/2 Table 8 full audits replication and yhatrf control.do"` and confirmed that `Output/table8_fullaudits_replicated.tex` now matches the legacy `1 regression execution controls.tex`, `1 regression detection controls.tex`, and `1 regression evasion controls.tex` backbone for the visible coefficients and summary rows.
+
+---
+
+Date: 2026-05-07
+Task: Add restricted-sample versions of the Table 4 and Table 8 predicted-evasion robustness workflows.
+
+## Files edited
+- `Code Analyse data/2 Table 4 replication and yhatrf control.do`
+- `Code Analyse data/2 Table 8 full audits replication and yhatrf control.do`
+- `SESSION_NOTES.md`
+
+## Substantive changes
+- Added outer sample-variant loops to the Table 4 and Table 8 workflows so the original full-sample outputs are still regenerated with their existing file names.
+- Added restricted-sample exports for `selectionyear` 2018 or 2019, using the suffix `_selectionyear_2018_2019`.
+- Added restricted-sample exports for LTU and medium tax centers, implemented as `inlist(groupbureau, 1, 2)` and using the suffix `_ltu_medium`.
+- Recomputed the grouped `yhatrf` controls inside each restricted sample so the decile/quintile/bin controls reflect the active estimation sample rather than the unrestricted sample.
+- For Table 8, applied each restriction to both the `datasetforanalysis.dta` sample and the `fullaudits_predicted.dta` sample before generating `rowid_table8`, preserving the row-order merge used to attach `yhatrf`.
+
+## Output files affected
+- New Table 4 fragments in `Output/` with `_selectionyear_2018_2019` and `_ltu_medium` suffixes, including the `_with_lee` variants and bin-support tables.
+- New Table 8 fragments in `Output/` with `_selectionyear_2018_2019` and `_ltu_medium` suffixes, including the bin-support tables.
+- Existing full-sample Table 4 and Table 8 outputs are still regenerated under their previous names.
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 8 full audits replication and yhatrf control.do"` successfully.
+- Confirmed that Table 8 wrote 11 `_selectionyear_2018_2019` fragments and 11 `_ltu_medium` fragments.
+- Ran `stata-mp /e do "Code Analyse data/2 Table 4 replication and yhatrf control.do"` successfully.
+- Confirmed that Table 4 wrote 21 `_selectionyear_2018_2019` fragments and 21 `_ltu_medium` fragments.
+- Checked both Stata log tails and confirmed that each do-file reached `end of do-file`.
+
+## Open issues / next steps
+- Interpreted "LTU Medium" as `groupbureau` values 1 and 2, based on the existing summary-statistics legend mapping `1 = LTU` and `2 = MTU/Medium`.
+
+Update: 2026-05-07 (extend restricted samples to recent Table 5 and Table 6 workflows)
+- Added the same three-way sample loop to `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do` and `Code Analyse data/6 Table 6 yhatrf control.do`, preserving the original full-sample output names and adding `_selectionyear_2018_2019` and `_ltu_medium` output families.
+- For Table 5, the restrictions are applied after the selected full-audit sample is built from `fullaudits_predicted.dta`; duration variables, availability indicators, grouped `yhatrf` bins, and all exported specifications are recomputed inside each active sample.
+- For Table 6, the restrictions are applied after the taxpayer-survey sample and SW indices are rebuilt; grouped `yhatrf` bins and both survey/admin-audited panels are recomputed inside each active sample.
+- Ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"` successfully and confirmed 11 `_selectionyear_2018_2019` fragments and 11 `_ltu_medium` fragments.
+- Ran `stata-mp /e do "Code Analyse data/6 Table 6 yhatrf control.do"` successfully and confirmed 11 `_selectionyear_2018_2019` fragments and 11 `_ltu_medium` fragments.
+- Together with the earlier Table 4 and Table 8 validation, the recent standalone Table 4, 5, 6, and 8 predicted-evasion workflows now generate the two restricted-sample table families. I did not find a recent standalone Table 7 `yhatrf` workflow in the same table-replication style.
+
+Update: 2026-05-07 (report integration for restricted-sample table families)
+- Updated `Code Analyse data/Inspector's Effort report.tex` to add a new restricted-sample predicted-evasion robustness section after the full-sample Table 8 wrappers.
+- Added compact LaTeX wrapper macros for the restricted tables and support tables, then included all generated `_selectionyear_2018_2019` and `_ltu_medium` fragments for Tables 4, 5, 6, and 8.
+- Included Table 4 `_with_lee` fragments for the restricted samples and the bin-support tables for each table family/sample combination.
+- Verified that all newly added restricted-sample `\input{Output/...}` targets exist in `Output/`.
+- Attempted `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile" "Inspector's Effort report.tex"` from `Code Analyse data`; compilation still stops before the new section on the pre-existing missing input `Output/inspectors_reg_panels_Full_exec_rate.tex`.
+
+Update: 2026-05-07 (debug Overleaf table imports)
+- Added a robust `\OutPath` macro to `Code Analyse data/Inspector's Effort report.tex` and `Code Analyse data/Audit_Discrepancy_Taxpayer_Section.tex` so table and figure imports resolve to `Output/` when compiling from the repository root and to `../Output/` when compiling from `Code Analyse data`.
+- Replaced hard-coded `Output/` table and figure imports in those TeX files with `\OutPath`-based paths, fixing the relative-path mismatch that made Overleaf look for `Code Analyse data/Output/...`.
+- Added `fontenc` and `lmodern` to the report preamble to avoid bitmap Computer Modern font generation failures in local PDF validation.
+- Fixed the Table 6 Stata exporter in `Code Analyse data/6 Table 6 yhatrf control.do`: the baseline Panel B export had drifted into the grouped-control loop, which appended repeated closed tabular blocks to `Output/table6_indices_replicated.tex` and caused a LaTeX `Misplaced \noalign` error at `\midrule`.
+- Re-ran `stata-mp /e do "Code Analyse data/6 Table 6 yhatrf control.do"` successfully, regenerating the Table 6 output fragments, including a clean `Output/table6_indices_replicated.tex`.
+- Verified no direct `\input{Output/...}` or `\includegraphics{Output/...}` imports remain in `Code Analyse data/*.tex` outside the `\OutPath` existence checks.
+- Validated `Code Analyse data/Inspector's Effort report.tex` with `pdflatex -interaction=nonstopmode -halt-on-error` from both `Code Analyse data` and the repository root; both runs completed and produced 189-page PDFs.
+- Remaining LaTeX messages are nonfatal warnings: overfull boxes, included PDFs with version 1.6 while the output PDF target is 1.5, and standard rerun-for-cross-reference warnings.
+
+Update: 2026-05-07 (trim restricted-sample report tables to decile specifications)
+- Revised `Code Analyse data/Inspector's Effort report.tex` after clarifying that the restricted-sample versions should be added only for the decile-control specifications.
+- The restricted-sample section now contains two tables for each of Tables 4, 5, 6, and 8: one restricted to `selectionyear` 2018 or 2019, and one restricted to LTU and medium tax centers (`inlist(groupbureau, 1, 2)`).
+- Removed the restricted-sample baseline, linear `yhatrf`, quadratic `yhatrf`, quintile, 15-bin, 20-bin, 40-bin, 50-bin, top-split, and bin-support table imports from the report.
+- Left the underlying generated output fragments in `Output/` in place; the report now imports only the restricted decile-control fragments.
+- Validated with `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data/Inspector's Effort report.tex"` from the repository root; compilation succeeded and produced a 139-page PDF.
+- Remaining LaTeX messages are nonfatal warnings, including pre-existing duplicate labels, overfull boxes, PDF inclusion version warnings, and rerun-for-reference notices.
+
+Update: 2026-05-07 (Table 5 N inspectors residual diagnostic)
+- Added a full-sample Table 5 diagnostic block to `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do` for Column 1 (`y16`, number of agents).
+- The diagnostic matches the `yhatrf` decile-control specification: it defines the Column 1 estimation sample with `algorithm overlap random safeties ib1.yhatrf_decile` and `inspectorclusteryear` fixed effects, then residualizes `y16` on all non-algorithm controls and the same fixed effects.
+- Exported two new kernel-density PDFs: `Output/table5_ninspectors_residual_yhatrf_deciles_kdensity.pdf` and `Output/table5_ninspectors_raw_kdensity.pdf`.
+- The residualized plot compares algorithm and inspector cases after controlling for overlap, random, safeties, `yhatrf` deciles, and inspector-year fixed effects; the raw plot compares the unadjusted `y16` distribution with no controls on the selected full-audit, non-safety sample.
+- Validation: ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"` successfully and confirmed both new kernel-density PDFs were written. The earlier non-`kdensity` filenames were not refreshed because Acrobat had the existing PDFs locked during validation.
+
+Update: 2026-05-08 (Table 5 N inspectors legend placement)
+- Revised the Table 5 N-inspectors diagnostic figures so the algorithm/inspector legend is placed inside the plot region at the upper right, with smaller legend text and a transparent legend region.
+- Refreshed the canonical kernel-density outputs after closing the locked PDF viewer: `Output/table5_ninspectors_residual_yhatrf_deciles_kdensity.pdf` and `Output/table5_ninspectors_raw_kdensity.pdf`.
+- Validation: ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"` successfully and confirmed both `*_kdensity.pdf` files were overwritten.
+
+Update: 2026-05-08 (Table 5 N inspectors plot cleanup)
+- Restricted the raw N-inspectors kernel density to executed selected full audits (`y2 == 1`) with nonmissing `y16`, still with no controls.
+- Removed visible titles from both the residualized and raw N-inspectors diagnostic figures.
+- Validation: ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"` successfully and confirmed `Output/table5_ninspectors_residual_yhatrf_deciles_kdensity.pdf` and `Output/table5_ninspectors_raw_kdensity.pdf` were refreshed.
+
+Update: 2026-05-08 (Table 5 N inspectors density colors)
+- Restyled the raw and residualized N-inspectors kernel densities to use solid `eltblue` lines for algorithm cases and orange short-dashed lines for inspector cases.
+- Validation: ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"` successfully and confirmed `Output/table5_ninspectors_residual_yhatrf_deciles_kdensity.pdf` and `Output/table5_ninspectors_raw_kdensity.pdf` were refreshed.
+
+Update: 2026-05-08 (Table 5 original-controls N inspectors residual diagnostic)
+- Added a third N-inspectors diagnostic figure to `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`: `Output/table5_ninspectors_residual_original_controls_kdensity.pdf`.
+- This plot residualizes `y16` using the original Table 5 Column 1 non-algorithm controls only: overlap, random, safeties, and inspector-year fixed effects, with no predicted-evasion controls.
+- The new figure uses the same styling as the other N-inspectors diagnostics: solid `eltblue` for algorithm cases, orange short-dashed for inspector cases, upper-right inside legend, and no title.
+- Validation: ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"`; Stata successfully wrote `Output/table5_ninspectors_residual_original_controls_kdensity.pdf`, then stopped when trying to overwrite an already-open existing PDF (`Output/table5_ninspectors_residual_yhatrf_deciles_kdensity.pdf`). Acrobat Reader was still running, so the remaining exports need a rerun after closing the PDF viewer.
+
+Update: 2026-05-08 (Table 5 2018/2019 N inspectors residual diagnostic)
+- Added a fourth N-inspectors diagnostic figure to `Code Analyse data/2 Table 5 full audits replication and yhatrf control.do`: `Output/table5_ninspectors_residual_yhatrf_deciles_selectionyear_2018_2019_kdensity.pdf`.
+- This plot uses the existing `selectionyear` 2018 or 2019 sample variant and residualizes `y16` with all non-algorithm controls from the decile specification: overlap, random, safeties, `yhatrf` deciles recomputed within the 2018/2019 sample, and inspector-year fixed effects.
+- Made diagnostic graph exports tolerant to open-PDF locks: if Stata cannot overwrite one diagnostic PDF, it now prints a warning and continues with the rest of the Table 5 workflow.
+- Validation: ran `stata-mp /e do "Code Analyse data/2 Table 5 full audits replication and yhatrf control.do"` successfully through `end of do-file`; confirmed the new 2018/2019 residual PDF was written. Existing full-sample diagnostic PDFs were open in Acrobat and therefore skipped with warnings during this validation run.
+
+Update: 2026-05-07 (move restricted decile tables next to sibling specifications)
+- Moved the eight restricted-sample decile-control table imports out of their standalone section in `Code Analyse data/Inspector's Effort report.tex`.
+- Inserted the two restricted decile tables immediately after the corresponding full-sample decile-control sibling for each Table 4, 5, 6, and 8 section.
+- Kept the shared restricted-table wrapper and notes near the Table 4 robustness notes so all moved imports are defined before use.
+- Removed the now-empty standalone restricted-sample section before the inspector-effort analysis.
+- Validated with two passes of `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data/Inspector's Effort report.tex"` from the repository root; compilation succeeded and produced a 137-page PDF.
+- Remaining LaTeX messages are nonfatal and pre-existing in this report, primarily duplicate labels, overfull boxes, and PDF inclusion version warnings.
+
+Update: 2026-05-07 (add filtered 40-bin and 50-bin tables to report)
+- Updated `Code Analyse data/Inspector's Effort report.tex` to include the already-generated restricted-sample 40-bin and 50-bin predicted-evasion control fragments for Tables 4, 5, 6, and 8.
+- Added 16 restricted table imports total: selection years 2018/2019 and LTU/Medium samples for each 40-bin and 50-bin specification.
+- Inserted each restricted table immediately after its corresponding full-sample 40-bin or 50-bin sibling, keeping the restricted variants inside the relevant Table 4, 5, 6, and 8 report sections.
+- Added shared restricted-bin note macros so the new table notes refer to 40 or 50 predicted-evasion bins rather than decile controls.
+- Confirmed all 16 referenced output fragments already existed in `Output/`; no Stata do-file changes or regenerated outputs were needed for this request.
+- Validated with two passes of `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data/Inspector's Effort report.tex"` from the repository root; compilation succeeded and produced a 148-page PDF.
+- Remaining LaTeX messages are nonfatal and consistent with prior validation, including duplicate-label warnings, overfull boxes, PDF inclusion version warnings, and MiKTeX local log/update notices.
+
+Update: 2026-05-08 (Table 4 full-audits coefficient summary CSV)
+- Created `Output/table4_full_audits_summary.csv` as a standalone summary output; no Stata workflow or LaTeX report code was changed.
+- Parsed the existing `Output/table4_main_outcomes_*.tex` main-table fragments, excluding `_with_lee` duplicates and bin-support fragments, and kept only the full-audits columns: P(Execution), P(Detection | Execution), and log(Evasion) | Detection.
+- The CSV records a compact table abbreviation, full specification label, sample label, outcome, full-audits column number, Algorithm coefficient, significance stars, standard error, N, and source TeX file.
+- Validation: confirmed the CSV has 91 lines total, including 90 data rows from 30 distinct Table 4 specification/sample fragments times three full-audit outcome columns; inspected the first and last rows for expected labels and coefficients.
+
+Update: 2026-05-08 (add R2 to Table 4 full-audits summary CSV)
+- Refreshed `Output/table4_full_audits_summary.csv` from the same existing Table 4 TeX fragments and added an `r2` column after `n`.
+- Kept the same scope: main Table 4 fragments only, excluding `_with_lee` duplicates and bin-support tables, and retaining only the full-audit outcome columns 1, 4, and 7.
+- Validation: confirmed the refreshed CSV still has 91 lines total, including 90 data rows, and inspected the header plus first and last rows to verify populated `r2` values.
+
+Update: 2026-05-08 (Table 5, 6, and 8 summary CSVs)
+- Created three standalone summary outputs from existing TeX fragments; no Stata workflow or LaTeX report code was changed:
+  - `Output/table5_fullaudits_summary.csv`
+  - `Output/table6_full_audits_summary.csv`
+  - `Output/table8_fullaudits_summary.csv`
+- Table 5 summary keeps all eight full-audit outcome columns for each main specification/sample fragment, excluding bin-support tables.
+- Table 6 summary keeps the full-audit columns only: Efficiency Index and Corruption Index in both Panel A and Panel B, excluding bin-support tables.
+- Table 8 summary keeps the final model column for each outcome and specification/sample fragment: column 5 for baseline replicated tables and column 6 for predicted-evasion robustness tables, avoiding repeated baseline-control columns in every robustness file.
+- Each CSV records compact table abbreviation, specification, sample, outcome context, Algorithm coefficient, significance stars, standard error, N, R2, and source TeX file.
+- Validation: confirmed line counts of 241, 121, and 91 respectively, corresponding to 240 Table 5 data rows, 120 Table 6 data rows, and 90 Table 8 data rows; inspected headers and representative first rows for expected labels and values.

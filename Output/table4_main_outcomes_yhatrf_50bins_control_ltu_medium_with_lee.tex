@@ -1,0 +1,17 @@
+\begin{tabular}{lccc|ccc|ccc} \toprule
+\multicolumn{1}{l}{} & \multicolumn{3}{c}{P(Execution)} & \multicolumn{3}{c}{P(Detection | Execution)} & \multicolumn{3}{c}{log(Evasion) | Detection} \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10} \multicolumn{1}{l}{} & Full audits & Desk audits & Desk audits & Full audits & Desk audits & Desk audits & Full audits & Desk audits & Desk audits \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) & (9) \\ \midrule
+Algorithm   &       -0.06\sym{*}  &       -0.07\sym{***}&       -0.06\sym{**} &        0.04\sym{**} &        0.01         &       -0.00         &        0.16         &        0.03         &        0.03         \\
+            &      (0.04)         &      (0.03)         &      (0.03)         &      (0.02)         &      (0.02)         &      (0.02)         &      (0.12)         &      (0.12)         &      (0.13)         \\
+\addlinespace
+ & & & & [0.02 ,0.05***] & & [-0.01,0.01] & [0.12,0.19*] & & [-0.08,0.09] \\  Inspectors x Overlap&        0.10         &        0.09\sym{**} &        0.09\sym{**} &        0.06\sym{*}  &        0.07\sym{*}  &        0.03         &        0.47\sym{*}  &       -0.29         &       -0.22         \\
+            &      (0.07)         &      (0.04)         &      (0.04)         &      (0.03)         &      (0.04)         &      (0.05)         &      (0.28)         &      (0.23)         &      (0.28)         \\
+\addlinespace
+Algorithm x Random&                     &        0.02         &        0.01         &                     &        0.03         &       -0.02         &                     &       -0.23         &       -0.16         \\
+            &                     &      (0.04)         &      (0.04)         &                     &      (0.03)         &      (0.03)         &                     &      (0.15)         &      (0.15)         \\
+\midrule
+Tax center x Year&         Yes         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         \\
+Inspector x Year&          No         &          No         &         Yes         &          No         &          No         &         Yes         &          No         &          No         &         Yes         \\
+N           &         704         &        1282         &        1282         &         413         &         549         &         535         &         377         &         458         &         444         \\
+R2          &        0.40         &        0.35         &        0.41         &        0.79         &        0.73         &        0.76         &        0.81         &        0.67         &        0.72         \\
+Mean outcome&        0.58         &        0.42         &        0.42         &        0.91         &        0.83         &        0.83         &       19.46         &       18.29         &       18.26         \\
+\bottomrule \end{tabular}

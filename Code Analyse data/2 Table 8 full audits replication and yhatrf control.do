@@ -79,6 +79,31 @@ local profit_controls "L1profitrate L1profitratesq L1profitratecu"
 local productivity_controls "L1productivity L1productivitysq L1productivitycu"
 local char_controls "distance durationcar firmage"
 
+foreach sample_variant in full selectionyear_2018_2019 ltu_medium {
+    local sample_suffix ""
+    local sample_label "Full selected full-audit sample"
+
+    if "`sample_variant'" == "selectionyear_2018_2019" {
+        local sample_suffix "_selectionyear_2018_2019"
+        local sample_label "Selection years 2018 and 2019"
+    }
+    if "`sample_variant'" == "ltu_medium" {
+        local sample_suffix "_ltu_medium"
+        local sample_label "LTU and medium tax centers"
+    }
+
+    local table_replicated "$output\table8_fullaudits_replicated`sample_suffix'.tex"
+    local table_yhatrf "$output\table8_fullaudits_yhatrf_control`sample_suffix'.tex"
+    local table_yhatrf_quadratic "$output\table8_fullaudits_yhatrf_quadratic_control`sample_suffix'.tex"
+    local table_yhatrf_deciles "$output\table8_fullaudits_yhatrf_deciles_control`sample_suffix'.tex"
+    local table_yhatrf_quintiles "$output\table8_fullaudits_yhatrf_quintiles_control`sample_suffix'.tex"
+    local table_yhatrf_bin15 "$output\table8_fullaudits_yhatrf_15bins_control`sample_suffix'.tex"
+    local table_yhatrf_bin20 "$output\table8_fullaudits_yhatrf_20bins_control`sample_suffix'.tex"
+    local table_yhatrf_bin40 "$output\table8_fullaudits_yhatrf_40bins_control`sample_suffix'.tex"
+    local table_yhatrf_bin50 "$output\table8_fullaudits_yhatrf_50bins_control`sample_suffix'.tex"
+    local table_yhatrf_topsplit "$output\table8_fullaudits_yhatrf_topsplit_control`sample_suffix'.tex"
+    local table_yhatrf_bin_support "$output\table8_fullaudits_yhatrf_bin_support`sample_suffix'.tex"
+
 ************************************************************
 * 1. Build the full-audit Table 8 sample from datasetforanalysis
 ************************************************************
@@ -86,6 +111,12 @@ use "$table8_analysisdata", clear
 keep if selection == 1
  drop if safeties == 1
 keep if x2 == 1
+if "`sample_variant'" == "selectionyear_2018_2019" {
+    keep if inlist(selectionyear, 2018, 2019)
+}
+if "`sample_variant'" == "ltu_medium" {
+    keep if inlist(groupbureau, 1, 2)
+}
 
 gen rowid_table8 = _n
 
@@ -99,6 +130,12 @@ use "$table8_predicted", clear
 keep if selection == 1
 drop if safeties == 1
 keep if x2 == 1
+if "`sample_variant'" == "selectionyear_2018_2019" {
+    keep if inlist(selectionyear, 2018, 2019)
+}
+if "`sample_variant'" == "ltu_medium" {
+    keep if inlist(groupbureau, 1, 2)
+}
 
 gen rowid_table8 = _n
 keep rowid_table8 yhatrf
@@ -528,4 +565,5 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
         substitute(\_ _)
     ;
     #delim cr
+}
 }

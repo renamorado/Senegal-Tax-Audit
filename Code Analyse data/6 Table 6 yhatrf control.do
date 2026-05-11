@@ -122,6 +122,38 @@ if _rc {
 swindex q32_inverted q42 q34 if q1 != ., generate(index_corruption) fullrescale displayw
 swindex q31 q33 q41 if q1 != ., generate(index_efficiency) fullrescale displayw
 
+tempfile table6_base_sample
+save `table6_base_sample', replace
+
+foreach sample_variant in full selectionyear_2018_2019 ltu_medium {
+	use `table6_base_sample', clear
+
+	local sample_suffix ""
+	local sample_label "Full taxpayer-survey sample"
+
+	if "`sample_variant'" == "selectionyear_2018_2019" {
+		keep if inlist(selectionyear, 2018, 2019)
+		local sample_suffix "_selectionyear_2018_2019"
+		local sample_label "Selection years 2018 and 2019"
+	}
+	if "`sample_variant'" == "ltu_medium" {
+		keep if inlist(groupbureau, 1, 2)
+		local sample_suffix "_ltu_medium"
+		local sample_label "LTU and medium tax centers"
+	}
+
+	local table_replicated "$output\table6_indices_replicated`sample_suffix'.tex"
+	local table_yhatrf "$output\table6_indices_yhatrf_control`sample_suffix'.tex"
+	local table_yhatrf_quadratic "$output\table6_indices_yhatrf_quadratic_control`sample_suffix'.tex"
+	local table_yhatrf_deciles "$output\table6_indices_yhatrf_deciles_control`sample_suffix'.tex"
+	local table_yhatrf_quintiles "$output\table6_indices_yhatrf_quintiles_control`sample_suffix'.tex"
+	local table_yhatrf_bin15 "$output\table6_indices_yhatrf_15bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin20 "$output\table6_indices_yhatrf_20bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin40 "$output\table6_indices_yhatrf_40bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin50 "$output\table6_indices_yhatrf_50bins_control`sample_suffix'.tex"
+	local table_yhatrf_topsplit "$output\table6_indices_yhatrf_topsplit_control`sample_suffix'.tex"
+	local table_yhatrf_bin_support "$output\table6_indices_yhatrf_bin_support`sample_suffix'.tex"
+
 capture drop yhatrf_decile
 capture drop yhatrf_quintile
 capture drop yhatrf_bin15
@@ -309,6 +341,24 @@ esttab `panel_a_models'
 ;
 #delim cr
 
+#delim ;
+esttab `panel_b_models'
+	using `"`table_replicated'"',
+	append fragment booktabs
+	prehead("\midrule `panel_b_title' `panel_numbers' \midrule")
+	posthead("")
+	postfoot("\bottomrule \end{tabular}")
+	order(algorithm overlap random)
+	keep(algorithm overlap random)
+	coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random")
+	b(%5.2f) se(%5.2f)
+	stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+	star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+	nomtitles nonumbers collabels(none) nonotes
+	substitute(\_ _)
+;
+#delim cr
+
 ************************************************************
 * 4. Export Table 6 with additional grouped controls
 ************************************************************
@@ -422,24 +472,6 @@ foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_bin40 yhatrf_bin50 yhatrf_topsp
 	;
 	#delim cr
 }
-
-#delim ;
-esttab `panel_b_models'
-	using `"`table_replicated'"',
-	append fragment booktabs
-	prehead("\midrule `panel_b_title' `panel_numbers' \midrule")
-	posthead("")
-	postfoot("\bottomrule \end{tabular}")
-	order(algorithm overlap random)
-	keep(algorithm overlap random)
-	coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random")
-	b(%5.2f) se(%5.2f)
-	stats(N r2 pp, labels("N" "R2" "Mean outcome"))
-	star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
-	nomtitles nonumbers collabels(none) nonotes
-	substitute(\_ _)
-;
-#delim cr
 
 ************************************************************
 * 5. Export Table 6 with yhatrf control
@@ -818,3 +850,5 @@ esttab `panel_b_models'
 	substitute(\_ _)
 ;
 #delim cr
+
+}

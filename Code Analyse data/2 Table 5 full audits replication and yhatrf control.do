@@ -82,6 +82,38 @@ if _rc {
 	exit 111
 }
 
+tempfile table5_base_sample
+save `table5_base_sample', replace
+
+foreach sample_variant in full selectionyear_2018_2019 ltu_medium {
+	use `table5_base_sample', clear
+
+	local sample_suffix ""
+	local sample_label "Full selected full-audit sample"
+
+	if "`sample_variant'" == "selectionyear_2018_2019" {
+		keep if inlist(selectionyear, 2018, 2019)
+		local sample_suffix "_selectionyear_2018_2019"
+		local sample_label "Selection years 2018 and 2019"
+	}
+	if "`sample_variant'" == "ltu_medium" {
+		keep if inlist(groupbureau, 1, 2)
+		local sample_suffix "_ltu_medium"
+		local sample_label "LTU and medium tax centers"
+	}
+
+	local table_replicated "$output\table5_fullaudits_replicated`sample_suffix'.tex"
+	local table_yhatrf "$output\table5_fullaudits_yhatrf_control`sample_suffix'.tex"
+	local table_yhatrf_quadratic "$output\table5_fullaudits_yhatrf_quadratic_control`sample_suffix'.tex"
+	local table_yhatrf_deciles "$output\table5_fullaudits_yhatrf_deciles_control`sample_suffix'.tex"
+	local table_yhatrf_quintiles "$output\table5_fullaudits_yhatrf_quintiles_control`sample_suffix'.tex"
+	local table_yhatrf_bin15 "$output\table5_fullaudits_yhatrf_15bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin20 "$output\table5_fullaudits_yhatrf_20bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin40 "$output\table5_fullaudits_yhatrf_40bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin50 "$output\table5_fullaudits_yhatrf_50bins_control`sample_suffix'.tex"
+	local table_yhatrf_topsplit "$output\table5_fullaudits_yhatrf_topsplit_control`sample_suffix'.tex"
+	local table_yhatrf_bin_support "$output\table5_fullaudits_yhatrf_bin_support`sample_suffix'.tex"
+
 * Rebuild the original duration definitions and date-availability
 * controls from 2 Regressions main results.do.
 capture drop earliestdate
@@ -249,6 +281,157 @@ file close support
 
 tempfile table5_prepared
 save `table5_prepared', replace
+
+************************************************************
+* 2a. Diagnostic plot for number of agents
+************************************************************
+if "`sample_variant'" == "full" {
+	local fig_resid_orig "$output\table5_ninspectors_residual_original_controls_kdensity.pdf"
+	local figure_ninspectors_resid "$output\table5_ninspectors_residual_yhatrf_deciles_kdensity.pdf"
+	local figure_ninspectors_raw "$output\table5_ninspectors_raw_kdensity.pdf"
+
+	use `table5_prepared', clear
+	estimates drop _all
+
+	* Match the original Column 1 sample, then remove the
+	* variation explained by all non-algorithm controls.
+	quietly reghdfe y16 algorithm overlap random safeties, ///
+		a(inspectorclusteryear) vce(robust)
+	gen table5_col1_original_sample = e(sample)
+
+	capture drop y16_resid_original
+	quietly reghdfe y16 overlap random safeties ///
+		if table5_col1_original_sample == 1, ///
+		a(inspectorclusteryear) vce(robust) residuals(y16_resid_original)
+	label variable y16_resid_original "Residualized number of agents"
+
+	quietly ksmirnov y16_resid_original if table5_col1_original_sample == 1, by(algorithm)
+	local resid_original_ks_p : display %5.3f r(p)
+
+	#delim ;
+	twoway
+		(kdensity y16_resid_original
+			if table5_col1_original_sample == 1 & algorithm == 1,
+			lcolor(eltblue) lpattern(solid) lwidth(medthick))
+		(kdensity y16_resid_original
+			if table5_col1_original_sample == 1 & algorithm == 0,
+			lcolor(orange) lpattern(shortdash) lwidth(medthick)),
+		legend(order(1 "Algorithm cases" 2 "Inspector cases") cols(1) ///
+			position(1) ring(0) size(small) region(lcolor(none) fcolor(none)))
+		xtitle("Residualized number of agents")
+		ytitle("Density")
+		note("Controls: overlap, random, safeties, and inspector-year FE. KS p-value: `resid_original_ks_p'")
+		graphregion(color(white))
+	;
+	#delim cr
+	capture noisily graph export `"`fig_resid_orig'"', as(pdf) replace
+	if _rc {
+		di as error "Warning: could not export `fig_resid_orig'. Close any open PDF viewer and rerun this do-file."
+	}
+
+	* Match the Column 1 decile-control sample, then remove the
+	* variation explained by all non-algorithm controls.
+	quietly reghdfe y16 algorithm overlap random safeties ib1.yhatrf_decile, ///
+		a(inspectorclusteryear) vce(robust)
+	gen table5_col1_decile_sample = e(sample)
+
+	capture drop y16_resid_decile
+	quietly reghdfe y16 overlap random safeties ib1.yhatrf_decile ///
+		if table5_col1_decile_sample == 1, ///
+		a(inspectorclusteryear) vce(robust) residuals(y16_resid_decile)
+	label variable y16_resid_decile "Residualized number of agents"
+
+	quietly ksmirnov y16_resid_decile if table5_col1_decile_sample == 1, by(algorithm)
+	local resid_ks_p : display %5.3f r(p)
+
+	#delim ;
+	twoway
+		(kdensity y16_resid_decile
+			if table5_col1_decile_sample == 1 & algorithm == 1,
+			lcolor(eltblue) lpattern(solid) lwidth(medthick))
+		(kdensity y16_resid_decile
+			if table5_col1_decile_sample == 1 & algorithm == 0,
+			lcolor(orange) lpattern(shortdash) lwidth(medthick)),
+		legend(order(1 "Algorithm cases" 2 "Inspector cases") cols(1) ///
+			position(1) ring(0) size(small) region(lcolor(none) fcolor(none)))
+		xtitle("Residualized number of agents")
+		ytitle("Density")
+		note("Controls: overlap, random, safeties, yhatrf deciles, and inspector-year FE. KS p-value: `resid_ks_p'")
+		graphregion(color(white))
+	;
+	#delim cr
+	capture noisily graph export `"`figure_ninspectors_resid'"', as(pdf) replace
+	if _rc {
+		di as error "Warning: could not export `figure_ninspectors_resid'. Close any open PDF viewer and rerun this do-file."
+	}
+
+	quietly ksmirnov y16 if y2 == 1 & y16 != . & inlist(algorithm, 0, 1), by(algorithm)
+	local raw_ks_p : display %5.3f r(p)
+
+	#delim ;
+	twoway
+		(kdensity y16
+			if y2 == 1 & y16 != . & algorithm == 1,
+			lcolor(eltblue) lpattern(solid) lwidth(medthick))
+		(kdensity y16
+			if y2 == 1 & y16 != . & algorithm == 0,
+			lcolor(orange) lpattern(shortdash) lwidth(medthick)),
+		legend(order(1 "Algorithm cases" 2 "Inspector cases") cols(1) ///
+			position(1) ring(0) size(small) region(lcolor(none) fcolor(none)))
+		xtitle("Number of agents")
+		ytitle("Density")
+		note("Sample: executed selected full audits, no controls. KS p-value: `raw_ks_p'")
+		graphregion(color(white))
+	;
+	#delim cr
+	capture noisily graph export `"`figure_ninspectors_raw'"', as(pdf) replace
+	if _rc {
+		di as error "Warning: could not export `figure_ninspectors_raw'. Close any open PDF viewer and rerun this do-file."
+	}
+}
+
+if "`sample_variant'" == "selectionyear_2018_2019" {
+	local fig_resid_1819 "$output\table5_ninspectors_residual_yhatrf_deciles_selectionyear_2018_2019_kdensity.pdf"
+
+	use `table5_prepared', clear
+	estimates drop _all
+
+	* Match the 2018/2019 Column 1 decile-control sample, then remove
+	* the variation explained by all non-algorithm controls.
+	quietly reghdfe y16 algorithm overlap random safeties ib1.yhatrf_decile, ///
+		a(inspectorclusteryear) vce(robust)
+	gen table5_col1_1819_sample = e(sample)
+
+	capture drop y16_resid_decile_1819
+	quietly reghdfe y16 overlap random safeties ib1.yhatrf_decile ///
+		if table5_col1_1819_sample == 1, ///
+		a(inspectorclusteryear) vce(robust) residuals(y16_resid_decile_1819)
+	label variable y16_resid_decile_1819 "Residualized number of agents"
+
+	quietly ksmirnov y16_resid_decile_1819 if table5_col1_1819_sample == 1, by(algorithm)
+	local resid_1819_ks_p : display %5.3f r(p)
+
+	#delim ;
+	twoway
+		(kdensity y16_resid_decile_1819
+			if table5_col1_1819_sample == 1 & algorithm == 1,
+			lcolor(eltblue) lpattern(solid) lwidth(medthick))
+		(kdensity y16_resid_decile_1819
+			if table5_col1_1819_sample == 1 & algorithm == 0,
+			lcolor(orange) lpattern(shortdash) lwidth(medthick)),
+		legend(order(1 "Algorithm cases" 2 "Inspector cases") cols(1) ///
+			position(1) ring(0) size(small) region(lcolor(none) fcolor(none)))
+		xtitle("Residualized number of agents")
+		ytitle("Density")
+		note("Sample: selection years 2018 and 2019. Controls: overlap, random, safeties, yhatrf deciles, and inspector-year FE. KS p-value: `resid_1819_ks_p'")
+		graphregion(color(white))
+	;
+	#delim cr
+	capture noisily graph export `"`fig_resid_1819'"', as(pdf) replace
+	if _rc {
+		di as error "Warning: could not export `fig_resid_1819'. Close any open PDF viewer and rerun this do-file."
+	}
+}
 
 ************************************************************
 * 3. Export Table 5 top panels: replicated specification
@@ -625,4 +808,6 @@ esttab `main_estlist'
 	substitute(\_ _)
 ;
 #delim cr
+
+}
 

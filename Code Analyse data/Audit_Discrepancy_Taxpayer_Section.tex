@@ -1,6 +1,11 @@
 \section{Audit Discrepancies and taxpayer dissatisfaction with the audit process.}
 \label{sec:audit_discrepancy_taxpayer}
 \providecommand{\sym}[1]{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\IfFileExists{Output/w_main_coverage_by_method.tex}{%
+  \providecommand{\OutPath}{Output/}%
+}{%
+  \providecommand{\OutPath}{../Output/}%
+}
 
 \makeatletter
 \@ifundefined{landscape}{\newenvironment{landscape}{}{}}{}
@@ -124,7 +129,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Informative regression-sample coverage by panel and audit type (counts and \% of base)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_main_coverage_by_method.tex}
+\input{\OutPath w_main_coverage_by_method.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -136,13 +141,13 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.82\textwidth]{Output/w_main_scatter_notification.pdf}
+\includegraphics[width=0.82\textwidth]{\OutPath w_main_scatter_notification.pdf}
 \caption{Scatter and linear fit: \(W_{\text{main}}\) vs notification value}
 \end{figure}
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.75\textwidth]{Output/w_main_density.pdf}
+\includegraphics[width=0.75\textwidth]{\OutPath w_main_density.pdf}
 \caption{Density of \(W_{\text{main}}\)}
 \end{figure}
 
@@ -154,7 +159,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Selection method, capped \(W\), and survey indexes: two panels (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_main_table_indices_recent_all.tex}
+\input{\OutPath w_main_table_indices_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -171,7 +176,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Selection method, capped \(W\), and survey-question outcomes: two panels (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
-\input{Output/w_main_table_questions_recent_all.tex}
+\input{\OutPath w_main_table_questions_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -190,7 +195,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{\neq 0}\) and survey indexes (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_robust_nonzero_table_indices_recent_all.tex}
+\input{\OutPath w_robust_nonzero_table_indices_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -207,7 +212,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{\neq 0}\) and survey questions (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
-\input{Output/w_robust_nonzero_table_questions_recent_all.tex}
+\input{\OutPath w_robust_nonzero_table_questions_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -224,7 +229,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{>\mathrm{med}}\) and survey indexes (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_robust_abovemedian_table_indices_recent_all.tex}
+\input{\OutPath w_robust_abovemedian_table_indices_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -241,7 +246,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{>\mathrm{med}}\) and survey questions (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
-\input{Output/w_robust_abovemedian_table_questions_recent_all.tex}
+\input{\OutPath w_robust_abovemedian_table_questions_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -258,7 +263,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{\ge q75}\) and survey indexes (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_robust_topquartile_table_indices_recent_all.tex}
+\input{\OutPath w_robust_topquartile_table_indices_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -275,7 +280,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{\ge q75}\) and survey questions (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
-\input{Output/w_robust_topquartile_table_questions_recent_all.tex}
+\input{\OutPath w_robust_topquartile_table_questions_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize

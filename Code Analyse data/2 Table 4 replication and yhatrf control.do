@@ -95,6 +95,48 @@ if _rc {
 keep if selection == 1
 drop if safeties == 1
 
+tempfile table4_base_sample
+save `table4_base_sample', replace
+
+foreach sample_variant in full selectionyear_2018_2019 ltu_medium {
+    use `table4_base_sample', clear
+
+    local sample_suffix ""
+    local sample_label "Full selected sample"
+
+    if "`sample_variant'" == "selectionyear_2018_2019" {
+        keep if inlist(selectionyear, 2018, 2019)
+        local sample_suffix "_selectionyear_2018_2019"
+        local sample_label "Selection years 2018 and 2019"
+    }
+    if "`sample_variant'" == "ltu_medium" {
+        keep if inlist(groupbureau, 1, 2)
+        local sample_suffix "_ltu_medium"
+        local sample_label "LTU and medium tax centers"
+    }
+
+    local table_replicated "$output\table4_main_outcomes_replicated`sample_suffix'.tex"
+    local table_replicated_lee "$output\table4_main_outcomes_replicated`sample_suffix'_with_lee.tex"
+    local table_yhatrf "$output\table4_main_outcomes_yhatrf_control`sample_suffix'.tex"
+    local table_yhatrf_lee "$output\table4_main_outcomes_yhatrf_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_quadratic "$output\table4_main_outcomes_yhatrf_quadratic_control`sample_suffix'.tex"
+    local table_yhatrf_quadratic_lee "$output\table4_main_outcomes_yhatrf_quadratic_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_deciles "$output\table4_main_outcomes_yhatrf_deciles_control`sample_suffix'.tex"
+    local table_yhatrf_deciles_lee "$output\table4_main_outcomes_yhatrf_deciles_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_quintiles "$output\table4_main_outcomes_yhatrf_quintiles_control`sample_suffix'.tex"
+    local table_yhatrf_quintiles_lee "$output\table4_main_outcomes_yhatrf_quintiles_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_bin15 "$output\table4_main_outcomes_yhatrf_15bins_control`sample_suffix'.tex"
+    local table_yhatrf_bin15_lee "$output\table4_main_outcomes_yhatrf_15bins_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_bin20 "$output\table4_main_outcomes_yhatrf_20bins_control`sample_suffix'.tex"
+    local table_yhatrf_bin20_lee "$output\table4_main_outcomes_yhatrf_20bins_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_bin40 "$output\table4_main_outcomes_yhatrf_40bins_control`sample_suffix'.tex"
+    local table_yhatrf_bin40_lee "$output\table4_main_outcomes_yhatrf_40bins_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_bin50 "$output\table4_main_outcomes_yhatrf_50bins_control`sample_suffix'.tex"
+    local table_yhatrf_bin50_lee "$output\table4_main_outcomes_yhatrf_50bins_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_topsplit "$output\table4_main_outcomes_yhatrf_topsplit_control`sample_suffix'.tex"
+    local table_yhatrf_topsplit_lee "$output\table4_main_outcomes_yhatrf_topsplit_control`sample_suffix'_with_lee.tex"
+    local table_yhatrf_bin_support "$output\table4_main_outcomes_yhatrf_bin_support`sample_suffix'.tex"
+
 foreach suffix in full desk_tax desk_insp {
     capture drop yhatrf_decile_`suffix'
     capture drop yhatrf_quintile_`suffix'
@@ -513,5 +555,6 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
     local newline " & & & & [`lowlee2' `low2',`highlee2'`high2'] & & [`lowlee1'`low1',`highlee1'`high1'] & [`lowlee4'`low4',`highlee4'`high4'] & & [`lowlee3'`low3',`highlee3'`high3'] \BS\BS "
 
     filefilter `"`table_out'"' `"`table_out_lee'"', from("Inspectors x Overlap") to("`newline' Inspectors x Overlap") replace
+}
 }
 
