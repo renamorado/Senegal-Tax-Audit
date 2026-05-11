@@ -998,3 +998,12 @@ Update: 2026-05-08 (Table 5, 6, and 8 summary CSVs)
 - Table 8 summary keeps the final model column for each outcome and specification/sample fragment: column 5 for baseline replicated tables and column 6 for predicted-evasion robustness tables, avoiding repeated baseline-control columns in every robustness file.
 - Each CSV records compact table abbreviation, specification, sample, outcome context, Algorithm coefficient, significance stars, standard error, N, R2, and source TeX file.
 - Validation: confirmed line counts of 241, 121, and 91 respectively, corresponding to 240 Table 5 data rows, 120 Table 6 data rows, and 90 Table 8 data rows; inspected headers and representative first rows for expected labels and values.
+
+Update: 2026-05-11 (inspector-effort report bin-table cleanup)
+- Created and pushed checkpoint commit `0134631` (`Checkpoint predicted-evasion robustness outputs`) on branch `inspector_effort` before changing the report cleanup.
+- Revised `Code Analyse data/Inspector's Effort report.tex` to withdraw the 20-bin, 40-bin, and 50-bin predicted-evasion robustness table blocks for Tables 4, 5, 6, and 8.
+- Removed the restricted-sample 40-bin and 50-bin table imports for Tables 4, 5, 6, and 8, along with the now-unused restricted-bin note macros.
+- Kept the 15-bin, decile, quintile, quadratic, top-split, and bin-support tables in the report.
+- Left all generated `Output/` fragments and PDFs in place for traceability; no Stata generation logic or output files were deleted.
+- Validation: confirmed with targeted `rg` searches that the report no longer imports or labels Table 4/5/6/8 `20bins`, `40bins`, or `50bins` variants, while retained robustness imports remain present.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully from the repository root; it produced a 127-page PDF. Remaining warnings were nonfatal and consistent with prior report builds, including duplicate labels, overfull boxes, PDF inclusion version warnings, and MiKTeX local log/update notices.

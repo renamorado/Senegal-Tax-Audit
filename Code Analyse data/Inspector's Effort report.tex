@@ -524,10 +524,6 @@ This subsection presents the Table 4 baseline replication together with variants
 \newcommand{\RestrictedTableFiveNote}{Restricted-sample version of the Table 5 full-audit decile-control specification. Duration variables, availability indicators, and predicted-evasion decile controls are recomputed within the active restricted sample.}
 \newcommand{\RestrictedTableSixNote}{Restricted-sample version of the Table 6 taxpayer-survey decile-control specification. Survey indexes and predicted-evasion decile controls are recomputed within the active restricted sample.}
 \newcommand{\RestrictedTableEightNote}{Restricted-sample version of the Table 8 full-audit decile-control specification. The observable-characteristics ladder is unchanged, and Column 6 contains predicted-evasion decile controls recomputed within the active restricted sample.}
-\newcommand{\RestrictedTableFourBinNote}[1]{Restricted-sample version of the Table 4 #1-bin control specification. The Table 4 rows include the rebuilt Lee-bounds row, and #1 predicted-evasion bins are recomputed within the active restricted sample.}
-\newcommand{\RestrictedTableFiveBinNote}[1]{Restricted-sample version of the Table 5 full-audit #1-bin control specification. Duration variables, availability indicators, and #1 predicted-evasion bins are recomputed within the active restricted sample.}
-\newcommand{\RestrictedTableSixBinNote}[1]{Restricted-sample version of the Table 6 taxpayer-survey #1-bin control specification. Survey indexes and #1 predicted-evasion bins are recomputed within the active restricted sample.}
-\newcommand{\RestrictedTableEightBinNote}[1]{Restricted-sample version of the Table 8 full-audit #1-bin control specification. The observable-characteristics ladder is unchanged, and Column 6 contains #1 predicted-evasion bins recomputed within the active restricted sample.}
 
 \begin{landscape}
 
@@ -629,60 +625,6 @@ This subsection presents the Table 4 baseline replication together with variants
 \end{threeparttable}
 \end{adjustbox}
 \end{table}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=1.4\textwidth}
-\begin{threeparttable}
-\caption{Algorithm Selection and Audit Outcomes, with 20 Predicted-Evasion Bin Controls}
-\label{tab:table4_main_outcomes_yhatrf_20bins_control}
-
-\footnotesize
-\input{\OutPath table4_main_outcomes_yhatrf_20bins_control_with_lee.tex}
-
-\begin{tablenotes}[flushleft]
-\TableFourRobustnessNotes{This robustness specification additionally controls for 20 predicted-evasion bins formed within the regression fixed-effect strata used in each column.}
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=1.4\textwidth}
-\begin{threeparttable}
-\caption{Algorithm Selection and Audit Outcomes, with 40 Predicted-Evasion Bin Controls}
-\label{tab:table4_main_outcomes_yhatrf_40bins_control}
-
-\footnotesize
-\input{\OutPath table4_main_outcomes_yhatrf_40bins_control_with_lee.tex}
-
-\begin{tablenotes}[flushleft]
-\TableFourRobustnessNotes{This robustness specification additionally controls for 40 predicted-evasion bins formed within the regression fixed-effect strata used in each column.}
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\RestrictedPredictedEvasionTable{1.4\textwidth}{Algorithm Selection and Audit Outcomes, with 40 Predicted-Evasion Bin Controls (Selection Years 2018 and 2019)}{table4_main_outcomes_yhatrf_40bins_control_selectionyear_2018_2019}{table4_main_outcomes_yhatrf_40bins_control_selectionyear_2018_2019_with_lee}{\RestrictedTableFourBinNote{40}}
-\RestrictedPredictedEvasionTable{1.4\textwidth}{Algorithm Selection and Audit Outcomes, with 40 Predicted-Evasion Bin Controls (LTU and Medium Tax Centers)}{table4_main_outcomes_yhatrf_40bins_control_ltu_medium}{table4_main_outcomes_yhatrf_40bins_control_ltu_medium_with_lee}{\RestrictedTableFourBinNote{40}}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=1.4\textwidth}
-\begin{threeparttable}
-\caption{Algorithm Selection and Audit Outcomes, with 50 Predicted-Evasion Bin Controls}
-\label{tab:table4_main_outcomes_yhatrf_50bins_control}
-
-\footnotesize
-\input{\OutPath table4_main_outcomes_yhatrf_50bins_control_with_lee.tex}
-
-\begin{tablenotes}[flushleft]
-\TableFourRobustnessNotes{This robustness specification additionally controls for 50 predicted-evasion bins formed within the regression fixed-effect strata used in each column.}
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\RestrictedPredictedEvasionTable{1.4\textwidth}{Algorithm Selection and Audit Outcomes, with 50 Predicted-Evasion Bin Controls (Selection Years 2018 and 2019)}{table4_main_outcomes_yhatrf_50bins_control_selectionyear_2018_2019}{table4_main_outcomes_yhatrf_50bins_control_selectionyear_2018_2019_with_lee}{\RestrictedTableFourBinNote{50}}
-\RestrictedPredictedEvasionTable{1.4\textwidth}{Algorithm Selection and Audit Outcomes, with 50 Predicted-Evasion Bin Controls (LTU and Medium Tax Centers)}{table4_main_outcomes_yhatrf_50bins_control_ltu_medium}{table4_main_outcomes_yhatrf_50bins_control_ltu_medium_with_lee}{\RestrictedTableFourBinNote{50}}
 
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=1.4\textwidth}
@@ -833,63 +775,6 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=1.4\textwidth}
 \begin{threeparttable}
-\caption{Resources Allocated to Audits and Audit Productivity, Full Audits, with 20 Predicted-Evasion Bin Controls (Panels A1 and B1 only)}
-\label{tab:table5_fullaudits_yhatrf_20bins_control}
-
-\footnotesize
-\input{\OutPath table5_fullaudits_yhatrf_20bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 20 predicted-evasion bins formed within inspector-cluster $\times$ year fixed-effect strata.
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=1.4\textwidth}
-\begin{threeparttable}
-\caption{Resources Allocated to Audits and Audit Productivity, Full Audits, with 40 Predicted-Evasion Bin Controls (Panels A1 and B1 only)}
-\label{tab:table5_fullaudits_yhatrf_40bins_control}
-
-\footnotesize
-\input{\OutPath table5_fullaudits_yhatrf_40bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 40 predicted-evasion bins formed within inspector-cluster $\times$ year fixed-effect strata.
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\RestrictedPredictedEvasionTable{1.4\textwidth}{Resources Allocated to Audits and Audit Productivity, Full Audits, with 40 Predicted-Evasion Bin Controls (Selection Years 2018 and 2019)}{table5_fullaudits_yhatrf_40bins_control_selectionyear_2018_2019}{table5_fullaudits_yhatrf_40bins_control_selectionyear_2018_2019}{\RestrictedTableFiveBinNote{40}}
-\RestrictedPredictedEvasionTable{1.4\textwidth}{Resources Allocated to Audits and Audit Productivity, Full Audits, with 40 Predicted-Evasion Bin Controls (LTU and Medium Tax Centers)}{table5_fullaudits_yhatrf_40bins_control_ltu_medium}{table5_fullaudits_yhatrf_40bins_control_ltu_medium}{\RestrictedTableFiveBinNote{40}}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=1.4\textwidth}
-\begin{threeparttable}
-\caption{Resources Allocated to Audits and Audit Productivity, Full Audits, with 50 Predicted-Evasion Bin Controls (Panels A1 and B1 only)}
-\label{tab:table5_fullaudits_yhatrf_50bins_control}
-
-\footnotesize
-\input{\OutPath table5_fullaudits_yhatrf_50bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 50 predicted-evasion bins formed within inspector-cluster $\times$ year fixed-effect strata.
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\RestrictedPredictedEvasionTable{1.4\textwidth}{Resources Allocated to Audits and Audit Productivity, Full Audits, with 50 Predicted-Evasion Bin Controls (Selection Years 2018 and 2019)}{table5_fullaudits_yhatrf_50bins_control_selectionyear_2018_2019}{table5_fullaudits_yhatrf_50bins_control_selectionyear_2018_2019}{\RestrictedTableFiveBinNote{50}}
-\RestrictedPredictedEvasionTable{1.4\textwidth}{Resources Allocated to Audits and Audit Productivity, Full Audits, with 50 Predicted-Evasion Bin Controls (LTU and Medium Tax Centers)}{table5_fullaudits_yhatrf_50bins_control_ltu_medium}{table5_fullaudits_yhatrf_50bins_control_ltu_medium}{\RestrictedTableFiveBinNote{50}}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=1.4\textwidth}
-\begin{threeparttable}
 \caption{Resources Allocated to Audits and Audit Productivity, Full Audits, with Top-Split Predicted-Evasion Decile Controls (Panels A1 and B1 only)}
 \label{tab:table5_fullaudits_yhatrf_topsplit_control}
 
@@ -1035,63 +920,6 @@ This subsection presents the baseline Table 6 replication together with variants
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=\textwidth}
 \begin{threeparttable}
-\caption{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 20 Predicted-Evasion Bin Controls}
-\label{tab:table6_indices_yhatrf_20bins_control}
-
-\footnotesize
-\input{\OutPath table6_indices_yhatrf_20bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 20 predicted-evasion bins formed within center $\times$ selection-year fixed-effect strata.
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=\textwidth}
-\begin{threeparttable}
-\caption{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 40 Predicted-Evasion Bin Controls}
-\label{tab:table6_indices_yhatrf_40bins_control}
-
-\footnotesize
-\input{\OutPath table6_indices_yhatrf_40bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 40 predicted-evasion bins formed within center $\times$ selection-year fixed-effect strata.
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\RestrictedPredictedEvasionTable{\textwidth}{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 40 Predicted-Evasion Bin Controls (Selection Years 2018 and 2019)}{table6_indices_yhatrf_40bins_control_selectionyear_2018_2019}{table6_indices_yhatrf_40bins_control_selectionyear_2018_2019}{\RestrictedTableSixBinNote{40}}
-\RestrictedPredictedEvasionTable{\textwidth}{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 40 Predicted-Evasion Bin Controls (LTU and Medium Tax Centers)}{table6_indices_yhatrf_40bins_control_ltu_medium}{table6_indices_yhatrf_40bins_control_ltu_medium}{\RestrictedTableSixBinNote{40}}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=\textwidth}
-\begin{threeparttable}
-\caption{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 50 Predicted-Evasion Bin Controls}
-\label{tab:table6_indices_yhatrf_50bins_control}
-
-\footnotesize
-\input{\OutPath table6_indices_yhatrf_50bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 50 predicted-evasion bins formed within center $\times$ selection-year fixed-effect strata.
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\RestrictedPredictedEvasionTable{\textwidth}{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 50 Predicted-Evasion Bin Controls (Selection Years 2018 and 2019)}{table6_indices_yhatrf_50bins_control_selectionyear_2018_2019}{table6_indices_yhatrf_50bins_control_selectionyear_2018_2019}{\RestrictedTableSixBinNote{50}}
-\RestrictedPredictedEvasionTable{\textwidth}{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 50 Predicted-Evasion Bin Controls (LTU and Medium Tax Centers)}{table6_indices_yhatrf_50bins_control_ltu_medium}{table6_indices_yhatrf_50bins_control_ltu_medium}{\RestrictedTableSixBinNote{50}}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=\textwidth}
-\begin{threeparttable}
 \caption{Algorithm Selection, Perceived Audit Efficiency and Corruption, with Top-Split Predicted-Evasion Decile Controls}
 \label{tab:table6_indices_yhatrf_topsplit_control}
 
@@ -1232,60 +1060,6 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \end{threeparttable}
 \end{adjustbox}
 \end{table}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=\textwidth}
-\begin{threeparttable}
-\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 20 Predicted-Evasion Bin Controls}
-\label{tab:table8_fullaudits_yhatrf_20bins_control}
-
-\footnotesize
-\input{\OutPath table8_fullaudits_yhatrf_20bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\TableEightRobustnessNotes{Column 6 additionally controls for 20 predicted-evasion bins formed within inspector $\times$ year fixed-effect strata.}
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=\textwidth}
-\begin{threeparttable}
-\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 40 Predicted-Evasion Bin Controls}
-\label{tab:table8_fullaudits_yhatrf_40bins_control}
-
-\footnotesize
-\input{\OutPath table8_fullaudits_yhatrf_40bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\TableEightRobustnessNotes{Column 6 additionally controls for 40 predicted-evasion bins formed within inspector $\times$ year fixed-effect strata.}
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\RestrictedPredictedEvasionTable{\textwidth}{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 40 Predicted-Evasion Bin Controls (Selection Years 2018 and 2019)}{table8_fullaudits_yhatrf_40bins_control_selectionyear_2018_2019}{table8_fullaudits_yhatrf_40bins_control_selectionyear_2018_2019}{\RestrictedTableEightBinNote{40}}
-\RestrictedPredictedEvasionTable{\textwidth}{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 40 Predicted-Evasion Bin Controls (LTU and Medium Tax Centers)}{table8_fullaudits_yhatrf_40bins_control_ltu_medium}{table8_fullaudits_yhatrf_40bins_control_ltu_medium}{\RestrictedTableEightBinNote{40}}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=\textwidth}
-\begin{threeparttable}
-\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 50 Predicted-Evasion Bin Controls}
-\label{tab:table8_fullaudits_yhatrf_50bins_control}
-
-\footnotesize
-\input{\OutPath table8_fullaudits_yhatrf_50bins_control.tex}
-
-\begin{tablenotes}[flushleft]
-\TableEightRobustnessNotes{Column 6 additionally controls for 50 predicted-evasion bins formed within inspector $\times$ year fixed-effect strata.}
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\RestrictedPredictedEvasionTable{\textwidth}{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 50 Predicted-Evasion Bin Controls (Selection Years 2018 and 2019)}{table8_fullaudits_yhatrf_50bins_control_selectionyear_2018_2019}{table8_fullaudits_yhatrf_50bins_control_selectionyear_2018_2019}{\RestrictedTableEightBinNote{50}}
-\RestrictedPredictedEvasionTable{\textwidth}{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 50 Predicted-Evasion Bin Controls (LTU and Medium Tax Centers)}{table8_fullaudits_yhatrf_50bins_control_ltu_medium}{table8_fullaudits_yhatrf_50bins_control_ltu_medium}{\RestrictedTableEightBinNote{50}}
 
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=\textwidth}
