@@ -1,0 +1,16 @@
+\begin{tabular}{lcc|cc|cc} \toprule
+\multicolumn{1}{l}{} & \multicolumn{2}{c}{P(Execution)} & \multicolumn{2}{c}{P(Detection | Execution)} & \multicolumn{2}{c}{log(Evasion) | Detection} \\\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7} \multicolumn{1}{l}{} & Original FE & Bureau FE & Original FE & Bureau FE & Original FE & Bureau FE \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule
+Algorithm   &       -0.17\sym{***}&       -0.17\sym{***}&        0.02         &        0.01         &       -0.65\sym{***}&       -0.67\sym{***}\\
+            &      (0.03)         &      (0.03)         &      (0.03)         &      (0.03)         &      (0.18)         &      (0.18)         \\
+\addlinespace
+Inspectors x Overlap&        0.16\sym{**} &        0.15\sym{**} &        0.08         &        0.09\sym{*}  &        0.29         &        0.15         \\
+            &      (0.07)         &      (0.07)         &      (0.05)         &      (0.05)         &      (0.46)         &      (0.44)         \\
+\addlinespace
+Algorithm x Random&                     &                     &                     &                     &                     &                     \\
+            &                     &                     &                     &                     &                     &                     \\
+\midrule
+Fixed effects&Inspector cluster x Year         &Bureau x Year         &Inspector cluster x Year         &Bureau x Year         &Inspector cluster x Year         &Bureau x Year         \\
+N           &         944         &         944         &         508         &         508         &         457         &         457         \\
+R2          &        0.26         &        0.24         &        0.11         &        0.08         &        0.32         &        0.28         \\
+Mean outcome&        0.53         &        0.53         &        0.89         &        0.89         &       19.26         &       19.26         \\
+\bottomrule \end{tabular}

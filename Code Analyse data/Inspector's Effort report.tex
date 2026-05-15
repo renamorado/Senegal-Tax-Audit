@@ -494,6 +494,87 @@
 
 \section{Main regression estimates adding predicted evasion controls}
 
+\begin{figure}[H]
+    \centering
+    \caption{Predicted Evasion Amount and Realized Execution Rate, All Cases: Optimization-Weighted Predictions}
+    \label{fig:figure4_panel_a_weighted_yhatrf_fullaudits}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_weighted_yhatrf_fullaudits.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: A plots the distribution of detected evasion for all full audits (log of FCFA amounts), as well as the results from an optimization-weighted random forest model predicting detected evasion based on firms' observable characteristics. The blue distribution is optimization-weighted predicted evasion for cases that were part of the annual audit program but not actually audited. The green distribution is optimization-weighted predicted evasion for cases that were audited. The solid line plots the realized audit execution rate by level of optimization-weighted predicted evasion. This figure is for full audits only.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Optimization-Weighted Predictions}
+    \label{fig:figure4_panel_b_weighted_yhatrf_fullaudits}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_weighted_yhatrf_fullaudits.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: B shows the distribution of optimization-weighted predicted evasion for all algorithm-selected cases (purple) and for all inspector-selected cases (orange). The solid lines (purple and orange) plot the realized audit execution rates by level of optimization-weighted predicted evasion. This figure is for full audits only.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Current and Top-Quartile-Weighted Predicted Evasion Scores}
+    \label{fig:yhatrf_weighted_vs_unweighted_scatterplots}
+    \begin{threeparttable}
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath yhatrf_weighted_vs_unweighted_fullaudits.pdf}
+        \subcaption{Full audits, selected cases}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath yhatrf_weighted_vs_unweighted_fullaudits_executed.pdf}
+        \subcaption{Full audits, executed cases}
+    \end{subfigure}
+
+    \vspace{0.7em}
+
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath yhatrf_weighted_vs_unweighted_deskaudits.pdf}
+        \subcaption{Desk audits, selected cases}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath yhatrf_weighted_vs_unweighted_deskaudits_executed.pdf}
+        \subcaption{Desk audits, executed cases}
+    \end{subfigure}
+
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure compares two random-forest predictions of detected evasion for selected audit cases. The horizontal axis reports the prediction from the baseline model, while the vertical axis reports the prediction from the model that places additional weight on high-evasion audit outcomes during training. Predictions are measured as log FCFA amounts. Panels A and C include selected full and desk audits, respectively; Panels B and D restrict to cases that were actually executed. The light gray dotted line is the 45-degree line, where the two predictions are equal. The solid line is an unweighted linear fit, and the fitted equation is reported inside each panel. Both axes use the same scale within each panel and start at zero.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\subsection{Testing bureau FE}
+
+This subsection compares the full-audit columns from Table 4 under the original full-audit fixed effects and under broad bureau $\times$ selection-year fixed effects.
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.2\textwidth}
+\begin{threeparttable}
+\caption{Table 4 Full-Audit Columns: Bureau FE Comparison}
+\label{tab:table4_fullaudit_fe_comparison}
+\footnotesize
+\input{\OutPath table4_fullaudit_fe_comparison.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table re-estimates the full-audit columns from Table 4. The dependent variables are the probability that a selected case was executed, the probability of detection conditional on execution, and log evasion conditional on detection. All columns use the selected non-safety sample, the same controls as the original specification (\texttt{algorithm}, \texttt{overlap}, \texttt{random}, and \texttt{safeties}), and robust standard errors. For each outcome, the first column uses the original \texttt{inspectorclusteryear} fixed effects and the second column uses broad \texttt{bureau} $\times$ \texttt{selectionyear} fixed effects, not \texttt{bureau\_detailed}.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
 \subsection{Table 4 with predicted evasion controls}
 
 This subsection presents the Table 4 baseline replication together with variants that keep the original nine-column layout and add predicted-evasion controls.
@@ -526,6 +607,57 @@ This subsection presents the Table 4 baseline replication together with variants
 \newcommand{\RestrictedTableEightNote}{Restricted-sample version of the Table 8 full-audit decile-control specification. The observable-characteristics ladder is unchanged, and Column 6 contains predicted-evasion decile controls recomputed within the active restricted sample.}
 
 \begin{landscape}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Table 4: Main Results Probability of Execution Varying Predicted Evasion Control Specification}
+\label{tab:table4_col1_predicted_evasion_control_comparison}
+
+\footnotesize
+\input{\OutPath table4_col1_predicted_evasion_control_comparison.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Column 1 of Table 4, where the dependent variable is the probability that a selected full-audit case was executed by the inspectors. All specifications use the selected non-safety full-audit sample, include the original selection-method and replacement controls, and absorb the original full-audit list fixed effects. Robust standard errors are shown in parentheses. Predicted evasion is the Random Forest prediction of uncovered evasion. Quintiles, deciles, top-split deciles, and integer ranks are formed within audit type by detailed tax office by selection year; for full audits, this detailed-tax-office-by-year cell is the selection list. The columns are ordered from simpler controls to richer list-specific controls: Columns 2--4 add linear, quadratic, and cubic continuous controls; Columns 5--6 add the within-list predicted-evasion rank to the linear and quadratic controls; Columns 7--9 use quintile, decile, and top-split-decile controls; Columns 10--12 allow predicted-evasion slopes to vary by list; Column 13 allows the rank slope to vary by list; Columns 14--16 absorb quintile-by-list, decile-by-list, and top-split-decile-by-list fixed effects; Column 17 allows a quadratic polynomial in within-list rank to vary by list; and Column 18 allows a quadratic predicted-evasion polynomial to vary by list for the non-LTU subsample. The non-LTU subsample excludes the Large Taxpayer Unit and keeps Medium, Liberal, and SME offices. The top-split decile control keeps deciles 1--8 and splits each list's ninth and tenth deciles into two equal-size bins. Rank 1 is the highest-predicted-evasion case in the list, rank 2 is the second-highest, and larger rank values correspond to lower predicted evasion. Singleton bin-by-list cells are dropped in Columns 14--16 because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-evasion control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Table 4: Main Results Probability of Execution Varying Predicted Evasion Control Specification, Optimization-Weighted Predictions}
+\label{tab:table4_col1_predicted_evasion_control_comparison_optimization_weighted}
+
+\footnotesize
+\input{\OutPath table4_col1_predicted_evasion_control_comparison_optimization_weighted.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Column 1 of Table 4, where the dependent variable is the probability that a selected full-audit case was executed by the inspectors. All specifications use the selected non-safety full-audit sample, include the original selection-method and replacement controls, and absorb the original full-audit list fixed effects. Robust standard errors are shown in parentheses. Predicted evasion is the optimization-exercise weighted Random Forest prediction of uncovered evasion, generated from the weighted prediction datasets exported by the optimization exercise. Column 1 keeps the original specification and does not add a predicted-evasion control; Columns 2--18 repeat the same predicted-evasion control specifications used in Table \ref{tab:table4_col1_predicted_evasion_control_comparison}, replacing only the current predicted-evasion measure with the optimization-weighted predicted-evasion measure. Quintiles, deciles, top-split deciles, and integer ranks are formed within audit type by detailed tax office by selection year; for full audits, this detailed-tax-office-by-year cell is the selection list. The columns are ordered from simpler controls to richer list-specific controls: Columns 2--4 add linear, quadratic, and cubic continuous controls; Columns 5--6 add the within-list predicted-evasion rank to the linear and quadratic controls; Columns 7--9 use quintile, decile, and top-split-decile controls; Columns 10--12 allow predicted-evasion slopes to vary by list; Column 13 allows the rank slope to vary by list; Columns 14--16 absorb quintile-by-list, decile-by-list, and top-split-decile-by-list fixed effects; Column 17 allows a quadratic polynomial in within-list rank to vary by list; and Column 18 allows a quadratic predicted-evasion polynomial to vary by list for the non-LTU subsample. The non-LTU subsample excludes the Large Taxpayer Unit and keeps Medium, Liberal, and SME offices. The top-split decile control keeps deciles 1--8 and splits each list's ninth and tenth deciles into two equal-size bins. Rank 1 is the highest-predicted-evasion case in the list, rank 2 is the second-highest, and larger rank values correspond to lower predicted evasion. Singleton bin-by-list cells are dropped in Columns 14--16 because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-evasion control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.05\textwidth}
+\begin{threeparttable}
+\caption{Table 4 Column 1 Predicted-Evasion Bin Support}
+\label{tab:table4_col1_predicted_evasion_bin_support}
+
+\footnotesize
+\input{\OutPath table4_col1_predicted_evasion_bin_support.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table reports support for the selected non-safety full-audit sample used in the Table 4 Column 1 robustness comparison. Bins are formed within audit type by detailed tax office by selection year, matching the comparison table. Algorithm N and Inspector N split total support by selection method. Executed N and the execution rate summarize the outcome used in Column 1. In the top-split specification, bins 9a and 9b are the lower and upper halves of decile 9, while bins 10a and 10b are the lower and upper halves of decile 10.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
 
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=1.4\textwidth}
@@ -666,6 +798,40 @@ This subsection presents the Table 4 baseline replication together with variants
 \subsection{Table 5 with predicted evasion controls}
 
 This section presents the full-audit Table 5 top-panel variants for the audit-productivity discussion. The tables below keep the original sample and layout and add predicted-evasion controls in the robustness specifications.
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Table 5 Panel A1 Column 1: Number of Agents Varying Predicted Evasion Control Specification}
+\label{tab:table5_col1_ninspectors_predicted_evasion_control_comparison}
+
+\footnotesize
+\input{\OutPath table5_col1_ninspectors_predicted_evasion_control_comparison.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Panel A1 Column 1 of Table 5, where the dependent variable is the number of agents recorded on a selected full-audit case. The outcome is set to missing for non-executed cases, matching the Table 5 exporter. All specifications use the selected non-safety full-audit sample, include the original selection-method and replacement controls, and absorb inspector-cluster $\times$ year fixed effects. Robust standard errors are shown in parentheses. Predicted evasion is the Random Forest prediction of uncovered evasion. Quintiles, deciles, top-split deciles, and integer ranks are formed within lists, defined here as the inspector-cluster $\times$ year groups. Column 1 keeps the original specification and does not add a predicted-evasion control; Columns 2--16 add the same predicted-evasion control families used in the consolidated Table 4 Column 1 comparison. The top-split decile control keeps deciles 1--8 and splits each list's ninth and tenth deciles into two equal-size bins. Rank 1 is the highest-predicted-evasion case in the list, rank 2 is the second-highest, and larger rank values correspond to lower predicted evasion. Singleton bin-by-list cells are dropped in Columns 14--16 because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-evasion control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Table 5 Panel A1 Column 1: Number of Agents Varying Predicted Evasion Control Specification, Optimization-Weighted Predictions}
+\label{tab:table5_col1_ninspectors_predicted_evasion_control_comparison_optimization_weighted}
+
+\footnotesize
+\input{\OutPath table5_col1_ninspectors_predicted_evasion_control_comparison_optimization_weighted.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Panel A1 Column 1 of Table 5, where the dependent variable is the number of agents recorded on a selected full-audit case. The outcome is set to missing for non-executed cases, matching the Table 5 exporter. All specifications use the selected non-safety full-audit sample, include the original selection-method and replacement controls, and absorb inspector-cluster $\times$ year fixed effects. Robust standard errors are shown in parentheses. Predicted evasion is the optimization-exercise weighted Random Forest prediction of uncovered evasion, generated from the weighted prediction dataset exported by the optimization exercise. No regression weights are used. Column 1 keeps the original specification and does not add a predicted-evasion control; Columns 2--16 repeat the same predicted-evasion control specifications used in Table \ref{tab:table5_col1_ninspectors_predicted_evasion_control_comparison}, replacing only the current predicted-evasion measure with the optimization-weighted predicted-evasion measure. Quintiles, deciles, top-split deciles, and integer ranks are formed within lists, defined here as the inspector-cluster $\times$ year groups. The top-split decile control keeps deciles 1--8 and splits each list's ninth and tenth deciles into two equal-size bins. Singleton bin-by-list cells are dropped in Columns 14--16 because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-evasion control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
 
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=1.4\textwidth}
@@ -1093,6 +1259,151 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \end{threeparttable}
 \end{adjustbox}
 \end{table}
+
+\section{Revision of optimization gains}
+
+\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.25\textwidth}
+\begin{threeparttable}
+\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Top-Five Revision}
+\label{tab:table_opt_full_and_desk_unweighted_top5_revision}
+
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_unweighted_top5_revision.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table shows the results from our optimization exercise in which we use the audit results from the realized set of audits to train a machine-learning (random forest) algorithm to predict evasion. We optimize which audits were conducted in 2018 and 2019. Column 1 shows the realized revenue (evasion and fines) from audits across all tax offices. Column 2 shows the predicted revenue, based on the random forest model, for firms that experienced an audit. Column 3 shows the revenue increase (in percent, compared to the predicted revenue in column 2) when using the random forest for audit selection. Concretely, we use our estimated random forest to predict evasion for all cases in the annual audit program list, then rank cases by predicted evasion within tax office and year, and pick the top cases such that the number of audits by tax office and year is the same as the realized audit implementation. Column 4 shows the share of cases audited in the realized program that were also chosen to be audited under the optimized program. Columns 1--4 reproduce the current version of the table. Column 5 repeats the revenue-increase calculation in column 3 using the direct unweighted predicted evasion measure, without replacing predicted values with zero for cases predicted to have no detected evasion, after excluding, within each audit type, the five actually audited firms with the largest realized revenue before ranking cases and constructing the optimized program. Column 6 repeats the overlap calculation in column 4 using the same unweighted, top-realized-outlier-excluded optimized program.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+\end{landscape}
+
+\noindent\textbf{Steps used to build the table}
+\medskip
+
+\noindent\textit{Weighted method, Columns 1--4}
+\begin{itemize}
+\item Start from selected annual audit-program cases, exclude safety cases, and run the exercise separately for full audits and desk audits.
+\item Train a detection random forest on actually audited cases with observed outcomes to predict whether an audit would uncover positive evasion.
+\item Train a weighted revenue random forest among actually audited cases with positive detected evasion; the weighting follows the current optimization-gains table and gives additional weight to high-realized-revenue audit outcomes within tax-office-by-year cells.
+\item Predict revenue for all selected non-safety audit-program cases in the audit type, including cases that were not actually audited.
+\item Assign predicted revenue equal to zero for cases predicted to have no detected evasion.
+\item Keep the 2018 and 2019 optimization years.
+\item Rank all remaining cases by weighted predicted revenue within each tax-office-by-year list and choose the top-ranked cases until the optimized list has the same number of audits as the realized implementation in that list.
+\item Column 1 reports the log mean of realized revenue among actually audited firms; Column 2 reports the log mean of weighted predicted revenue among actually audited firms.
+\item Column 3 reports:
+$$
+100 \times \left(
+\frac{\text{mean weighted predicted revenue under optimized selection}}
+{\text{mean weighted predicted revenue among realized audited firms}}
+- 1
+\right).
+$$
+\item Column 4 reports:
+$$
+\frac{\text{number of realized audited firms also selected by the weighted optimized rule}}
+{\text{number of firms selected by the weighted optimized rule}}.
+$$
+\end{itemize}
+
+\noindent\textit{Unweighted method excluding top realized outliers, Columns 5--6}
+\begin{itemize}
+\item Use the same selected annual audit-program sample, safety-case exclusion, and audit-type split as in Columns 1--4.
+\item Train a direct unweighted revenue random forest on actually audited cases with observed realized revenue, matching the unweighted predicted-evasion measure used in the prediction plots; the top five firms are not removed before training.
+\item Predict revenue for all selected non-safety audit-program cases in the audit type, including non-audited cases.
+\item Do not apply the detection-model gate and do not replace predicted revenue with zero for cases predicted to have no detected evasion.
+\item Keep the 2018 and 2019 optimization years.
+\item Within each audit type, identify the five actually audited firms with the largest realized revenue (evasion and fines) in the 2018--2019 optimization sample.
+\item Remove those five top realized-revenue firms before constructing the unweighted optimized program.
+\item Recompute the realized audit count in each tax-office-by-year list after this exclusion.
+\item Rank the remaining cases by unweighted predicted revenue within each tax-office-by-year list and choose the top-ranked cases until the optimized list has the same number of audits as the remaining realized implementation in that list.
+\item Column 5 reports:
+$$
+100 \times \left(
+\frac{\text{mean unweighted predicted revenue under the re-ranked optimized selection}}
+{\text{mean unweighted predicted revenue among remaining realized audited firms}}
+- 1
+\right).
+$$
+\item Column 6 reports:
+$$
+\frac{\text{number of remaining realized audited firms also selected by the re-ranked unweighted optimized rule}}
+{\text{number of firms selected by the re-ranked unweighted optimized rule}}.
+$$
+\end{itemize}
+
+\section{Predicting rank}
+
+This section repeats the Figure 4 diagnostics using a Random Forest prediction of a firm's rank within the full-audit list rather than a prediction of the evasion amount. The rank model uses the selected non-safety full-audit sample. It trains on actually executed full audits with observed detected evasion, ranks realized evasion within detailed tax office by selection year, predicts the rank outcome for all selected non-safety full-audit cases, and then re-ranks those predictions within each full-audit list. The horizontal axis inverts that within-list predicted rank order, so moving to the right corresponds to higher predicted evasion priority within the list.
+
+\noindent\textbf{Steps used to predict rank}
+\begin{itemize}
+\item Start from selected full-audit cases and exclude safety cases, matching the Figure 4 full-audit sample.
+\item Among actually executed full audits with observed detected evasion, rank cases within each detailed tax office by selection year list. The realized rank is computed from negative detected evasion, so the largest detected evasion receives rank 1. Tied top cases receive the same rank.
+\item Train an unweighted random forest on those executed cases, using the same observable firm characteristics and filing-history predictors as the direct unweighted predicted-evasion model.
+\item Predict the rank outcome for every selected non-safety full-audit case, including cases that were not actually executed.
+\item Within each detailed tax office by selection year list, sort cases by the Random Forest predicted rank outcome and create a predicted rank order over all selected non-safety full-audit cases.
+\item Use this non-inverted predicted rank order for the Table 4 Column 1 controls: rank 1, rank percentile 0, decile 1, and the top-priority indicators indicate the highest predicted evasion priority. For the Figure 4-style diagnostics only, multiply the predicted rank order by minus one so that the horizontal axis increases with predicted priority.
+\end{itemize}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.15\textwidth}
+\begin{threeparttable}
+\caption{Table 4 Column 1 with Predicted-Rank Controls}
+\label{tab:table4_col1_predicted_rank_control_comparison}
+\footnotesize
+\input{\OutPath table4_col1_predicted_rank_control_comparison.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Column 1 of Table 4, where the dependent variable is the probability that a selected full-audit case was executed by the inspectors. Column 1 keeps the original specification and does not add a predicted-rank control. Columns 2--10 add increasingly flexible controls for the unweighted Random Forest predicted rank, conditional on the original inspector-cluster-by-year list fixed effects. Columns 2--4 use the raw within-list predicted rank order additively, interacted with the list, and as a quadratic polynomial interacted with the list. Columns 5--7 repeat those three specifications using the within-list rank percentile, where 0 is the highest predicted priority and 1 is the lowest predicted priority. Column 8 adds within-list rank-decile fixed effects. Column 9 absorbs rank-decile-by-list fixed effects. Column 10 adds top-priority indicators for the top 10 percent and top quartile within each list. The Random Forest first predicts the realized within-list evasion rank, then those predictions are sorted within each detailed-tax-office-by-selection-year full-audit list to create the predicted rank order used in this table. The rank measures are not inverted in the regressions: rank 1, percentile 0, decile 1, and the top-priority indicators indicate the highest predicted evasion priority. All specifications include the original selection-method and replacement controls and absorb the original inspector-cluster-by-year fixed effects. Robust standard errors are shown in parentheses. Column 9 drops singleton decile-by-list cells because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-rank control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=0.95\textwidth}
+\begin{threeparttable}
+\caption{Support for Table 4 Column 1 Predicted-Rank Controls}
+\label{tab:table4_col1_predicted_rank_support}
+\footnotesize
+\input{\OutPath table4_col1_predicted_rank_support.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table reports support for the selected non-safety full-audit sample used in Table \ref{tab:table4_col1_predicted_rank_control_comparison}. Predicted-rank bins are formed within detailed tax office by selection year, matching the full-audit list used for the rank prediction. Decile 1, the top 10 percent, and the top quartile are the highest-priority predicted-rank bins.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \caption{Inverted Predicted Rank and Realized Execution Rate, All Full-Audit Cases}
+    \label{fig:figure4_panel_a_predicted_rank_fullaudits}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_predicted_rank_fullaudits.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors Figure 4 Panel A but replaces the predicted evasion amount with an inverted predicted within-list rank score. The model is an unweighted random forest trained on executed full audits with observed detected evasion. The realized training target ranks detected evasion within detailed tax office by selection year, with the highest detected evasion assigned rank 1. After prediction, cases are re-ranked within each detailed-tax-office-by-selection-year list using the Random Forest predicted rank outcome. For plotting, this within-list predicted rank order is multiplied by minus one, so higher horizontal-axis values correspond to better predicted ranks and higher predicted evasion priority. The blue distribution is the inverted predicted rank score for cases that were part of the annual full-audit program but not actually audited. The green distribution is the inverted predicted rank score for cases that were audited. The gray distribution shows the inverted realized rank score among executed full audits. The solid line plots the realized audit execution rate by the inverted predicted rank score.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Inverted Predicted Rank}
+    \label{fig:figure4_panel_b_predicted_rank_fullaudits}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_predicted_rank_fullaudits.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors Figure 4 Panel B but replaces the predicted evasion amount with an inverted predicted within-list rank score. After the Random Forest predicts the rank outcome, cases are re-ranked within each detailed-tax-office-by-selection-year list. The purple distribution shows algorithm-selected full-audit cases and the orange distribution shows inspector-selected full-audit cases. The solid lines plot realized audit execution rates by the inverted predicted rank score separately for algorithm-selected and inspector-selected cases. Higher horizontal-axis values correspond to better predicted ranks and higher predicted evasion priority within the detailed-tax-office-by-selection-year list.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
 
 \section{Inspector effort analysis}
 

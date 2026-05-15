@@ -2,6 +2,178 @@
 
 ---
 
+Date: 2026-05-12
+Task: Add consolidated Table 4 Column 1 predicted-evasion control comparison.
+
+## Files edited
+- `Code Analyse data/2 Table 4 column 1 predicted evasion controls.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a standalone Stata workflow that re-estimates full-audit Table 4 Column 1 across eight predicted-evasion control specifications: original, linear `yhatrf`, quadratic `yhatrf`, quintiles, deciles, deciles interacted with `bureau_detailed`, integer rank plus linear `yhatrf`, and integer rank plus quadratic `yhatrf`.
+- Constructed quintiles, deciles, and integer ranks within audit type x `bureau_detailed` x selection year, with higher ranks corresponding to higher predicted evasion.
+- Added the new consolidated table to the Table 4 predicted-evasion robustness section of `Inspector's Effort report.tex`, with notes explaining the sample, controls, and bin/rank construction.
+
+## Output files affected
+- New output fragment: `Output/table4_col1_predicted_evasion_control_comparison.tex`.
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully.
+- Confirmed the generated TeX fragment has eight columns, displays only `Algorithm`, `Inspectors x Overlap`, and `Algorithm x Random`, includes the requested predicted-evasion control marker rows, and reports populated `N`, `R2`, and mean outcome rows.
+- Confirmed `Inspector's Effort report.tex` references `table4_col1_predicted_evasion_control_comparison.tex`.
+- Did not recompile the full report in this pass.
+
+## Open issues / next steps
+- If the full report PDF is needed, rerun the existing report compilation check after confirming all imported fragments are available.
+
+Update: 2026-05-12 (additional decile interaction columns)
+- Extended `Code Analyse data/2 Table 4 column 1 predicted evasion controls.do` so the consolidated table now has ten columns, adding decile-by-selection-year controls and a combined decile-by-selection-year plus decile-by-`bureau_detailed` specification.
+- Updated the table notes in `Code Analyse data/Inspector's Effort report.tex` to explain Columns 9 and 10.
+- Regenerated `Output/table4_col1_predicted_evasion_control_comparison.tex`; confirmed Columns 9 and 10 are populated, the lower-panel markers identify the new interaction controls, and `N`, `R2`, and mean outcome rows remain populated.
+- Validation: re-ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully.
+
+Update: 2026-05-12 (list-specific predicted-evasion slope and rank direction)
+- Extended the consolidated table to eleven columns, adding a specification with list-specific linear predicted-evasion controls plus the integer predicted-evasion rank.
+- Redefined the integer predicted-evasion rank so rank 1 is the highest-predicted-evasion case within the detailed-tax-office-by-selection-year list; larger ranks correspond to lower predicted evasion.
+- Rewrote the consolidated table note in `Code Analyse data/Inspector's Effort report.tex` to avoid dataset variable names and code formatting, and to describe controls in paper-facing terms.
+- Regenerated `Output/table4_col1_predicted_evasion_control_comparison.tex`; confirmed Column 11 is populated, marks both the list-specific predicted-evasion control and rank control, and preserves populated `N`, `R2`, and mean outcome rows.
+- Validation: re-ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully.
+
+Update: 2026-05-12 (rank marker cleanup)
+- Removed the separate `Rank of predicted evasion, quadratic` marker row from the consolidated table.
+- Column 8 is now described by the combination of the `Quadratic predicted evasion` and `Rank of predicted evasion` marker rows, matching the underlying specification more cleanly.
+- Validation: re-ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully and confirmed the regenerated table has no separate quadratic-rank row.
+
+Update: 2026-05-12 (top-split column and bin support)
+- Extended `Code Analyse data/2 Table 4 column 1 predicted evasion controls.do` so the consolidated Table 4 Column 1 comparison now has a twelfth column controlling for top-split predicted-evasion deciles.
+- Constructed the top-split bins within the same audit-type x detailed-tax-office x selection-year cells as the existing decile controls, keeping deciles 1--8 and splitting deciles 9 and 10 into lower and upper halves.
+- Added a new support-table export, `Output/table4_col1_predicted_evasion_bin_support.tex`, reporting FE-stratum coverage, total support, algorithm/inspector support, executed cases, and execution rates for the ordinary decile and top-split specifications.
+- Added the support table to `Code Analyse data/Inspector's Effort report.tex` and updated the comparison-table note to describe Column 12 and the top-split bin construction.
+- Validation: re-ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully; confirmed `Output/table4_col1_predicted_evasion_control_comparison.tex` has 12 populated columns and a `Top-split deciles` marker row, and confirmed the support table is populated, including the small top split bin 10b (`31` total observations, `7` algorithm-selected observations).
+
+Update: 2026-05-12 (tax-office-year polynomial predicted-evasion slopes)
+- Extended `Code Analyse data/2 Table 4 column 1 predicted evasion controls.do` so the consolidated Table 4 Column 1 comparison now has a thirteenth column controlling for a quadratic polynomial in predicted evasion interacted with detailed tax office by selection year.
+- Added `table4_col1_bureauyear` and `yhatrf_sq_col1` to support the specification, using tax-office-year-specific linear and squared predicted-evasion slopes while keeping the original full-audit fixed effects.
+- Updated the comparison-table note in `Code Analyse data/Inspector's Effort report.tex` to describe Column 13.
+- Regenerated `Output/table4_col1_predicted_evasion_control_comparison.tex`; in Column 13 the Algorithm coefficient is `-0.06` with `**`, with `N = 944` and `R2 = 0.47`.
+- Validation: re-ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully; the Stata log reaches `end of do-file`.
+
+Update: 2026-05-12 (rank-by-list column and lower-panel cleanup)
+- Added one more consolidated Table 4 Column 1 specification controlling for predicted-evasion rank interacted with the list, so the table now has 14 columns.
+- Reworked the lower-panel decile-interaction marker rows so the combined decile-by-selection-year plus decile-by-detailed-tax-office specification is marked once, rather than appearing as duplicate `x` entries in the separate interaction rows.
+- Updated the report note in `Code Analyse data/Inspector's Effort report.tex` to describe Column 14 and the mutually exclusive decile-interaction marker rows.
+- Regenerated `Output/table4_col1_predicted_evasion_control_comparison.tex`.
+- Validation: re-ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully; confirmed the output has 14 populated columns, a `Rank of predicted evasion x List` marker only in Column 14, and separate rows for decile-by-bureau only, decile-by-selection-year only, and the combined decile interaction.
+
+Update: 2026-05-12 (decile-by-list and top-split-by-list diagnostics)
+- Added two fully saturated bin-by-list diagnostics to `Code Analyse data/2 Table 4 column 1 predicted evasion controls.do`: decile-by-list fixed effects and top-split-decile-by-list fixed effects, extending the consolidated comparison to 16 columns.
+- Implemented these two specifications as absorbed fixed effects rather than explicit dummy controls, after confirming that explicit dummy controls produced singular robust variance matrices and missing standard errors.
+- Updated `Code Analyse data/Inspector's Effort report.tex` to describe Columns 15 and 16 and to note that singleton bin-by-list cells are dropped because they do not contribute identifying variation once those fixed effects are absorbed.
+- Regenerated `Output/table4_col1_predicted_evasion_control_comparison.tex`.
+- Validation: re-ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully; confirmed Columns 15 and 16 have usable robust standard errors. Column 15 reports Algorithm `-0.09**` with `N = 912` and `R2 = 0.54`; Column 16 reports Algorithm `-0.09**` with `N = 871` and `R2 = 0.54`.
+
+Update: 2026-05-12 (cubic controls and intuitive column order)
+- Reordered the consolidated Table 4 Column 1 comparison so the columns move from simple continuous controls, to rank and bin controls, to list-specific slopes, and then to bin-by-list fixed effects.
+- Added a cubic predicted-evasion control, a cubic predicted-evasion polynomial interacted with the list, and quintile-by-list fixed effects.
+- Renamed the list-specific polynomial marker row from tax-office-year language to `Quadratic polynomial predicted evasion x List`, matching the detailed-tax-office-by-selection-year list definition used in the table.
+- Updated the comparison-table note in `Code Analyse data/Inspector's Effort report.tex` to describe the reordered column groups and the new singleton handling in Columns 14--16.
+- Regenerated `Output/table4_col1_predicted_evasion_control_comparison.tex`; confirmed the table has 16 populated columns, the new cubic and quintile-by-list marker rows, and populated `N`, `R2`, and mean outcome rows.
+- Validation: re-ran `stata-mp /e do "Code Analyse data/2 Table 4 column 1 predicted evasion controls.do"` successfully; the Stata log reaches `end of do-file`.
+
+---
+
+Date: 2026-05-11
+Task: Switch Table 4 full-audit FE comparison from bureau-detailed to broad bureau-year.
+
+## Files edited
+- `Code Analyse data/2 Table 4 replication and yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Updated the full-audit Table 4 FE comparison so the second specification uses broad `bureau x selectionyear` fixed effects rather than `bureau_detailed x selectionyear`.
+- Kept the original-FE comparison columns, outcomes, sample restrictions, controls, and output filename unchanged.
+- Revised the Section 2.1 caption and notes in the report to describe broad bureau-year fixed effects and explicitly say the comparison does not use `bureau_detailed`.
+
+## Output files affected
+- Regenerated `Output/table4_fullaudit_fe_comparison.tex`.
+- Existing Table 4 fragments were regenerated by the Table 4 workflow.
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 4 replication and yhatrf control.do"` successfully; the Stata log reaches `end of do-file`.
+- Confirmed `Output/table4_fullaudit_fe_comparison.tex` labels the comparison columns as `Bureau FE` / `Bureau x Year` and preserves the full-audit sample sizes `944`, `508`, and `457`.
+
+---
+
+Date: 2026-05-11
+Task: Extend Table 4 FE comparison to all full-audit columns.
+
+## Files edited
+- `Code Analyse data/2 Table 4 replication and yhatrf control.do`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Replaced the earlier Table 4 Column 1-only FE comparison with a six-column full-audit comparison covering Table 4 columns 1, 4, and 7: `P(Execution)`, `P(Detection | Execution)`, and `log(Evasion) | Detection`.
+- For each outcome, the table now compares the original `inspectorclusteryear` fixed effects with `bureau_detailed x selectionyear` fixed effects, constructed as `egen table4_fe_bureau_detailed_year = group(bureau_detailed selectionyear), missing`.
+- Updated Section 2.1 of `Inspector's Effort report.tex` to import the new full-audit comparison fragment and revise the caption and notes.
+
+## Output files affected
+- New output fragment: `Output/table4_fullaudit_fe_comparison.tex`.
+- Existing Table 4 fragments were regenerated by the Table 4 workflow.
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 4 replication and yhatrf control.do"` successfully; the Stata log reaches `end of do-file`.
+- Confirmed the new comparison table has six columns, with outcome-specific sample sizes matching the full-audit Table 4 columns: `N = 944`, `508`, and `457`.
+- Confirmed `Inspector's Effort report.tex` imports `Output/table4_fullaudit_fe_comparison.tex` in Section 2.1.
+
+---
+
+Date: 2026-05-11
+Task: Add Table 4 Column 1 FE comparison to the inspector-effort report.
+
+## Files edited
+- `Code Analyse data/Inspector's Effort report.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added Section 2.1, `Testing bureau and bureau detailed FE`, under `Main regression estimates adding predicted evasion controls`.
+- Inserted the standalone Table 4 Column 1 full-audit FE comparison fragment, with notes clarifying that the original `inspectorclusteryear` FE corresponds to the detailed-bureau-by-selection-year grouping for full audits and that the comparison column uses broad `bureau x selectionyear`.
+
+## Output files affected
+- The report now imports `Output/table4_col1_fullaudit_fe_comparison.tex`.
+
+## Validation performed
+- Confirmed the new report subsection, table label, and `\input{\OutPath table4_col1_fullaudit_fe_comparison.tex}` are present.
+- Confirmed `Output/table4_col1_fullaudit_fe_comparison.tex` exists.
+- Did not recompile the full report in this pass.
+
+---
+
+Date: 2026-05-11
+Task: Add Table 4 column 1 fixed-effect comparison for full audits.
+
+## Files edited
+- `Code Analyse data/2 Table 4 replication and yhatrf control.do`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a standalone Table 4 column 1 comparison that re-estimates the full-audit `P(Execution)` specification with the original `inspectorclusteryear` fixed effects and with broad `bureau x selectionyear` fixed effects.
+- Defined the new comparison fixed effect as `egen table4_fe_bureau_year = group(bureau selectionyear), missing`, explicitly using broad `bureau` rather than `bureau_detailed` or `controlbureauannee`.
+- Kept the RHS, sample, and robust VCE aligned with the original column 1 specification: `y2` on `algorithm overlap random safeties`, restricted to `x2 == 1` in the selected non-safety sample.
+
+## Output files affected
+- New output fragment: `Output/table4_col1_fullaudit_fe_comparison.tex`.
+- Existing Table 4 fragments were regenerated by the Table 4 workflow.
+
+## Validation performed
+- Ran `stata-mp /e do "Code Analyse data/2 Table 4 replication and yhatrf control.do"`. The shell wrapper timed out after the Stata run, but the Stata log reaches `end of do-file`.
+- Confirmed `Output/table4_col1_fullaudit_fe_comparison.tex` was written with exactly two model columns, matching `N = 944` and mean outcome `0.53` in both columns.
+- Confirmed representative original outputs, including `Output/table4_main_outcomes_replicated.tex` and `Output/table4_main_outcomes_replicated_with_lee.tex`, were regenerated.
+
+---
+
 Date: 2026-05-05
 Task: Add Anne-style 15-bin, 20-bin, and top-split predicted-evasion robustness tables.
 
@@ -1007,3 +1179,267 @@ Update: 2026-05-11 (inspector-effort report bin-table cleanup)
 - Left all generated `Output/` fragments and PDFs in place for traceability; no Stata generation logic or output files were deleted.
 - Validation: confirmed with targeted `rg` searches that the report no longer imports or labels Table 4/5/6/8 `20bins`, `40bins`, or `50bins` variants, while retained robustness imports remain present.
 - Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully from the repository root; it produced a 127-page PDF. Remaining warnings were nonfatal and consistent with prior report builds, including duplicate labels, overfull boxes, PDF inclusion version warnings, and MiKTeX local log/update notices.
+
+Update: 2026-05-12 (Table 4 Column 1 consolidated table list-level controls)
+- Revised `Code Analyse data/2 Table 4 column 1 predicted evasion controls.do` to drop the predicted-evasion control specifications based on detailed tax office only, selection year only, and their additive combination.
+- Kept the true list-level specifications based on detailed tax office by selection year, including list-specific predicted-evasion slopes, list-specific rank slopes, decile-by-list fixed effects, and top-split-decile-by-list fixed effects.
+- Regenerated `Output/table4_col1_predicted_evasion_control_comparison.tex`; the table now has 13 columns rather than 16 and no longer contains the rows for `Deciles x Bureau detailed only`, `Deciles x Selection year only`, or `Deciles x Bureau detailed and selection year`.
+- Updated the corresponding note in `Code Analyse data/Inspector's Effort report.tex` so the column descriptions match the revised 13-column table and state that the dropped additive bureau/year specifications are omitted.
+- Validation: ran `stata-mp /e do "Code Analyse data\2 Table 4 column 1 predicted evasion controls.do"` successfully through `end of do-file`.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 131-page PDF. Remaining warnings were nonfatal and consistent with prior report builds, including duplicate labels, overfull boxes, PDF inclusion version warnings, and MiKTeX local log/update notices.
+
+Update: 2026-05-12 (Table 4 Column 1 optimization-weighted yhatrf version)
+- Revised `Code Analyse data/2 Table 4 column 1 predicted evasion controls.do` to run the consolidated Column 1 specifications twice: once with the current `fullaudits_predicted.dta` / `deskaudits_predicted.dta` inputs, and once with the optimization-exercise weighted RF inputs `audits_predicted_2.dta` / `audits_predicted_1.dta`.
+- Added optimization-weighted outputs `Output/table4_col1_predicted_evasion_control_comparison_optimization_weighted.tex` and `Output/table4_col1_predicted_evasion_bin_support_optimization_weighted.tex`; the original output filenames are unchanged.
+- Added the optimization-weighted consolidated estimate table to `Code Analyse data/Inspector's Effort report.tex` immediately after the current Table 4 Column 1 consolidated comparison.
+- Validation: ran `stata-mp /e do "Code Analyse data\2 Table 4 column 1 predicted evasion controls.do"` successfully through `end of do-file`; confirmed the new optimization-weighted TeX fragments were written.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` twice successfully; it produced a 131-page PDF. Remaining warnings were nonfatal and consistent with prior report builds, including duplicate labels, overfull boxes, PDF inclusion version warnings, and MiKTeX local log/update notices.
+
+Update: 2026-05-12 (optimization-weighted Table 4 Column 1 table note)
+- Expanded the table note for the optimization-weighted consolidated Table 4 Column 1 comparison in `Code Analyse data/Inspector's Effort report.tex`.
+- The note now stands alone, matching the structure of the current-yhatrf comparison note while clarifying that Column 1 keeps the original no-yhatrf specification and Columns 2--16 replace only the predicted-evasion measure with the optimization-weighted RF prediction.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 131-page PDF. Remaining warnings were nonfatal and consistent with prior report builds, including duplicate labels, overfull boxes, PDF inclusion version warnings, and MiKTeX local log/update notices.
+
+Update: 2026-05-12 (Table 5 Panel A1 Column 1 consolidated predicted-evasion controls)
+- Added `Code Analyse data/2 Table 5 column 1 predicted evasion controls.do`, a standalone Stata workflow for Table 5 Panel A1 Column 1 (`y16`, Number of Agents).
+- The new workflow re-estimates the original selected non-safety full-audit Column 1 specification across 16 predicted-evasion control variants, using the current RF prediction from `fullaudits_predicted.dta` and the optimization-weighted RF prediction from `audits_predicted_2.dta`.
+- Added four output fragments: `Output/table5_col1_ninspectors_predicted_evasion_control_comparison.tex`, `Output/table5_col1_ninspectors_predicted_evasion_control_comparison_optimization_weighted.tex`, `Output/table5_col1_ninspectors_predicted_evasion_bin_support.tex`, and `Output/table5_col1_ninspectors_predicted_evasion_bin_support_optimization_weighted.tex`.
+- Added the two consolidated estimate tables to `Code Analyse data/Inspector's Effort report.tex` at the start of the existing Table 5 predicted-evasion controls section, with notes clarifying that the weighted version changes the RF prediction source and does not use regression weights.
+- Validation: ran `stata-mp /e do "Code Analyse data\2 Table 5 column 1 predicted evasion controls.do"` successfully through `end of do-file`; confirmed all four TeX fragments were written and the two estimate tables contain populated coefficient, `N`, `R2`, and mean-outcome rows.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully after rerunning with filesystem escalation for MiKTeX user-log access; it produced a 135-page PDF. Remaining warnings were nonfatal and consistent with prior report builds, including multiply-defined labels, overfull boxes, PDF inclusion version warnings, and the MiKTeX update notice.
+- Open note: the highest-flexibility stratum-specific slope specifications report missing robust standard errors for some displayed coefficients, but Stata completed the models and populated the requested fit rows.
+
+Update: 2026-05-12 (optimization-weighted Figure 4 panels)
+- Added `Code Analyse data/6 Figure 4 weighted yhatrf panels.do`, a standalone Stata generator for the two Figure 4-style full-audit panels using the optimization-weighted RF prediction from `audits_predicted_2.dta` as `yhatrf`.
+- Exported `Output/figure4_panel_a_weighted_yhatrf_fullaudits.pdf` and `Output/figure4_panel_b_weighted_yhatrf_fullaudits.pdf`. Panel A reproduces the predicted-evasion, detected-evasion, and execution-rate display; Panel B reproduces the algorithm-versus-inspector distribution and execution-rate display.
+- Added both PDFs as separate figure blocks in Section 2 of `Code Analyse data/Inspector's Effort report.tex`, with notes clarifying that the horizontal axis and predicted-evasion distributions use the weighted `yhatrf` while detected evasion remains realized detected evasion among executed audits.
+- Validation: ran `stata-mp /e do "Code Analyse data\6 Figure 4 weighted yhatrf panels.do"` successfully through `end of do-file` and confirmed both PDFs were written to `Output/`.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 134-page PDF. Remaining warnings were nonfatal and consistent with prior report builds, including duplicate labels, overfull boxes, PDF inclusion version warnings, and MiKTeX update notices.
+
+Update: 2026-05-12 (Figure 4 weighted panels rendering fix)
+- Diagnosed why the first Stata-generated Figure 4 PDFs showed only execution-rate lines: the binned distribution and confidence-interval variables were populated, but Stata PDF exports using filled `area`/`rarea` layers with transparency did not render the filled polygons reliably after PDF export/inclusion.
+- Revised `Code Analyse data/6 Figure 4 weighted yhatrf panels.do` to match the original Figure 4 style more closely: the distributions are shaded `area` layers and the confidence intervals are shaded `rarea` bands, using Stata `color()` plus `fintensity()` fill settings that render reliably in the exported PDFs.
+- Regenerated `Output/figure4_panel_a_weighted_yhatrf_fullaudits.pdf` and `Output/figure4_panel_b_weighted_yhatrf_fullaudits.pdf`.
+- Validation: ran `stata-mp /e do "Code Analyse data\6 Figure 4 weighted yhatrf panels.do"` successfully through `end of do-file`; rendered PDF previews confirmed the shaded distributions and shaded confidence intervals are visible.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 134-page PDF with the updated figures. Remaining warnings were nonfatal and consistent with prior report builds.
+
+Update: 2026-05-12 (Figure 4 weighted panels manuscript-style notes)
+- Revised the two Figure 4 weighted-panel notes in `Code Analyse data/Inspector's Effort report.tex` to follow the manuscript Figure 4 wording while describing the prediction as optimization-weighted predicted evasion in plain research terms.
+- Removed dataset and variable names from the figure notes and aligned the color references with the plotted Stata/R-style layers.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 134-page PDF. Remaining warnings were nonfatal and consistent with prior report builds.
+
+Update: 2026-05-12 (Table 5 Column 1 list wording cleanup)
+- Revised `Code Analyse data/2 Table 5 column 1 predicted evasion controls.do` so the consolidated Table 5 Column 1 output labels use "List" rather than "FE stratum" for list-specific predicted-evasion controls.
+- Refreshed the four `Output/table5_col1_ninspectors_predicted_evasion_*` TeX fragments; the estimate tables now show rows such as `Linear predicted evasion x List`, and the bin-support tables use `Lists` as the count header.
+- Updated the two new consolidated Table 5 Column 1 notes in `Code Analyse data/Inspector's Effort report.tex` to describe lists as the inspector-cluster by year groups and to use list/bin-by-list wording.
+- Validation: reran `stata-mp /e do "Code Analyse data\2 Table 5 column 1 predicted evasion controls.do"` successfully through `end of do-file`.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully with filesystem escalation for MiKTeX user-log access; it produced a 134-page PDF. Remaining warnings were nonfatal and consistent with prior report builds.
+
+Update: 2026-05-12 (Figure 4 weighted panels lighter distribution fills)
+- Revised `Code Analyse data/6 Figure 4 weighted yhatrf panels.do` so the Figure 4 weighted-panel distribution areas and confidence bands render with lighter visual weight.
+- Removed outline strokes from the filled distribution and confidence-band layers using `lcolor(none)`, keeping the execution-rate lines as the main visual guide.
+- Reduced the Panel B distribution fill intensities from the prior stronger maroon/orange fills to lighter `fintensity()` values.
+- Regenerated `Output/figure4_panel_a_weighted_yhatrf_fullaudits.pdf` and `Output/figure4_panel_b_weighted_yhatrf_fullaudits.pdf`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Figure 4 weighted yhatrf panels.do"` successfully through `end of do-file` after closing the previously open PDF; both canonical PDFs were refreshed in `Output/`.
+
+Update: 2026-05-12 (Figure 4 weighted panels visible light fills)
+- Revised `Code Analyse data/6 Figure 4 weighted yhatrf panels.do` again after the no-outline version made the filled distribution and confidence-band areas disappear in the exported PDFs.
+- Restored very thin outline strokes using `lwidth(vvthin)` and raised the `fintensity()` values enough for the shaded areas to remain visible while still lighter than the original bold fills.
+- Regenerated `Output/figure4_panel_a_weighted_yhatrf_fullaudits.pdf` and `Output/figure4_panel_b_weighted_yhatrf_fullaudits.pdf`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Figure 4 weighted yhatrf panels.do"` successfully through `end of do-file`; the refreshed PDFs returned to the larger filled-layer file sizes, indicating the shaded distribution and CI layers are included.
+
+Update: 2026-05-12 (Figure 4 weighted panels cropped above log evasion 15)
+- Revised `Code Analyse data/6 Figure 4 weighted yhatrf panels.do` to export an additional cropped version of each weighted-yhatrf Figure 4 panel using only plotted bins with `mid_bin > 15`.
+- Added `Output/figure4_panel_a_weighted_yhatrf_fullaudits_cropped_gt15.pdf` and `Output/figure4_panel_b_weighted_yhatrf_fullaudits_cropped_gt15.pdf`.
+- Kept the original full-range output filenames unchanged; added a visible warning around the pre-existing Panel B full-range export so a locked/open PDF does not prevent the new cropped Panel B export.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Figure 4 weighted yhatrf panels.do"` successfully through `end of do-file`; both cropped PDFs were written. The existing Panel B full-range PDF was not refreshed during this run because Stata could not replace the locked/open file.
+
+Update: 2026-05-13 (Table 4 Column 1 additional list-specific predicted-evasion controls)
+- Revised `Code Analyse data/2 Table 4 column 1 predicted evasion controls.do` to add two consolidated Table 4 Column 1 specifications for both current RF and optimization-weighted RF predictions.
+- Added a squared within-list predicted-evasion rank and a new list-specific quadratic rank specification, using within-list rank and rank squared interacted with the full-audit list.
+- Added a non-LTU list-specific quadratic predicted-evasion specification, defined as `inlist(groupbureau, 2, 3, 4)` so it excludes only LTU and keeps Medium, Liberal, and SME offices.
+- Expanded the consolidated comparison exports from 16 to 18 columns and added table rows for `Quadratic rank polynomial x List` and `Quadratic predicted evasion x List, non-LTU`.
+- Regenerated `Output/table4_col1_predicted_evasion_control_comparison.tex` and `Output/table4_col1_predicted_evasion_control_comparison_optimization_weighted.tex`; the unchanged bin-support section of the do-file also rewrote the existing bin-support fragments without adding new bin definitions.
+- Updated the two corresponding notes in `Code Analyse data/Inspector's Effort report.tex` to describe Columns 17 and 18 and the non-LTU definition.
+- Validation: reran `stata-mp /e do "Code Analyse data\2 Table 4 column 1 predicted evasion controls.do"` successfully through `end of do-file`.
+- Validation: confirmed both consolidated output tables use 18-column headers, show the two new control rows, and report `N = 548` for the new non-LTU Column 18 versus `N = 944` for the full-sample list-quadratic Column 17.
+
+Update: 2026-05-13 (weighted vs unweighted yhatrf scatterplots)
+- Added `Code Analyse data/6 Compare weighted and unweighted yhatrf scatterplots.do`, a standalone Stata workflow comparing current and optimization-weighted RF predicted evasion scores.
+- The do-file merges current and weighted predictions by `firmid selectionyear x2 inspectorclusteryear sequencing`, checks the key with `isid`, asserts all merge results are matched, and exports separate full-audit and desk-audit scatterplots with OLS `lfit` lines.
+- Added `Output/yhatrf_weighted_vs_unweighted_fullaudits.pdf` and `Output/yhatrf_weighted_vs_unweighted_deskaudits.pdf`; each graph includes the fitted formula in the lower-left plotting area.
+- Validation: ran `stata-mp /e do "Code Analyse data\6 Compare weighted and unweighted yhatrf scatterplots.do"` successfully through `end of do-file`. Merge diagnostics were clean, with 944 full-audit matches and 2,731 desk-audit matches and no unmatched rows.
+- Validation: extracted text from both PDFs with `pdftotext` and confirmed the formulas render in the exported files: `Weighted = 1.15 + 1.06*Unweighted` for full audits and `Weighted = -0.65 + 1.21*Unweighted` for desk audits.
+
+Update: 2026-05-13 (executed-only weighted vs unweighted yhatrf scatterplots)
+- Revised `Code Analyse data/6 Compare weighted and unweighted yhatrf scatterplots.do` to make the selected non-safety sample restrictions explicit before plotting: `selection == 1`, drop `safeties == 1`, keep the expected full-audit or desk-audit control type, and drop missing current or weighted predictions.
+- Kept the original selected-sample output filenames and added executed-only companion figures: `Output/yhatrf_weighted_vs_unweighted_fullaudits_executed.pdf` and `Output/yhatrf_weighted_vs_unweighted_deskaudits_executed.pdf`.
+- Added graph subtitles distinguishing `Selected non-safety sample` from `Executed cases only`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Compare weighted and unweighted yhatrf scatterplots.do"` successfully through `end of do-file`. The selected samples remained 944 full-audit cases and 2,731 desk-audit cases; the executed-only samples were 508 full-audit cases and 1,011 desk-audit cases.
+- Validation: extracted text from all four PDFs with `pdftotext` and confirmed the formula text renders. The executed-only formulas are `Weighted = -9.40 + 1.59*Unweighted` for full audits and `Weighted = -5.20 + 1.43*Unweighted` for desk audits.
+
+Update: 2026-05-13 (weighted-vs-unweighted scatterplot subtitle cleanup and negative check)
+- Revised `Code Analyse data/6 Compare weighted and unweighted yhatrf scatterplots.do` so the whole selected-sample figures use the subtitle `Selected sample` rather than `Selected non-safety sample`.
+- Regenerated the four weighted-vs-unweighted scatterplot PDFs in `Output/`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Compare weighted and unweighted yhatrf scatterplots.do"` successfully through `end of do-file`; the log now reports `Selected sample` for the whole selected-sample runs.
+- Validation: extracted text from the selected-sample PDFs with `pdftotext` and confirmed the updated subtitle is rendered.
+- Validation: checked both current and top-quartile-weighted `yhatrf` values in the merged graph samples. There are no negative values in either prediction: full selected minimums are 3.352910 and 0.000000, full executed minimums are 3.352910 and 0.000000, desk selected minimums are 1.238989 and 0.000000, and desk executed minimums are 1.238989 and 0.000000.
+
+Update: 2026-05-13 (weighted-vs-unweighted scatterplot selected-cases wording and zero axes)
+- Revised `Code Analyse data/6 Compare weighted and unweighted yhatrf scatterplots.do` so the whole selected-sample figures use the subtitle `Selected cases`.
+- Cropped all weighted-vs-unweighted scatterplots so both axes start at zero. Because the executed-only OLS fitted line implied negative fitted values near the left edge, the do-file now computes the same OLS fitted line after the regression and omits only fitted-line segments below zero; the coefficient formula remains based on the full regression sample.
+- Regenerated `Output/yhatrf_weighted_vs_unweighted_fullaudits.pdf`, `Output/yhatrf_weighted_vs_unweighted_fullaudits_executed.pdf`, `Output/yhatrf_weighted_vs_unweighted_deskaudits.pdf`, and `Output/yhatrf_weighted_vs_unweighted_deskaudits_executed.pdf`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Compare weighted and unweighted yhatrf scatterplots.do"` successfully through `end of do-file`.
+- Validation: extracted text from all four PDFs with `pdftotext`; selected-case figures render `Selected cases`, and executed-only figures no longer display negative y-axis ticks.
+
+Update: 2026-05-13 (weighted-vs-unweighted scatterplot equivalence line and matched axes)
+- Revised `Code Analyse data/6 Compare weighted and unweighted yhatrf scatterplots.do` to add a light gray dotted `y = x` equivalence line starting at zero to each weighted-vs-unweighted scatterplot.
+- Updated the graph code so each figure computes a common maximum across current and top-quartile-weighted predictions, rounds it up to the next 5-unit tick, and applies the same 0-based range and tick marks to both axes.
+- Added a square plotting aspect and updated the legend to include `Equivalence` alongside `Cases` and `OLS fit`.
+- Regenerated the four weighted-vs-unweighted PDFs in `Output/`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Compare weighted and unweighted yhatrf scatterplots.do"` successfully through `end of do-file`.
+- Validation: extracted text from all four PDFs with `pdftotext` and confirmed the matched 0, 5, 10, 15, 20, 25 tick sequence and the `Equivalence` legend entry render in each file.
+
+Update: 2026-05-13 (add weighted-vs-unweighted prediction scatterplots to report)
+- Added a four-panel figure to `Code Analyse data/Inspector's Effort report.tex` importing the full-audit and desk-audit weighted-vs-unweighted prediction scatterplots for selected cases and executed cases.
+- Added paper-facing figure notes describing the baseline and top-quartile-weighted random-forest predictions, the selected and executed samples, the 45-degree equivalence line, and the unweighted linear fits without using dataset variable names.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` twice successfully; the report compiled to a 138-page PDF and included all four weighted-vs-unweighted scatterplot PDFs.
+- Remaining LaTeX messages were nonfatal and consistent with the existing report, including duplicate labels, overfull boxes, PDF inclusion version warnings, and MiKTeX update notices.
+
+Update: 2026-05-13 (weighted-vs-unweighted scatterplot do-file refactor)
+- Refactored `Code Analyse data/6 Compare weighted and unweighted yhatrf scatterplots.do` so it first appends the current full- and desk-audit prediction files, appends the weighted full- and desk-audit prediction files, merges the two prediction sources once, and only then starts the plotting loops.
+- Simplified the control flow by removing repeated per-audit-type dataset loading and variable-confirmation blocks, while preserving key checks through `isid` and `assert _merge == 3`.
+- Added clearer numbered comments for loading current predictions, loading weighted predictions, merging, applying the graph sample, looping over audit type and sample, estimating the comparison line, and exporting graphs.
+- Regenerated the four weighted-vs-unweighted PDFs in `Output/`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Compare weighted and unweighted yhatrf scatterplots.do"` successfully through `end of do-file`; sample counts and regression coefficients match the pre-refactor outputs.
+- Validation: extracted text from `Output/yhatrf_weighted_vs_unweighted_fullaudits.pdf` with `pdftotext` and confirmed the selected-case subtitle, matched ticks, and `Equivalence` legend entry remain rendered.
+
+Update: 2026-05-13 (revision of optimization gains table)
+- Added `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R`, a standalone R script that recreates the optimization-gains table with unweighted random forest predicted evasion and appends aggregate realized and predicted revenue columns excluding the five largest firms within each audit type.
+- Connected the new revision script to `Code Analyse data/Replication R/00_Main.R` with an absolute source path, since `00_Main.R` changes the working directory to the Dropbox replication package before sourcing the numbered R scripts.
+- Added Section 3, `Revision of optimization gains`, to `Code Analyse data/Inspector's Effort report.tex`, including the new table, near-original table notes updated for the unweighted prediction and two aggregate columns, and a short bullet note explaining the table construction, aggregate calculations, revenue-gain formula, and overlap formula.
+- Generated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex`. The new table has six columns and reports Full Audits and Desk Audits rows.
+- Validation: ran `Rscript --vanilla "C:/Users/wb648862/Documents/Projects/Senegal Tax Audits/Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R"` from the Dropbox replication package working directory. The script completed successfully and wrote the new TeX fragment.
+- Validation: confirmed `randomForest` loads from the replication package local R library without activating `renv`, confirmed the new script parses, and inspected the generated TeX fragment for the expected two rows and six columns.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 136-page PDF. Remaining warnings were nonfatal and consistent with the existing report build, including multiply-defined labels, overfull boxes, PDF inclusion version warnings, and a MiKTeX update notice.
+
+Update: 2026-05-13 (optimization gains top-five columns corrected)
+- Revised `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` so Columns 5 and 6 now replicate the current revenue-gain and overlap columns after dropping the five largest predicted-revenue firms, rather than reporting aggregate revenue totals.
+- Regenerated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex`. The corrected Column 5 reports top-five-excluded revenue gains and Column 6 reports top-five-excluded optimized-program overlap.
+- Updated the Section 3 notes and construction bullets in `Code Analyse data/Inspector's Effort report.tex` to describe Columns 5 and 6 as top-five-excluded versions of Columns 3 and 4.
+- Validation: reran the standalone R revision script successfully and inspected the generated TeX fragment. The corrected table reports Column 5 as `+ 24.07%` for full audits and `+ 41.42%` for desk audits, and Column 6 as `65%` for full audits and `62%` for desk audits.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 136-page PDF with only the existing nonfatal report warnings.
+
+Update: 2026-05-13 (optimization gains current-table replication)
+- Revised `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` so Columns 1--4 are taken from the current saved Table 9 fragment, ensuring they exactly reproduce the current table, while Columns 5--6 remain newly computed from the unweighted top-five-excluded exercise.
+- Regenerated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex`; Columns 1--4 now match the snapshot/current table exactly: Full Audits `21.24`, `21.14`, `+ 18.09%`, `65%`; Desk Audits `19.00`, `18.73`, `+ 31.01%`, `61%`.
+- Updated the Section 3 caption and notes in `Code Analyse data/Inspector's Effort report.tex` to state that Columns 1--4 reproduce the current table and Columns 5--6 use the unweighted top-five-excluded exercise.
+- Validation: reran the standalone R revision script successfully and inspected the generated TeX fragment.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 136-page PDF with only existing nonfatal report warnings.
+
+Update: 2026-05-13 (optimization gains recomputation diagnosis)
+- Diagnosed the remaining discrepancy in the recomputed Desk Audits revenue-gain column: the first random forest in the original optimization script uses the predictor order `activity group`, `tax office`, then `audit algorithm`, while the revision script had reused the revenue-model order. With a fixed seed, `randomForest` is still sensitive to this order because candidate variables are sampled by position.
+- Revised `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` to use separate predictor lists for the detection model and the revenue model, matching the original `07_Optimization_Exercise.R`, and removed the saved-table fallback for Columns 1--4.
+- Regenerated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex` from the R workflow. Columns 1--4 now reproduce the current Table 9 values by recomputation: Full Audits `21.24`, `21.14`, `+ 18.09%`, `65%`; Desk Audits `19.00`, `18.73`, `+ 31.01%`, `61%`.
+- The final top-five-excluded unweighted columns report Column 5 as `+ 24.07%` for full audits and `+ 41.56%` for desk audits, and Column 6 as `65%` for full audits and `62%` for desk audits.
+- Validation: reran the standalone R revision script from the Dropbox replication package working directory successfully, inspected the six-column TeX fragment, and reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully with only existing nonfatal report warnings.
+
+Update: 2026-05-13 (optimization gains top realized outlier exclusion)
+- Revised `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` so Columns 5--6 train the unweighted random forest on the full audited sample, then exclude the five actually audited records with the largest realized revenue within each audit type before re-running the unweighted ranking and optimized selection.
+- The top-five exclusion is now applied before optimization for Columns 5--6 only; optimized counts are recomputed after the exclusion within each tax-office-by-year list so the optimized program matches the remaining realized audit implementation.
+- Regenerated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex`. Columns 1--4 remain unchanged and match current Table 9; the new top-realized-outlier columns report Column 5 as `+ 23.10%` for full audits and `+ 41.04%` for desk audits, and Column 6 as `65%` for full audits and `62%` for desk audits.
+- Updated `Code Analyse data/Inspector's Effort report.tex` table notes and construction bullets to describe the unweighted full-sample training, the pre-ranking exclusion of the five largest realized-revenue audited records, the re-ranking step, and the Column 5 and Column 6 formulas.
+- Validation: reran the standalone R revision script from the Dropbox replication package working directory successfully. Warnings were limited to packages built under R 4.5.2 while running R 4.5.1.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 138-page PDF. Remaining warnings were nonfatal and consistent with the existing report build, including duplicate labels, overfull boxes, PDF inclusion version warnings, and a MiKTeX update/log notice.
+
+Update: 2026-05-13 (optimization gains construction-note split)
+- Revised the construction note under Section 3 in `Code Analyse data/Inspector's Effort report.tex` to separate the table-building steps into `Weighted method, Columns 1--4` and `Unweighted method excluding top realized outliers, Columns 5--6`.
+- The weighted bullets now spell out the selected non-safety sample, audited-case training, high-revenue weighting, prediction over all selected program cases, 2018--2019 restriction, within-list ranking, and Columns 1--4 formulas.
+- The unweighted bullets now spell out full-sample unweighted training, prediction over all selected program cases, 2018--2019 restriction, top-five realized-revenue audited-case exclusion, recomputation of remaining realized audit counts, within-list re-ranking, and Columns 5--6 formulas.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 139-page PDF with only existing nonfatal report warnings.
+
+Update: 2026-05-13 (optimization gains direct unweighted prediction)
+- Revised `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` so Columns 5--6 use the direct unweighted predicted-evasion construction used in the prediction plots: a single unweighted revenue random forest trained on actually audited cases with observed realized revenue, with no detection-model gate and no replacement of predicted values with zero.
+- Preserved the original two-stage weighted optimization logic for Columns 1--4, including the detection gate and zero replacement needed to reproduce the current Table 9 values.
+- Regenerated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex`. Columns 1--4 remain unchanged; the direct-unweighted, top-realized-outlier columns now report Column 5 as `+ 8.39%` for full audits and `+ 34.49%` for desk audits, and Column 6 as `78%` for full audits and `72%` for desk audits.
+- Updated the Section 3 table note and construction bullets in `Code Analyse data/Inspector's Effort report.tex` to state that the unweighted branch does not apply the detection-model gate and does not replace predicted revenue with zero.
+- Validation: reran the standalone R revision script from the Dropbox replication package working directory successfully; the log confirms the unweighted branch trains only the unweighted revenue random forest. Warnings were limited to packages built under R 4.5.2 while running R 4.5.1.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 139-page PDF with only existing nonfatal report warnings.
+
+Update: 2026-05-13 (optimization gains header and formula wording)
+- Revised the generated table headers in `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` so Columns 5--6 explicitly mention unweighted predicted revenue and the top-five realized-firm exclusion.
+- Regenerated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex`; values were unchanged from the direct-unweighted top-realized-outlier version.
+- Revised the Section 3 construction bullets in `Code Analyse data/Inspector's Effort report.tex` so the Column 3--6 formulas use display math with `$$...$$` and `\frac{...}{...}` for the divisions.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; it produced a 139-page PDF with only existing nonfatal report warnings.
+
+Update: 2026-05-14 (full-audit list-rank RF prediction plan and script)
+- Added `docs/plans/2026-05-14-001-feat-full-audit-rank-rf-plan.md`, documenting the first implementation unit for a full-audit-only unweighted random forest that predicts realized evasion rank within `bureau_detailed` by `selectionyear`.
+- Added `Code Analyse data/Replication R/08_Full_Audit_Rank_RF_Unweighted.R`, a standalone R script that mirrors the direct unweighted `yhatrf` process: selected non-safety full audits, training on executed full audits with observed `y4`, the same RF predictors, no weights, no detection gate, and prediction over all selected non-safety full-audit cases.
+- The realized target is `rank_y4_bureauyear = rank(-y4, ties.method = "min")` within each full-audit list, so the largest realized evasion in each `bureau_detailed` by `selectionyear` list receives rank 1, including tied top cases.
+- Generated `Working Data/fullaudits_predicted_rank_bureauyear.dta` in the Dropbox replication package working-data folder. The output includes `rank_y4_bureauyear`, `predicted_rank_y4_bureauyear`, `yhatrf_rank_score`, and a rank-specific compatibility variable `yhatrf = -predicted_rank_y4_bureauyear`.
+- Validation: ran `Rscript --vanilla "Code Analyse data/Replication R/08_Full_Audit_Rank_RF_Unweighted.R"` from the Dropbox replication package working directory using the installed R 4.5.1 executable. The script trained on 508 executed full-audit observations and wrote predictions for 944 selected non-safety full-audit rows.
+- Validation: inspected the generated `.dta` and confirmed all expected variables are present, `predicted_rank_y4_bureauyear` is nonmissing for all 944 rows, `rank_y4_bureauyear` is nonmissing for the 508 training rows, and every bureau-year list assigns rank 1 to the maximum realized `y4`.
+- Open issue: the consolidated Column 1 table scripts have not yet been wired to the rank-prediction source; that remains the next implementation unit.
+
+Update: 2026-05-14 (Figure 4 predicted-rank panels and report section)
+- Added `Code Analyse data/6 Figure 4 predicted rank panels.do`, a Figure 4-style Stata do-file that reads `Working Data/fullaudits_predicted_rank_bureauyear.dta`, keeps selected non-safety full audits, and uses `predicted_rank_y4_bureauyear` on the x-axis instead of predicted evasion amount.
+- The new do-file exports `Output/figure4_panel_a_predicted_rank_fullaudits.pdf` and `Output/figure4_panel_b_predicted_rank_fullaudits.pdf`. Panel A compares predicted-rank distributions for executed and non-executed cases, adds the realized-rank distribution among executed full audits, and overlays execution rates. Panel B compares algorithm-selected and inspector-selected distributions and execution-rate lines by predicted rank.
+- Added Section 4, `Predicting rank`, to `Code Analyse data/Inspector's Effort report.tex`, including both new rank figures and notes explaining the full-audit list-level rank target.
+- Updated `tasks/2026-05-14-001-feat-full-audit-rank-rf-plan.md` to mark the Figure 4-style rank diagnostics as a completed implementation unit.
+- Validation: ran `stata-mp /e do "Code Analyse data\6 Figure 4 predicted rank panels.do"` successfully and confirmed both rank PDFs were regenerated in `Output/`.
+- Validation: extracted text from the new PDFs with `pdftotext` and confirmed the x-axis label `Predicted rank (1 = highest evasion)` and the expected legend entries are rendered.
+- Validation: ran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` twice successfully; the compiled report is 140 pages and includes the new `Predicting rank` section. Remaining warnings are nonfatal and consistent with the existing report build, including duplicate labels, PDF inclusion version warnings, overfull boxes, and MiKTeX update notices.
+
+Update: 2026-05-14 (predicting-rank construction bullets)
+- Added a `Steps used to predict rank` bullet list to Section 4, `Predicting rank`, in `Code Analyse data/Inspector's Effort report.tex`.
+- The bullets document the selected non-safety full-audit sample, realized rank construction within detailed tax office by selection year, use of `-y4` so the largest detected evasion receives rank 1, the unweighted random-forest training sample and predictors, prediction over all selected non-safety full-audit cases, and use of direct predicted rank in the Figure 4-style diagnostics.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; the compiled report is 141 pages. Remaining warnings are nonfatal and consistent with the existing report build.
+
+Update: 2026-05-14 (organize task Markdown files)
+- Created a root-level `tasks/` folder to keep planning and task documents together.
+- Moved `Code Analyse data/Anne_Reflections_To_Dos_2026-04-22.md` to `tasks/Anne_Reflections_To_Dos_2026-04-22.md`.
+- Moved `docs/plans/2026-05-14-001-feat-full-audit-rank-rf-plan.md` to `tasks/2026-05-14-001-feat-full-audit-rank-rf-plan.md`.
+- Left `Code Analyse data/Inspector_Effort_Discrepancy_Discussion.md` in place because it is analysis documentation rather than a task list.
+- Validation: listed `tasks/` and confirmed both task Markdown files are present.
+
+Update: 2026-05-14 (invert predicted-rank plot axis)
+- Revised `Code Analyse data/6 Figure 4 predicted rank panels.do` so the Figure 4-style rank panels use `yhatrf_rank_score = -predicted_rank_y4_bureauyear` on the horizontal axis, making the plots increase with predicted evasion priority.
+- Updated Section 4, `Predicting rank`, in `Code Analyse data/Inspector's Effort report.tex` so the text, construction bullets, figure captions, and figure notes describe the inverted rank score used for plotting.
+- Updated `tasks/2026-05-14-001-feat-full-audit-rank-rf-plan.md` so the completed diagnostics unit reflects the inverted predicted-rank plotting convention.
+- Regenerated `Output/figure4_panel_a_predicted_rank_fullaudits.pdf` and `Output/figure4_panel_b_predicted_rank_fullaudits.pdf`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Figure 4 predicted rank panels.do"` successfully and confirmed both PDFs were regenerated.
+- Validation: extracted text from both PDFs with `pdftotext` and confirmed the horizontal axis now reads `Inverted predicted rank score` with the updated execution-rate legend wording.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; the compiled report is 142 pages. Remaining warnings are nonfatal and consistent with the existing report build.
+
+Update: 2026-05-14 (use within-list predicted rank order)
+- Revised `Code Analyse data/Replication R/08_Full_Audit_Rank_RF_Unweighted.R` so the random forest still predicts the realized rank target, but the output then re-ranks those predictions within each `bureau_detailed` by `selectionyear` full-audit list.
+- The rank prediction output now includes `predicted_rank_order_bureauyear`; `yhatrf_rank_score` and the rank-specific compatibility variable `yhatrf` are now defined as `-predicted_rank_order_bureauyear`, not the negative raw RF-predicted rank value.
+- Updated `Code Analyse data/6 Figure 4 predicted rank panels.do` to require the new within-list predicted-rank-order variable and continue plotting the inverted score.
+- Updated Section 4, `Predicting rank`, in `Code Analyse data/Inspector's Effort report.tex` and the task plan to describe the extra within-list re-ranking step after prediction.
+- Regenerated `Working Data/fullaudits_predicted_rank_bureauyear.dta` in the Dropbox replication package, plus `Output/figure4_panel_a_predicted_rank_fullaudits.pdf` and `Output/figure4_panel_b_predicted_rank_fullaudits.pdf`.
+- Validation: reran the R rank-prediction script successfully. Warnings were limited to packages built under R 4.5.2 while running R 4.5.1.
+- Validation: reran rank diagnostics and confirmed the realized-rank target assigns rank 1 to the maximum `y4` in every bureau-year list; among executed cases, the inverted within-list predicted-rank score has a positive correlation with realized rank score and with `y4`, and no top-decile realized-evasion cases fall in the bottom quartile of predicted priority.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Figure 4 predicted rank panels.do"` successfully and confirmed both PDFs were regenerated.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; the compiled report is 142 pages with only the existing nonfatal warnings.
+
+Update: 2026-05-14 (Table 4 Column 1 predicted-rank controls)
+- Added `Code Analyse data/2 Table 4 column 1 predicted rank controls.do`, a compact Table 4 Column 1 exporter that keeps the original probability-of-execution specification as Column 1 and adds predicted-rank controls in Columns 2--10.
+- The table groups columns by three rank versions: raw within-list predicted rank order, within-list predicted-rank quintile order, and within-list predicted-rank decile order. For the regression controls, rank is not inverted: rank 1, quintile 1, and decile 1 indicate the highest predicted priority, while larger values indicate lower predicted priority.
+- Within each group, the three specifications add the rank measure additively, interact the rank measure with the detailed-tax-office-by-selection-year list, and interact a quadratic polynomial in the rank measure with the list.
+- Exported `Output/table4_col1_predicted_rank_control_comparison.tex` and `Output/table4_col1_predicted_rank_support.tex`.
+- Added both predicted-rank tables to Section 4, `Predicting rank`, in `Code Analyse data/Inspector's Effort report.tex`.
+- Validation: ran `stata-mp /e do "Code Analyse data\2 Table 4 column 1 predicted rank controls.do"` successfully. The regression table has 944 observations in all columns, and the support table shows all 29 full-audit strata represented in each quintile and decile.
+- Validation: reran the Stata exporter after removing the inverted rank score from the required regression-table inputs; the table continues to use `predicted_rank_order_bureauyear` directly.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully after switching the regression controls to non-inverted rank; the compiled report is 143 pages with only the existing nonfatal warnings.
+- Updated the Section 4 `Steps used to predict rank` bullets to distinguish the non-inverted predicted rank order used in the Table 4 Column 1 controls from the minus-one transformation used only for Figure 4-style plotting.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully after the bullet update; the compiled report remains 143 pages with only the existing nonfatal warnings.
+
+Update: 2026-05-14 (cleaner Table 4 Column 1 predicted-rank grid)
+- Revised `Code Analyse data/2 Table 4 column 1 predicted rank controls.do` to replace the raw/quintile/decile three-by-three grid with a cleaner within-list predicted-priority grid: original specification, raw predicted rank, raw rank by list, quadratic raw rank by list, rank percentile, rank percentile by list, quadratic rank percentile by list, rank-decile fixed effects, rank-decile-by-list fixed effects, and top-priority indicators.
+- Constructed the rank percentile from the non-inverted within-list predicted rank order, with 0 indicating the highest predicted priority and 1 indicating the lowest predicted priority.
+- Constructed top 10 percent and top quartile indicators using within-list rank thresholds.
+- Implemented the rank-decile-by-list specification as absorbed fixed effects rather than explicit dummy controls so the robust variance matrix remains usable; singleton decile-by-list cells are dropped by `reghdfe`, leaving 912 observations in that column.
+- Regenerated `Output/table4_col1_predicted_rank_control_comparison.tex` and `Output/table4_col1_predicted_rank_support.tex`.
+- Updated Section 4 of `Code Analyse data/Inspector's Effort report.tex` so the bullets and table notes describe the new grid and the singleton-cell drop in the decile-by-list fixed-effect column.
+- Validation: reran `stata-mp /e do "Code Analyse data\2 Table 4 column 1 predicted rank controls.do"` successfully. The regenerated table has 944 observations in all columns except the rank-decile-by-list fixed-effect column, which has 912 after singleton cells are dropped.
+- Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; the compiled report remains 143 pages with only existing nonfatal warnings.

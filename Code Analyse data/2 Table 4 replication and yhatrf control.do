@@ -69,6 +69,7 @@ local table_yhatrf_bin50_lee "$output\table4_main_outcomes_yhatrf_50bins_control
 local table_yhatrf_topsplit "$output\table4_main_outcomes_yhatrf_topsplit_control.tex"
 local table_yhatrf_topsplit_lee "$output\table4_main_outcomes_yhatrf_topsplit_control_with_lee.tex"
 local table_yhatrf_bin_support "$output\table4_main_outcomes_yhatrf_bin_support.tex"
+local table_fullaudit_fe_comparison "$output\table4_fullaudit_fe_comparison.tex"
 
 ************************************************************
 * Shared table metadata
@@ -97,6 +98,65 @@ drop if safeties == 1
 
 tempfile table4_base_sample
 save `table4_base_sample', replace
+
+************************************************************
+* 3. Compare full-audit fixed-effect definitions
+************************************************************
+capture estimates drop _all
+capture drop table4_fe_bureau_year
+egen table4_fe_bureau_year = group(bureau selectionyear), missing
+
+local estlist ""
+local colindex = 0
+foreach outcome in y2 y3 y4 {
+    if "`outcome'" != "y2" {
+        replace `outcome' = . if y2 == 0
+    }
+    if "`outcome'" == "y4" {
+        replace `outcome' = . if `outcome' == 0
+    }
+
+    local ++colindex
+    eststo fe`colindex': reghdfe `outcome' algorithm overlap random safeties if x2 == 1, ///
+        a(inspectorclusteryear) vce(robust)
+    estadd local fe_definition "Inspector cluster x Year"
+    quietly summarize `outcome' if e(sample) == 1
+    local meanoutcome = int(100 * `r(mean)') / 100
+    local meanoutcome : display %5.2f `meanoutcome'
+    estadd local pp `meanoutcome'
+    estadd local N = e(N), replace
+    local estlist "`estlist' fe`colindex'"
+
+    local ++colindex
+    eststo fe`colindex': reghdfe `outcome' algorithm overlap random safeties if x2 == 1, ///
+        a(table4_fe_bureau_year) vce(robust)
+    estadd local fe_definition "Bureau x Year"
+    quietly summarize `outcome' if e(sample) == 1
+    local meanoutcome = int(100 * `r(mean)') / 100
+    local meanoutcome : display %5.2f `meanoutcome'
+    estadd local pp `meanoutcome'
+    estadd local N = e(N), replace
+    local estlist "`estlist' fe`colindex'"
+}
+
+#delim ;
+esttab `estlist'
+    using `"`table_fullaudit_fe_comparison'"',
+    replace fragment booktabs
+    prehead("\begin{tabular}{lcc|cc|cc} \toprule")
+    posthead("\multicolumn{1}{l}{} & \multicolumn{2}{c}{P(Execution)} & \multicolumn{2}{c}{P(Detection | Execution)} & \multicolumn{2}{c}{log(Evasion) | Detection} \\\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7} \multicolumn{1}{l}{} & Original FE & Bureau FE & Original FE & Bureau FE & Original FE & Bureau FE \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule")
+    postfoot("\bottomrule \end{tabular}")
+    order(algorithm overlap random)
+    keep(algorithm overlap random)
+    coeflabels(algorithm "Algorithm" overlap "Inspectors x Overlap" random "Algorithm x Random")
+    b(%5.2f) se(%5.2f)
+    stats(fe_definition N r2 pp,
+        labels("Fixed effects" "N" "R2" "Mean outcome"))
+    star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+    nomtitles nonumbers collabels(none) nonotes
+    substitute(\_ _)
+;
+#delim cr
 
 foreach sample_variant in full selectionyear_2018_2019 ltu_medium {
     use `table4_base_sample', clear
@@ -265,7 +325,7 @@ tempfile table4_prepared
 save `table4_prepared', replace
 
 ************************************************************
-* 3. Export Table 4 variants
+* 4. Export Table 4 variants
 ************************************************************
 foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintiles yhatrf_bin15 yhatrf_bin20 yhatrf_bin40 yhatrf_bin50 yhatrf_topsplit {
     use `table4_prepared', clear
@@ -428,7 +488,7 @@ foreach spec in replicated yhatrf yhatrf_quadratic yhatrf_deciles yhatrf_quintil
     #delim cr
 
     ********************************************************
-    * 4. Rebuild the Lee-bounds row for this variant
+    * 5. Rebuild the Lee-bounds row for this variant
     ********************************************************
     use `table4_prepared', clear
 
