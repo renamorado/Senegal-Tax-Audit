@@ -1260,13 +1260,13 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \end{adjustbox}
 \end{table}
 
-\section{Revision of optimization gains}
+\section{Revision of optimization gains and predicting rank}
 
 \begin{landscape}
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=1.25\textwidth}
 \begin{threeparttable}
-\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Top-Five Revision}
+\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Panel Revision}
 \label{tab:table_opt_full_and_desk_unweighted_top5_revision}
 
 \footnotesize
@@ -1274,7 +1274,7 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This table shows the results from our optimization exercise in which we use the audit results from the realized set of audits to train a machine-learning (random forest) algorithm to predict evasion. We optimize which audits were conducted in 2018 and 2019. Column 1 shows the realized revenue (evasion and fines) from audits across all tax offices. Column 2 shows the predicted revenue, based on the random forest model, for firms that experienced an audit. Column 3 shows the revenue increase (in percent, compared to the predicted revenue in column 2) when using the random forest for audit selection. Concretely, we use our estimated random forest to predict evasion for all cases in the annual audit program list, then rank cases by predicted evasion within tax office and year, and pick the top cases such that the number of audits by tax office and year is the same as the realized audit implementation. Column 4 shows the share of cases audited in the realized program that were also chosen to be audited under the optimized program. Columns 1--4 reproduce the current version of the table. Column 5 repeats the revenue-increase calculation in column 3 using the direct unweighted predicted evasion measure, without replacing predicted values with zero for cases predicted to have no detected evasion, after excluding, within each audit type, the five actually audited firms with the largest realized revenue before ranking cases and constructing the optimized program. Column 6 repeats the overlap calculation in column 4 using the same unweighted, top-realized-outlier-excluded optimized program.
+\item Notes: This table shows the results from our optimization exercise in which we use the audit results from the realized set of audits to train machine-learning (random forest) models to predict evasion or realized-evasion rank. The unit is an audit-program case, not a unique firm; the same firm can therefore contribute more than one case if it appears more than once in the audit-program data. We optimize which audit cases were conducted in 2018 and 2019. Columns 1 and 2 are shared within each A/B scenario pair: Column 1 shows the realized revenue (evasion and fines) from executed audit cases across all tax offices, and Column 2 shows the predicted revenue, based on the relevant amount-prediction random forest, for cases that experienced an audit. Panel A ranks cases for optimized selection by predicted revenue; Column 3 shows the revenue increase (in percent, compared to the predicted revenue in Column 2), and Column 4 shows the overlap with the realized audit program. Panel B ranks cases for optimized selection by predicted rank; Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A amount-prediction model. A1 and B1 keep all cases and use the current weighted two-step amount prediction for valuation. A2 and B2 use the same weighted two-step amount prediction after excluding the top five realized-revenue audited cases. A3 and B3 use a one-step unweighted amount prediction after the same top-five exclusion. Top five means the five executed audited cases with the largest realized revenue within each audit type in the 2018--2019 optimization sample. In the top-five scenarios, these cases are removed before model training, prediction, recomputation of realized audit-case counts, and optimized selection. After the exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -1284,70 +1284,54 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \noindent\textbf{Steps used to build the table}
 \medskip
 
-\noindent\textit{Weighted method, Columns 1--4}
+\noindent\textit{Panel A: amount-based optimized selection}
 \begin{itemize}
 \item Start from selected annual audit-program cases, exclude safety cases, and run the exercise separately for full audits and desk audits.
-\item Train a detection random forest on actually audited cases with observed outcomes to predict whether an audit would uncover positive evasion.
-\item Train a weighted revenue random forest among actually audited cases with positive detected evasion; the weighting follows the current optimization-gains table and gives additional weight to high-realized-revenue audit outcomes within tax-office-by-year cells.
-\item Predict revenue for all selected non-safety audit-program cases in the audit type, including cases that were not actually audited.
-\item Assign predicted revenue equal to zero for cases predicted to have no detected evasion.
-\item Keep the 2018 and 2019 optimization years.
-\item Rank all remaining cases by weighted predicted revenue within each tax-office-by-year list and choose the top-ranked cases until the optimized list has the same number of audits as the realized implementation in that list.
-\item Column 1 reports the log mean of realized revenue among actually audited firms; Column 2 reports the log mean of weighted predicted revenue among actually audited firms.
+\item A1 uses the current two-step weighted prediction method: first predict whether an audit would uncover positive evasion, then train a weighted revenue random forest among actually audited cases with positive detected evasion, giving additional weight to high-realized-revenue audit outcomes within tax-office-by-year cells.
+\item A2 repeats the A1 method after removing the five executed audited cases with the largest realized revenue within each audit type in the 2018--2019 optimization sample.
+\item A3 uses the same top-five-excluded sample as A2, but replaces the two-step weighted method with a one-step unweighted revenue random forest trained on actually audited cases with observed realized revenue.
+\item For each A panel, predict revenue for all remaining selected non-safety audit-program cases, keep the 2018 and 2019 optimization years, rank cases by predicted revenue within each tax-office-by-year list, and choose the top-ranked cases until the optimized list has the same number of executed audit cases as the realized implementation in that list.
+\item Columns 1 and 2 report the log mean of realized revenue and predicted revenue among actually audited cases. These columns are shared with the paired Panel B scenario because Panel B uses the same amount-prediction model for valuation.
 \item Column 3 reports:
 $$
 100 \times \left(
-\frac{\text{mean weighted predicted revenue under optimized selection}}
-{\text{mean weighted predicted revenue among realized audited firms}}
+\frac{\text{mean predicted revenue under optimized selection}}
+{\text{mean predicted revenue among realized audited cases}}
 - 1
 \right).
 $$
 \item Column 4 reports:
 $$
-\frac{\text{number of realized audited firms also selected by the weighted optimized rule}}
-{\text{number of firms selected by the weighted optimized rule}}.
+\frac{\text{number of realized audited cases also selected by the optimized rule}}
+{\text{number of cases selected by the optimized rule}}.
 $$
 \end{itemize}
 
-\noindent\textit{Unweighted method excluding top realized outliers, Columns 5--6}
+\noindent\textit{Panel B: rank-based optimized selection}
 \begin{itemize}
-\item Use the same selected annual audit-program sample, safety-case exclusion, and audit-type split as in Columns 1--4.
-\item Train a direct unweighted revenue random forest on actually audited cases with observed realized revenue, matching the unweighted predicted-evasion measure used in the prediction plots; the top five firms are not removed before training.
-\item Predict revenue for all selected non-safety audit-program cases in the audit type, including non-audited cases.
-\item Do not apply the detection-model gate and do not replace predicted revenue with zero for cases predicted to have no detected evasion.
-\item Keep the 2018 and 2019 optimization years.
-\item Within each audit type, identify the five actually audited firms with the largest realized revenue (evasion and fines) in the 2018--2019 optimization sample.
-\item Remove those five top realized-revenue firms before constructing the unweighted optimized program.
-\item Recompute the realized audit count in each tax-office-by-year list after this exclusion.
-\item Rank the remaining cases by unweighted predicted revenue within each tax-office-by-year list and choose the top-ranked cases until the optimized list has the same number of audits as the remaining realized implementation in that list.
-\item Column 5 reports:
-$$
-100 \times \left(
-\frac{\text{mean unweighted predicted revenue under the re-ranked optimized selection}}
-{\text{mean unweighted predicted revenue among remaining realized audited firms}}
-- 1
-\right).
-$$
-\item Column 6 reports:
-$$
-\frac{\text{number of remaining realized audited firms also selected by the re-ranked unweighted optimized rule}}
-{\text{number of firms selected by the re-ranked unweighted optimized rule}}.
-$$
+\item Panel B uses the same selected non-safety samples, 2018--2019 restriction, and audit-type split as Panel A.
+\item First, among actually audited cases, construct the realized-evasion rank separately within each detailed tax office by selection year list. Within each list, the case with the largest realized evasion is assigned rank 1, and larger rank values correspond to lower realized-evasion priority.
+\item Second, train a separate unweighted random forest to predict this within-list realized-rank outcome.
+\item Third, use the rank model to predict rank for all remaining selected non-safety audit-program cases.
+\item Fourth, within each detailed tax office by selection year list, sort cases by the Random Forest predicted-rank outcome and create the predicted-rank ordering used for optimization.
+\item Finally, build the optimized program from this predicted-rank ordering rather than from predicted revenue. After any top-five exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
+\item B1 uses rank-based optimized selection on the all-case sample and reports Columns 5 and 6 using the A1 amount-prediction values for the revenue-gain calculation.
+\item B2 uses rank-based optimized selection after the same pre-training top-five exclusion as A2 and reports Columns 5 and 6 using the A2 amount-prediction values.
+\item B3 uses rank-based optimized selection after the same pre-training top-five exclusion as A3 and reports Columns 5 and 6 using the A3 amount-prediction values.
+\item The rank prediction is used only to select the optimized cases. Columns 1 and 2 are shared with the matched Panel A scenario, and the revenue gains in Column 5 always use the matched amount-prediction model. Panel B therefore isolates how changing the ranking rule changes the optimized audit set.
 \end{itemize}
 
-\section{Predicting rank}
-
-This section repeats the Figure 4 diagnostics using a Random Forest prediction of a firm's rank within the full-audit list rather than a prediction of the evasion amount. The rank model uses the selected non-safety full-audit sample. It trains on actually executed full audits with observed detected evasion, ranks realized evasion within detailed tax office by selection year, predicts the rank outcome for all selected non-safety full-audit cases, and then re-ranks those predictions within each full-audit list. The horizontal axis inverts that within-list predicted rank order, so moving to the right corresponds to higher predicted evasion priority within the list.
-
-\noindent\textbf{Steps used to predict rank}
+\noindent\textit{Top-five exclusion}
 \begin{itemize}
-\item Start from selected full-audit cases and exclude safety cases, matching the Figure 4 full-audit sample.
-\item Among actually executed full audits with observed detected evasion, rank cases within each detailed tax office by selection year list. The realized rank is computed from negative detected evasion, so the largest detected evasion receives rank 1. Tied top cases receive the same rank.
-\item Train an unweighted random forest on those executed cases, using the same observable firm characteristics and filing-history predictors as the direct unweighted predicted-evasion model.
-\item Predict the rank outcome for every selected non-safety full-audit case, including cases that were not actually executed.
-\item Within each detailed tax office by selection year list, sort cases by the Random Forest predicted rank outcome and create a predicted rank order over all selected non-safety full-audit cases.
-\item Use this non-inverted predicted rank order for the Table 4 Column 1 controls: rank 1, rank percentile 0, decile 1, and the top-priority indicators indicate the highest predicted evasion priority. For the Figure 4-style diagnostics only, multiply the predicted rank order by minus one so that the horizontal axis increases with predicted priority.
+\item The top-five exclusion is defined separately for full audits and desk audits.
+\item Within each audit type, the excluded cases are the five executed audited cases with the largest realized revenue (evasion and fines) in the 2018--2019 optimization sample.
+\item In A2, A3, B2, and B3, those five cases are removed before random-forest training, prediction, recomputation of realized audit-case counts, and optimized selection.
+\item After the exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
 \end{itemize}
+
+\subsection{Predicting rank}
+
+This subsection reports the predicted-rank diagnostics that accompany the Table 48 optimization exercise. The rank-prediction construction is described in the Table 48 steps above. The diagnostics below use the non-inverted predicted rank order in the Table 4 Column 1 controls; for the Figure 4-style diagnostics only, the horizontal axis groups cases into within-list predicted-priority deciles, where decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The included figures use the B1 all-cases rank scenario exported from the optimization exercise. The top-five-excluded rank scenario is also exported as a diagnostic Figure 4 variant, but is not included in this report section.
 
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=1.15\textwidth}
@@ -1381,26 +1365,26 @@ This section repeats the Figure 4 diagnostics using a Random Forest prediction o
 
 \begin{figure}[H]
     \centering
-    \caption{Inverted Predicted Rank and Realized Execution Rate, All Full-Audit Cases}
+    \caption{Predicted Priority Decile and Realized Execution Rate, All Full-Audit Cases}
     \label{fig:figure4_panel_a_predicted_rank_fullaudits}
     \begin{threeparttable}
     \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_predicted_rank_fullaudits.pdf}
     \begin{tablenotes}[flushleft]
     \footnotesize
-    \item Notes: This figure mirrors Figure 4 Panel A but replaces the predicted evasion amount with an inverted predicted within-list rank score. The model is an unweighted random forest trained on executed full audits with observed detected evasion. The realized training target ranks detected evasion within detailed tax office by selection year, with the highest detected evasion assigned rank 1. After prediction, cases are re-ranked within each detailed-tax-office-by-selection-year list using the Random Forest predicted rank outcome. For plotting, this within-list predicted rank order is multiplied by minus one, so higher horizontal-axis values correspond to better predicted ranks and higher predicted evasion priority. The blue distribution is the inverted predicted rank score for cases that were part of the annual full-audit program but not actually audited. The green distribution is the inverted predicted rank score for cases that were audited. The gray distribution shows the inverted realized rank score among executed full audits. The solid line plots the realized audit execution rate by the inverted predicted rank score.
+    \item Notes: This figure mirrors Figure 4 Panel A but replaces the predicted evasion amount with the B1 all-cases predicted-rank output exported from the optimization exercise. The model is an unweighted random forest trained on executed full audits with observed detected evasion. The realized training target ranks detected evasion within detailed tax office by selection year, with the highest detected evasion assigned rank 1. After prediction, cases are re-ranked within each detailed-tax-office-by-selection-year list using the Random Forest predicted rank outcome. For plotting, cases are grouped into predicted-priority deciles within audit type, detailed tax office, and selection year. Decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The line plots the realized audit execution rate by predicted-priority decile, and the shaded band shows the 95 percent confidence interval.
     \end{tablenotes}
     \end{threeparttable}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Inverted Predicted Rank}
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Predicted Priority Decile}
     \label{fig:figure4_panel_b_predicted_rank_fullaudits}
     \begin{threeparttable}
     \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_predicted_rank_fullaudits.pdf}
     \begin{tablenotes}[flushleft]
     \footnotesize
-    \item Notes: This figure mirrors Figure 4 Panel B but replaces the predicted evasion amount with an inverted predicted within-list rank score. After the Random Forest predicts the rank outcome, cases are re-ranked within each detailed-tax-office-by-selection-year list. The purple distribution shows algorithm-selected full-audit cases and the orange distribution shows inspector-selected full-audit cases. The solid lines plot realized audit execution rates by the inverted predicted rank score separately for algorithm-selected and inspector-selected cases. Higher horizontal-axis values correspond to better predicted ranks and higher predicted evasion priority within the detailed-tax-office-by-selection-year list.
+    \item Notes: This figure mirrors Figure 4 Panel B but replaces the predicted evasion amount with the B1 all-cases predicted-rank output exported from the optimization exercise. After the Random Forest predicts the rank outcome, cases are re-ranked within each detailed-tax-office-by-selection-year list. For plotting, cases are grouped into predicted-priority deciles within audit type, detailed tax office, and selection year. Decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The lines plot realized audit execution rates by predicted-priority decile separately for algorithm-selected and inspector-selected full-audit cases, and the shaded bands show 95 percent confidence intervals.
     \end{tablenotes}
     \end{threeparttable}
 \end{figure}

@@ -1,15 +1,22 @@
-
-\begin{tabular}[t]{cccccc}
+\begin{tabular}[t]{lcccccc}
 \toprule
-\multicolumn{1}{c}{\shortstack{Realized\\Revenue\\Log(mean)}} & \multicolumn{1}{c}{\shortstack{Predicted\\Revenue\\Log(mean)}} & \multicolumn{1}{c}{\shortstack{$\Delta$ Revenue vs Predicted\\w/ RF Selection\\Among Program Cases}} & \multicolumn{1}{c}{\shortstack{Overlap Between\\Optimized and\\Realized Audit Program}} & \multicolumn{1}{c}{\shortstack{$\Delta$ Revenue vs Unweighted\\Predicted Revenue\\Excl. Top Five Realized Firms}} & \multicolumn{1}{c}{\shortstack{Overlap w/ Unweighted\\Predicted Revenue Selection\\Excl. Top Five Realized Firms}} \\
-\cmidrule(l{3pt}r{3pt}){1-1} \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5} \cmidrule(l{3pt}r{3pt}){6-6}
-(1) & (2) & (3) & (4) & (5) & (6)\\
+ & \multicolumn{4}{c}{\textbf{Panel A: Optimized selection by predicted evasion}} & \multicolumn{2}{c}{\textbf{Panel B: Optimized selection by predicted rank}}\\
+\cmidrule(l{3pt}r{3pt}){2-5} \cmidrule(l{3pt}r{3pt}){6-7}
+ & \multicolumn{1}{c}{\shortstack{Realized\\Revenue\\Log(mean)}} & \multicolumn{1}{c}{\shortstack{Predicted\\Revenue\\Log(mean)}} & \multicolumn{1}{c}{\shortstack{$\Delta$ Revenue vs Predicted\\w/ RF Selection\\Among Program Cases}} & \multicolumn{1}{c}{\shortstack{Overlap Between\\Optimized and\\Realized Audit Program}} & \multicolumn{1}{c}{\shortstack{$\Delta$ Revenue vs Predicted\\w/ RF Selection\\Among Program Cases}} & \multicolumn{1}{c}{\shortstack{Overlap Between\\Optimized and\\Realized Audit Program}}\\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5} \cmidrule(l{3pt}r{3pt}){6-6} \cmidrule(l{3pt}r{3pt}){7-7}
+ & (1) & (2) & (3) & (4) & (5) & (6)\\
 \midrule
-\addlinespace[0.3em]
-\multicolumn{6}{l}{\textbf{A: Full Audits}}\\
-\hspace{1em}21.24 & 21.14 & + 18.09\% & 65\% & + 8.39\% & 78\%\\
-\addlinespace[0.3em]
-\multicolumn{6}{l}{\textbf{B: Desk Audits}}\\
-\hspace{1em}19.00 & 18.73 & + 31.01\% & 61\% & + 34.49\% & 72\%\\
+\addlinespace[0.45em]
+\multicolumn{5}{l}{\textit{A1: Current weighted two-step amount prediction, all cases}} & \multicolumn{2}{l}{\textit{B1: Predicted-rank selection, valued with A1 amount prediction}}\\
+\hspace{1em}Full Audits & 21.24 & 21.14 & + 18.09\% & 65\% & + 12.66\% & 69\%\\
+\hspace{1em}Desk Audits & 19.00 & 18.73 & + 31.01\% & 61\% & + 23.58\% & 67\%\\
+\addlinespace[0.45em]
+\multicolumn{5}{l}{\textit{A2: Weighted two-step amount prediction, excluding top five realized cases}} & \multicolumn{2}{l}{\textit{B2: Predicted-rank selection, valued with A2 amount prediction}}\\
+\hspace{1em}Full Audits & 20.95 & 20.89 & + 18.59\% & 64\% & + 12.86\% & 69\%\\
+\hspace{1em}Desk Audits & 18.74 & 18.49 & + 32.52\% & 61\% & + 25.86\% & 67\%\\
+\addlinespace[0.45em]
+\multicolumn{5}{l}{\textit{A3: Unweighted one-step amount prediction, excluding top five realized cases}} & \multicolumn{2}{l}{\textit{B3: Predicted-rank selection, valued with A3 amount prediction}}\\
+\hspace{1em}Full Audits & 20.95 & 19.39 & + 7.37\% & 79\% & + 3.13\% & 69\%\\
+\hspace{1em}Desk Audits & 18.74 & 17.52 & + 32.58\% & 72\% & + 26.04\% & 67\%\\
 \bottomrule
 \end{tabular}

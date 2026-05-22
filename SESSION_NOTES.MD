@@ -1443,3 +1443,67 @@ Update: 2026-05-14 (cleaner Table 4 Column 1 predicted-rank grid)
 - Updated Section 4 of `Code Analyse data/Inspector's Effort report.tex` so the bullets and table notes describe the new grid and the singleton-cell drop in the decile-by-list fixed-effect column.
 - Validation: reran `stata-mp /e do "Code Analyse data\2 Table 4 column 1 predicted rank controls.do"` successfully. The regenerated table has 944 observations in all columns except the rank-decile-by-list fixed-effect column, which has 912 after singleton cells are dropped.
 - Validation: reran `pdflatex -interaction=nonstopmode -halt-on-error -output-directory ".codex_tmp\report_compile_root" "Code Analyse data\Inspector's Effort report.tex"` successfully; the compiled report remains 143 pages with only existing nonfatal warnings.
+
+Update: 2026-05-20 (Anne 2026-05-19 task breakdown)
+- Added `tasks/Anne_To_Dos_2026-05-19.md`, a planning-only task file dissecting Anne's raw comments into workstreams for Figure 4 rank-quantile diagnostics, 2018-2019 restriction verification, panel-based Table 48 optimization revisions, Table G2 top-five reshuffling metrics, and prediction-quality diagnostics.
+- No analysis code, table outputs, figures, or manuscript TeX files were changed.
+- Validation: confirmed the new task file was added under the existing `tasks/` folder. No Stata/R validation was needed because this was documentation-only planning work.
+
+Update: 2026-05-20 (Table 48 panel optimization revision)
+- Revised `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` to generate a four-column panel version of the optimization gains table. Panel A ranks optimized selections by predicted amount; Panel B ranks optimized selections by predicted rank while keeping amount-prediction values for revenue calculations.
+- Implemented A1/B1 as the current weighted two-step amount-prediction setup with all cases, A2/B2 as the weighted two-step setup after removing the five largest realized-revenue audited cases within each audit type before training and optimization, and A3/B3 as the one-step unweighted amount-prediction setup after the same exclusion.
+- Regenerated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex` and added `Output/table_opt_full_and_desk_unweighted_top5_revision_diagnostics.csv`, which records selected, executed, optimized, overlap, and 2020 table-row counts for each scenario and audit type.
+- Updated `Code Analyse data/Inspector's Effort report.tex` so the caption, table note, and construction explanation describe the new Panel A/Panel B design, the 2018--2019 restriction, the top-five exclusion timing, and the fact that Panel B uses rank predictions only for optimized selection.
+- Validation: ran the revised R script from the Dropbox replication package using the local R 4.4 renv library and wrote outputs to this repo's `Output/` folder. The script reported that A1 reproduces current Table 9 values exactly: full audits `21.24`, `21.14`, `+ 18.09%`, `65%`; desk audits `19.00`, `18.73`, `+ 31.01%`, `61%`.
+- Validation: inspected the diagnostics CSV and confirmed every scenario has `rows_2020_in_table = 0`; optimized counts equal executed counts within each scenario and audit type.
+- Validation: compiled `Code Analyse data/Inspector's Effort report.tex` twice with MiKTeX `pdflatex`; the second run produced a 143-page PDF in `.codex_tmp/report_compile_root/` with only the existing nonfatal report warnings, mainly duplicate labels, overfull boxes, and PDF-version inclusion warnings.
+
+Update: 2026-05-20 (group optimization and rank sections)
+- Revised `Code Analyse data/Inspector's Effort report.tex` so the optimization-gains revision and predicting-rank material are part of the same top-level section, now titled `Revision of optimization gains and predicting rank`.
+- Demoted `Predicting rank` from a separate top-level section to a subsection under the shared optimization/rank section and adjusted the opening sentence from "section" to "subsection".
+- Validation: reran MiKTeX `pdflatex` twice after the hierarchy change. The final build produced a 143-page PDF in `.codex_tmp/report_compile_root/`; remaining warnings are the existing nonfatal duplicate-label, overfull-box, and PDF-version inclusion warnings.
+
+Update: 2026-05-20 (Table 48 side-by-side panel layout)
+- Revised `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` so the Table 48 TeX fragment displays paired A/B scenarios side by side: Panel A keeps realized revenue, predicted revenue, amount-selection gain, and overlap in Columns 1--4; Panel B reports only predicted-rank-selection gain and overlap in Columns 5--6.
+- Regenerated `Output/table_opt_full_and_desk_unweighted_top5_revision.tex` with paired A1/B1, A2/B2, and A3/B3 row groups, while leaving the underlying optimization calculations unchanged.
+- Updated `Code Analyse data/Inspector's Effort report.tex` table notes and construction bullets to state that Columns 1 and 2 are shared within each A/B scenario pair, and that Panel B revenue gains are valued with the matched Panel A amount-prediction model.
+- Validation: reran the R script from the Dropbox replication package and confirmed A1 still reproduces the current Table 9 values exactly for full and desk audits.
+- Validation: compiled `Code Analyse data/Inspector's Effort report.tex` with MiKTeX `pdflatex`; the 143-page PDF in `.codex_tmp/report_compile_root/` includes the new six-column Table 48 layout on page 57. Remaining warnings are the existing nonfatal duplicate-label, overfull-box, and PDF-version inclusion warnings.
+
+Update: 2026-05-20 (deduplicate rank-prediction explanation)
+- Removed the duplicated `Steps used to predict rank` block from the `Predicting rank` subsection in `Code Analyse data/Inspector's Effort report.tex`.
+- Kept the rank-prediction process documented with the Table 48 construction notes, and replaced the subsection opening with a short pointer back to those notes plus the distinction between non-inverted rank controls and inverted Figure 4-style diagnostics.
+- Validation: reran MiKTeX `pdflatex` twice into `.codex_tmp/report_compile_rank_dedup/` because the prior temporary PDF was open and locked. The final build produced a 142-page PDF with only the existing nonfatal duplicate-label, overfull-box, and PDF-version inclusion warnings.
+
+Update: 2026-05-20 (clarify Table 48 case-level unit)
+- Revised the Table 48 note and construction bullets in `Code Analyse data/Inspector's Effort report.tex` to clarify that the optimization unit is an audit-program case, not a unique firm.
+- Replaced remaining firm-level phrasing in the Table 48 explanation with case-level wording, including the top-five exclusion, realized/predicted revenue means, overlap formula, and recomputed audit-case counts.
+- Validation: reran MiKTeX `pdflatex` into `.codex_tmp/report_compile_root/`; the report built successfully as a 142-page PDF with only the existing nonfatal duplicate-label, overfull-box, and PDF-version inclusion warnings.
+
+Update: 2026-05-20 (clarify predicted-rank list construction)
+- Revised the Table 48 Panel B construction notes in `Code Analyse data/Inspector's Effort report.tex` to narrate predicted-rank selection as steps.
+- Clarified that the realized-rank target is constructed within each detailed tax office by selection year list, with rank 1 assigned to the largest realized-evasion case, and that predicted ranks are sorted again within the same list structure for optimization.
+- Validation: reran MiKTeX `pdflatex` into `.codex_tmp/report_compile_root/`; the report built successfully as a 142-page PDF with only the existing nonfatal duplicate-label, overfull-box, and PDF-version inclusion warnings.
+
+Update: 2026-05-20 (clarify optimized count after top-five exclusion)
+- Revised the Table 48 note and construction bullets in `Code Analyse data/Inspector's Effort report.tex` to explain that, after top-five exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
+- Validation: reran MiKTeX `pdflatex` into `.codex_tmp/report_compile_root/`; the report built successfully as a 142-page PDF with only the existing nonfatal duplicate-label, overfull-box, and PDF-version inclusion warnings.
+
+Update: 2026-05-20 (Figure 4 rank-percent inputs from 07 optimization script)
+- Revised `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` so the same predicted-rank objects used for B-scenario optimization are exported for Figure 4 diagnostics.
+- Added two Dropbox working-data exports: `fullaudits_predicted_rank_bureauyear_07_b1_allcases.dta` for the B1 all-cases rank scenario, and `fullaudits_predicted_rank_bureauyear_07_b2b3_top5excluded.dta` for the shared B2/B3 top-five-excluded rank scenario.
+- Reworked `Code Analyse data/6 Figure 4 predicted rank panels.do` to read those two `07` exports and generate both canonical B1/all-cases PDFs and top-five-excluded diagnostic PDFs. The x-axis now uses `100 * (N - rank + 1) / N`, so rank 1 maps to 100 and lower-priority ranks move left according to their list denominator.
+- Updated the Figure 4 predicted-rank captions and notes in `Code Analyse data/Inspector's Effort report.tex` to describe the B1 all-cases `07` export and the inverted within-list rank-percentile axis; the top-five-excluded versions are documented as diagnostic outputs not included in the report section.
+- Output files affected: `Output/figure4_panel_a_predicted_rank_fullaudits.pdf`, `Output/figure4_panel_b_predicted_rank_fullaudits.pdf`, `Output/figure4_panel_a_predicted_rank_fullaudits_top5excluded.pdf`, and `Output/figure4_panel_b_predicted_rank_fullaudits_top5excluded.pdf`.
+- Validation: reran `07_Optimization_Exercise_Unweighted_Top5_Revision.R` with `data_path` pointing to the Dropbox working-data folder and `output_path` pointing to this repo's `Output/`; the script wrote both rank exports and again reported that A1 reproduces current Table 9 values exactly.
+- Validation: reran Stata 17 batch mode for `Code Analyse data/6 Figure 4 predicted rank panels.do` successfully. The do-file asserts the top predicted and realized ranks map to 100, and all four Figure 4 predicted-rank PDFs were regenerated.
+- Validation: ran an additional Stata spot check on the B1 all-cases export confirming that rank 1 maps to 100 and that two 30-case-list observations with rank 30 map to `100/30`.
+
+Update: 2026-05-21 (Figure 4 predicted-rank decile execution-rate plots)
+- Revised `Code Analyse data/6 Figure 4 predicted rank panels.do` to replace the rank-percentile distribution plots with execution-rate plots by within-list predicted-priority decile.
+- Constructed predicted-priority deciles within audit type, detailed tax office, and selection year when `controle` is available; decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority.
+- Panel A now plots the overall execution rate by predicted-priority decile with a 95 percent confidence band. Panel B now plots algorithm-case and inspector-case execution rates by predicted-priority decile with separate 95 percent confidence bands.
+- Removed the predicted-rank and realized-rank distribution layers from the rank version because those distributions are mechanically induced by within-list ranking.
+- Updated `Code Analyse data/Inspector's Effort report.tex` so the predicted-rank figure captions and notes describe predicted-priority deciles rather than inverted rank percentiles or rank distributions.
+- Output files affected: `Output/figure4_panel_a_predicted_rank_fullaudits.pdf`, `Output/figure4_panel_b_predicted_rank_fullaudits.pdf`, `Output/figure4_panel_a_predicted_rank_fullaudits_top5excluded.pdf`, and `Output/figure4_panel_b_predicted_rank_fullaudits_top5excluded.pdf`.
+- Validation: reran Stata 17 batch mode for `Code Analyse data/6 Figure 4 predicted rank panels.do` successfully. The do-file asserts deciles are between 1 and 10, top predicted rank maps to decile 10, and the lowest predicted rank in each multi-case list maps to decile 1; all four PDFs were regenerated with 10 matched deciles in Panel B.

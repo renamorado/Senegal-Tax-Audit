@@ -1,0 +1,13 @@
+"scenario_id","scenario_label","selection_method","audit_type","training_rows_amount","selected_rows_2018_2019","executed_rows_2018_2019","optimized_rows_2018_2019","overlap_rows_2018_2019","rows_2020_in_table"
+"A1","Current weighted two-step amount prediction, all cases","amount","Full Audits",407,646,407,407,264,0
+"A1","Current weighted two-step amount prediction, all cases","amount","Desk Audits",857,1707,857,857,519,0
+"A2","Weighted two-step amount prediction, excluding top five realized cases","amount","Full Audits",402,641,402,402,258,0
+"A2","Weighted two-step amount prediction, excluding top five realized cases","amount","Desk Audits",852,1702,852,852,518,0
+"A3","Unweighted one-step amount prediction, excluding top five realized cases","amount","Full Audits",402,641,402,402,317,0
+"A3","Unweighted one-step amount prediction, excluding top five realized cases","amount","Desk Audits",852,1702,852,852,613,0
+"B1","Rank-based optimized selection, amounts from A1","rank","Full Audits",407,646,407,407,282,0
+"B1","Rank-based optimized selection, amounts from A1","rank","Desk Audits",857,1707,857,857,573,0
+"B2","Rank-based optimized selection, amounts from A2","rank","Full Audits",402,641,402,402,278,0
+"B2","Rank-based optimized selection, amounts from A2","rank","Desk Audits",852,1702,852,852,572,0
+"B3","Rank-based optimized selection, amounts from A3","rank","Full Audits",402,641,402,402,278,0
+"B3","Rank-based optimized selection, amounts from A3","rank","Desk Audits",852,1702,852,852,572,0
