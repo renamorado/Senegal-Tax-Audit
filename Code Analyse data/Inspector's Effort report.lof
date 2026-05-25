@@ -1,0 +1,50 @@
+\contentsline {figure}{\numberline {1}{\ignorespaces Predicted evasion vs. number of inspectors and duration, Full audits [Executed cases sample -- preferred]}}{9}{figure.caption.6}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Predicted evasion vs. number of inspectors and duration, Full audits [Outcome-specific executed sample]}}{10}{figure.caption.8}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Execution Rates and Audit Success, Algorithm-Selected Full Audits}}{11}{figure.caption.10}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Execution Rates and Audit Success, Algorithm-Selected Full Audits: 2018 vs 2019}}{12}{figure.caption.12}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Execution Rates and Audit Success relative to Inspector-selected Cases, Full Audits: 2018 vs 2019}}{13}{figure.caption.13}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Predicted Evasion Amount and Realized Execution Rate, All Cases: Optimization-Weighted Predictions}}{14}{figure.caption.14}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Realized Execution Rate for Algorithm Cases and Inspector Cases: Optimization-Weighted Predictions}}{15}{figure.caption.16}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Current and Top-Quartile-Weighted Predicted Evasion Scores}}{16}{figure.caption.18}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Predicted Priority Decile and Realized Execution Rate, All Full-Audit Cases}}{63}{figure.caption.122}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Realized Execution Rate for Algorithm Cases and Inspector Cases: Predicted Priority Decile}}{64}{figure.caption.124}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Distribution of evasion rates across years}}{66}{figure.caption.129}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Share of execution of all $\text {audits}_t$ vrs Share of execution of all $\text {audits}_{t+1}$}}{72}{figure.caption.136}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Share of execution of $\text {Algorithm}_t$ vrs Share of execution of $\text {Algorithm}_{t+1}$}}{73}{figure.caption.137}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Share of execution of $\text {Inspector}_t$ vrs Share of execution of $\text {Inspector}_{t+1}$}}{74}{figure.caption.138}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Share of total $\text {void}_t$ vrs Share of total execution of $\text {assigned}_{t+1}$}}{75}{figure.caption.139}%
+\contentsline {figure}{\numberline {17}{\ignorespaces Share of void $\text {algo}_t$ vrs share of execution of $\text {algo}_{t+1}$}}{76}{figure.caption.140}%
+\contentsline {figure}{\numberline {18}{\ignorespaces Share of void $\text {Inspector-selected}_t$ vrs share of execution of $\text {Inspector-selected}_{t+1}$}}{77}{figure.caption.141}%
+\contentsline {figure}{\numberline {19}{\ignorespaces Share of total $\text {below median evasion rate cases}_t$ vrs Share of total execution of $\text {assigned}_{t+1}$}}{78}{figure.caption.142}%
+\contentsline {figure}{\numberline {20}{\ignorespaces Share of below median evasion rate $\text {algo}_t$ vrs share of execution of $\text {algo}_{t+1}$}}{79}{figure.caption.143}%
+\contentsline {figure}{\numberline {21}{\ignorespaces Share of below median evasion rate $\text {Inspector-selected}_t$ vrs share of execution of $\text {Inspector-selected}_{t+1}$}}{80}{figure.caption.144}%
+\contentsline {figure}{\numberline {22}{\ignorespaces Share of total $\text {bottom quartile evasion rate cases}_t$ vrs Share of total execution of $\text {assigned}_{t+1}$}}{81}{figure.caption.145}%
+\contentsline {figure}{\numberline {23}{\ignorespaces Share of bottom quartile evasion rate $\text {algo}_t$ vrs share of execution of $\text {algo}_{t+1}$}}{82}{figure.caption.146}%
+\contentsline {figure}{\numberline {24}{\ignorespaces Share of bottom quartile evasion rate $\text {Inspector-selected}_t$ vrs share of execution of $\text {Inspector-selected}_{t+1}$}}{83}{figure.caption.147}%
+\contentsline {figure}{\numberline {25}{\ignorespaces Execution rates when the first sequenced algorithm case has high potential evasion versus low potential evasion.}}{85}{figure.caption.148}%
+\contentsline {figure}{\numberline {26}{\ignorespaces Average number of inspectors by predicted evasion bins (outcome-specific executed-sample quantile binning).}}{93}{figure.26}%
+\contentsline {figure}{\numberline {27}{\ignorespaces Average duration (admin data) by predicted evasion bins (outcome-specific executed-sample quantile binning).}}{94}{figure.27}%
+\contentsline {figure}{\numberline {28}{\ignorespaces Average duration (taxpayer survey) by predicted evasion bins (outcome-specific executed-sample quantile binning).}}{94}{figure.28}%
+\contentsline {figure}{\numberline {29}{\ignorespaces Average duration (self-reported) by predicted evasion bins (outcome-specific executed-sample quantile binning).}}{95}{figure.29}%
+\contentsline {figure}{\numberline {30}{\ignorespaces Average number of inspectors by predicted evasion bins (Executed-sample binning).}}{96}{figure.30}%
+\contentsline {figure}{\numberline {31}{\ignorespaces Average duration (admin data) by predicted evasion bins (Executed-sample binning).}}{98}{figure.31}%
+\contentsline {figure}{\numberline {32}{\ignorespaces Average duration (taxpayer survey) by predicted evasion bins (Executed-sample binning).}}{100}{figure.32}%
+\contentsline {figure}{\numberline {33}{\ignorespaces Average duration (self-reported) by predicted evasion bins (Executed-sample binning).}}{102}{figure.33}%
+\contentsline {figure}{\numberline {34}{\ignorespaces Average number of inspectors by firm turnover bins (outcome-specific executed-sample quantile binning).}}{106}{figure.34}%
+\contentsline {figure}{\numberline {35}{\ignorespaces Average duration (admin data) by firm turnover bins (outcome-specific executed-sample quantile binning).}}{106}{figure.35}%
+\contentsline {figure}{\numberline {36}{\ignorespaces Average duration (taxpayer survey) by firm turnover bins (outcome-specific executed-sample quantile binning).}}{107}{figure.36}%
+\contentsline {figure}{\numberline {37}{\ignorespaces Average duration (self-reported) by firm turnover bins (outcome-specific executed-sample quantile binning).}}{108}{figure.37}%
+\contentsline {figure}{\numberline {38}{\ignorespaces Average number of inspectors by firm turnover bins (Executed-sample binning).}}{108}{figure.38}%
+\contentsline {figure}{\numberline {39}{\ignorespaces Average duration (admin data) by firm turnover bins (Executed-sample binning).}}{110}{figure.39}%
+\contentsline {figure}{\numberline {40}{\ignorespaces Average duration (taxpayer survey) by firm turnover bins (Executed-sample binning).}}{112}{figure.40}%
+\contentsline {figure}{\numberline {41}{\ignorespaces Average duration (self-reported) by firm turnover bins (Executed-sample binning).}}{114}{figure.41}%
+\contentsline {figure}{\numberline {42}{\ignorespaces Average number of inspectors by predicted evasion bins (within algorithm/inspector estimated bins).}}{116}{figure.42}%
+\contentsline {figure}{\numberline {43}{\ignorespaces Average duration (admin data) by predicted evasion bins (within algorithm/inspector estimated bins).}}{118}{figure.43}%
+\contentsline {figure}{\numberline {44}{\ignorespaces Average duration (taxpayer survey) by predicted evasion bins (within algorithm/inspector estimated bins).}}{120}{figure.44}%
+\contentsline {figure}{\numberline {45}{\ignorespaces Average duration (self-reported) by predicted evasion bins (within algorithm/inspector estimated bins).}}{122}{figure.45}%
+\contentsline {figure}{\numberline {46}{\ignorespaces Average number of inspectors by firm turnover bins (within algorithm/inspector estimated bins).}}{124}{figure.46}%
+\contentsline {figure}{\numberline {47}{\ignorespaces Average duration (admin data) by firm turnover bins (within algorithm/inspector estimated bins).}}{126}{figure.47}%
+\contentsline {figure}{\numberline {48}{\ignorespaces Average duration (taxpayer survey) by firm turnover bins (within algorithm/inspector estimated bins).}}{128}{figure.48}%
+\contentsline {figure}{\numberline {49}{\ignorespaces Average duration (self-reported) by firm turnover bins (within algorithm/inspector estimated bins).}}{130}{figure.49}%
+\contentsline {figure}{\numberline {50}{\ignorespaces Scatter and linear fit: \(W_{\text {main}}\) vs notification value}}{137}{figure.caption.185}%
+\contentsline {figure}{\numberline {51}{\ignorespaces Density of \(W_{\text {main}}\)}}{138}{figure.caption.186}%

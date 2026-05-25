@@ -1,0 +1,33 @@
+\contentsline {section}{\numberline {1}New exhibits for paper}{6}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Regression Analysis - Description of Approach}{6}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Main regression estimates adding predicted evasion controls}{14}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Testing bureau FE}{16}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Table 4 with predicted evasion controls}{17}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Table 5 with predicted evasion controls}{30}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Table 6 with predicted evasion controls}{37}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Table 8 with predicted evasion controls}{47}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Revision of optimization gains and predicting rank}{56}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Predicting high-evasion bins}{59}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Predicting rank}{61}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Inspector effort analysis}{64}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Definition of void audit cases}{64}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Definitions of low evasion rates cases}{65}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Approaches to assess inspectors effort}{66}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Approach 1: pre-post void audit case [discarded for now]}{66}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Approach 2: Comparing previous year performance with next year's execution rate }{66}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Approach 3: Top-listed high-potential algorithm-selected audits}{83}{subsection.5.3}%
+\contentsline {subsubsection}{\numberline {5.3.1}Regression estimates}{86}{subsubsection.5.3.1}%
+\contentsline {section}{\numberline {6}Measures of inspector effort by predicted evasion}{93}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Whole Sample Bins}{93}{subsection.6.1}%
+\contentsline {subsubsection}{\numberline {6.1.1}Predicted evasion}{93}{subsubsection.6.1.1}%
+\contentsline {subsubsection}{\numberline {6.1.2}Firm turnover}{106}{subsubsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.2}Within Algo/Inspector Estimated Bins}{116}{subsection.6.2}%
+\contentsline {subsubsection}{\numberline {6.2.1}Predicted evasion}{116}{subsubsection.6.2.1}%
+\contentsline {subsubsection}{\numberline {6.2.2}Firm turnover}{124}{subsubsection.6.2.2}%
+\contentsline {subsection}{\numberline {6.3}More on inspector characteristics performance and firm size }{133}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Audit Discrepancies and taxpayer dissatisfaction with the audit process.}{135}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Current empirical steps (updated main specification)}{135}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Regression equation and notation}{136}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Coverage and \(W\) diagnostics}{136}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Main regression tables (current outputs)}{136}{subsection.7.4}%
+\contentsline {subsection}{\numberline {7.5}Robustness regression tables}{140}{subsection.7.5}%

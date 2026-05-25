@@ -1329,6 +1329,56 @@ $$
 \item After the exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
 \end{itemize}
 
+\subsection{Predicting high-evasion bins}
+
+\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.25\textwidth}
+\begin{threeparttable}
+\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Direct Bin-Target Companion}
+\label{tab:table_opt_full_and_desk_bin_target_panelc}
+
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_panelc.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table is a companion to Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}. It reports an optimization exercise in which we use audit results from the realized set of audits to train machine-learning (random forest) models to predict evasion and high-realized-evasion-quartile membership. The unit is an audit-program case, not a unique firm; the same firm can therefore contribute more than one case if it appears more than once in the audit-program data. We optimize which audit cases were conducted in 2018 and 2019. Columns 1 and 2 are shared within each A/C scenario pair: Column 1 shows the realized revenue (evasion and fines) from executed audit cases across all tax offices, and Column 2 shows the predicted revenue, based on the relevant amount-prediction random forest, for cases that experienced an audit. Panel A ranks cases for optimized selection by predicted revenue; Column 3 shows the revenue increase (in percent, compared to the predicted revenue in Column 2), and Column 4 shows the overlap with the realized audit program. Panel C ranks cases for optimized selection by the predicted probability that the case belongs to the highest realized-evasion quartile within its audit-type-by-detailed-tax-office-by-year list; Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A amount-prediction model. C1 uses direct quartile-target optimized selection on the all-case sample and values gains with the A1 amount-prediction model. C2 uses direct quartile-target optimized selection after the same pre-training top-five exclusion as A2 and values gains with the A2 amount-prediction model. C3 uses direct quartile-target optimized selection after the same pre-training top-five exclusion as A3 and values gains with the A3 amount-prediction model. The quartile target is defined separately by audit type and scenario. Training lists must have at least two executed observed cases per quartile; lists that cannot support quartiles are excluded from bin-target training and reported in Table \ref{tab:table_opt_full_and_desk_bin_target_support}. Top five means the five executed audited cases with the largest realized revenue within each audit type in the 2018--2019 optimization sample. In the top-five scenarios, these cases are removed before model training, prediction, recomputation of realized audit-case counts, and optimized selection. After the exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+\end{landscape}
+
+\noindent\textbf{Steps used to build the bin-target companion table}
+\medskip
+
+\noindent\textit{Panel C: direct bin-target optimized selection}
+\begin{itemize}
+\item Panel C uses the same selected non-safety samples, 2018--2019 restriction, audit-type split, and top-five exclusion rules as Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}.
+\item First, within each audit type and scenario, the script tries quartiles among executed audit cases with observed realized revenue in each detailed tax office by selection year list.
+\item Second, it keeps training lists that have at least two executed observed cases per quartile. Lists that cannot support quartiles are excluded from bin-target training and reported in the support table.
+\item Third, among the supported training lists, it defines the high-evasion-bin target as an indicator for belonging to the highest realized-evasion quartile, where cases are ordered by realized revenue within audit type, detailed tax office, and selection year.
+\item Fourth, it trains a one-step unweighted random forest classifier to predict this high-bin indicator and predicts the probability of high-bin membership for all selected non-safety audit-program cases.
+\item Finally, it builds the optimized program from this predicted high-bin probability rather than from predicted revenue. The number of optimized cases is still fixed to match the realized number of executed audits within each tax-office-by-year list.
+\item The bin prediction is used only to select the optimized cases. Columns 1 and 2 are shared with the matched Panel A scenario, and the revenue gains in Column 5 always use the matched amount-prediction model. Panel C therefore isolates how changing the ranking rule changes the optimized audit set.
+\end{itemize}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=0.95\textwidth}
+\begin{threeparttable}
+\caption{Support for Direct Bin-Target Prediction}
+\label{tab:table_opt_full_and_desk_bin_target_support}
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_support.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table reports the support rule used to define the high-realized-evasion-quartile target in Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. Quartiles are defined separately within audit-type-by-detailed-tax-office-by-selection-year training lists. Supported lists have at least two executed audit cases with observed realized revenue per quartile. Unsupported lists have too few executed observed cases to support this quartile rule; these lists are excluded from bin-target training but remain in the prediction and optimization sample when the trained classifier can score them. High-bin rows reports the number of executed observed training cases assigned to the highest realized-evasion quartile.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
 \subsection{Predicting rank}
 
 This subsection reports the predicted-rank diagnostics that accompany the Table 48 optimization exercise. The rank-prediction construction is described in the Table 48 steps above. The diagnostics below use the non-inverted predicted rank order in the Table 4 Column 1 controls; for the Figure 4-style diagnostics only, the horizontal axis groups cases into within-list predicted-priority deciles, where decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The included figures use the B1 all-cases rank scenario exported from the optimization exercise. The top-five-excluded rank scenario is also exported as a diagnostic Figure 4 variant, but is not included in this report section.

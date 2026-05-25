@@ -2,6 +2,130 @@
 
 ---
 
+Date: 2026-05-25
+Task: Revise direct bin-target companion exercise to fixed quartiles.
+
+## Files edited
+- `Code Analyse data/Replication R/08_Optimization_Exercise_Bin_Target_PanelC.R`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `Output/table_opt_full_and_desk_bin_target_panelc.tex`
+- `Output/table_opt_full_and_desk_bin_target_panelc_diagnostics.csv`
+- `Output/table_opt_full_and_desk_bin_target_support.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Changed the companion Panel C target from an automatically selected support-safe bin count to a fixed quartile target.
+- Made the realized-bin construction explicit within audit type, detailed tax office, and selection year by grouping on `controle`, `bureau_detailed`, and `selectionyear`.
+- Updated the report notes, construction bullets, scenario labels, and support table language to describe direct highest-realized-evasion-quartile prediction.
+- Expanded the support table to show total, supported, and unsupported training lists.
+
+## Output files affected
+- Regenerated `Output/table_opt_full_and_desk_bin_target_panelc.tex`.
+- Regenerated `Output/table_opt_full_and_desk_bin_target_panelc_diagnostics.csv`.
+- Regenerated `Output/table_opt_full_and_desk_bin_target_support.tex`.
+- Regenerated report build artifacts and `Code Analyse data/Inspector's Effort report.pdf` during validation.
+
+## Validation performed
+- Ran `08_Optimization_Exercise_Bin_Target_PanelC.R` using Dropbox working data and the project renv package library while writing generated outputs to this repo's `Output/` folder.
+- Confirmed the script reports `A1 validation passed: current Table 9 values are reproduced.`
+- Confirmed all diagnostics have `rows_2020_in_table = 0`, Panel C rows have `panel_c_uses_amount_yhatrf = TRUE`, and optimized counts equal realized executed counts.
+- Confirmed quartile support: Full Audits keep 21 of 28 training lists and exclude 7; Desk Audits keep 23 of 24 and exclude 1. Supported lists have at least two cases per quartile.
+- Compiled `Code Analyse data/Inspector's Effort report.tex` with MiKTeX successfully; remaining warnings are existing-style warnings about multiply defined labels, PDF inclusion versions, and overfull boxes.
+
+## Open issues / next steps
+- Quartiles are more substantively interpretable than halves but exclude more full-audit training lists; if this version becomes central, consider whether to include an appendix sensitivity comparing automatic support-safe bins and fixed quartiles.
+
+---
+
+Date: 2026-05-25
+Task: Implement direct bin-target companion optimization table.
+
+## Files edited
+- `Code Analyse data/Replication R/08_Optimization_Exercise_Bin_Target_PanelC.R`
+- `Code Analyse data/Inspector's Effort report.tex`
+- `Output/table_opt_full_and_desk_bin_target_panelc.tex`
+- `Output/table_opt_full_and_desk_bin_target_panelc_diagnostics.csv`
+- `Output/table_opt_full_and_desk_bin_target_support.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a standalone R companion script for the Table 48 bin-target exercise, leaving `Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R` unchanged.
+- The new script rebuilds the amount-prediction Panel A benchmarks and adds Panel C, where optimized selections are ranked by a one-step random forest classifier predicting high-realized-evasion-bin membership.
+- Implemented the support-safe bin rule: check deciles, quintiles, quartiles, terciles, then halves, and choose the finest grouping with at least two executed observed cases per bin in each included detailed-tax-office-by-selection-year training list.
+- Added a new report subsection, companion table, support table, construction bullets, and Table 48-style tablenotes explaining the audit-program-case unit, 2018--2019 optimization restriction, matched amount-model valuation, support-safe bin rule, and top-five exclusion rule.
+
+## Output files affected
+- New companion table: `Output/table_opt_full_and_desk_bin_target_panelc.tex`.
+- New diagnostics CSV: `Output/table_opt_full_and_desk_bin_target_panelc_diagnostics.csv`.
+- New support table: `Output/table_opt_full_and_desk_bin_target_support.tex`.
+- Regenerated report build artifacts and `Code Analyse data/Inspector's Effort report.pdf` during validation.
+
+## Validation performed
+- Ran `08_Optimization_Exercise_Bin_Target_PanelC.R` using Dropbox working data and the project renv package library while writing generated outputs to this repo's `Output/` folder.
+- Confirmed the script reports `A1 validation passed: current Table 9 values are reproduced.`
+- Confirmed C1--C3 rows exist for Full Audits and Desk Audits, all table scenarios have `rows_2020_in_table = 0`, optimized counts equal executed counts, and Panel C diagnostics mark `panel_c_uses_amount_yhatrf = TRUE`.
+- Confirmed support diagnostics selected halves for full audits and terciles for desk audits under the minimum-two-cases-per-bin rule.
+- Compiled `Code Analyse data/Inspector's Effort report.tex` twice with MiKTeX successfully; the second pass produced `Inspector's Effort report.pdf` with 145 pages. Remaining LaTeX warnings are pre-existing-style warnings about multiply defined labels, PDF inclusion versions, and overfull boxes.
+
+## Open issues / next steps
+- Review whether halves for full audits are substantively too coarse despite satisfying the support-safe rule.
+- If Panel C is promising, consider later sensitivity outputs for alternative bin definitions or a detection-gated two-step bin classifier.
+
+---
+
+Date: 2026-05-25
+Task: Brainstorm direct top-bin prediction as an alternative to predicted-rank diagnostics.
+
+## Files edited
+- `tasks/2026-05-25-001-predicted-evasion-bin-target-brainstorm.md`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added a planning-only brainstorm note discussing Alipio's suggestion to predict high-evasion bin membership directly, such as top 10 percent or top quintile within bureau-year lists, rather than predicting full within-list ranks.
+- Distinguished direct bin-target prediction from the existing practice of binning predicted amount or rank scores after prediction.
+- Recorded benefits, risks, candidate target definitions, diagnostic steps, interpretation guardrails, and open questions for Anne, Alipio, and Roldan.
+
+## Output files affected
+- None. This pass added documentation only.
+
+## Validation performed
+- Reviewed the existing rank-prediction plan, Anne task notes, current predicted-rank Figure 4 script, Table 4 predicted-rank control script, and relevant session-note entries before drafting the brainstorm note.
+- No Stata or R scripts were run because no analysis code or result outputs were changed.
+
+## Open issues / next steps
+- Decide whether the first implementation should estimate both top 10 percent and top quintile targets, or start with one primary bin definition.
+- If implementation proceeds, create separate prediction outputs and diagnostics so existing amount- and rank-prediction files remain unchanged.
+
+Update: 2026-05-25 (support-driven bin definition)
+- Revised `tasks/2026-05-25-001-predicted-evasion-bin-target-brainstorm.md` to incorporate Roldan's point that office-year lists have different numbers of audit cases, so the bin definition should be constrained by the smallest usable list.
+- Added quartiles as a candidate target and reframed the recommendation around choosing the finest grouping with acceptable support across all included lists.
+- Added proposed report diagnostics for minimum and maximum cases per bin, empty or singleton bins, and lists excluded or pooled because of insufficient support.
+- Validation: documentation-only update; no Stata or R code was run.
+
+Update: 2026-05-25 (selected direct bin-target prediction)
+- Updated `tasks/2026-05-25-001-predicted-evasion-bin-target-brainstorm.md` to record the selected next-pass approach: define the outcome as membership in a high-realized-evasion bin and train a classifier to predict the probability of that membership.
+- Narrowed the recommendation and open questions around direct bin-target prediction, leaving support-rule choice as the main remaining design decision.
+- Validation: documentation-only update; no Stata or R code was run.
+
+Update: 2026-05-25 (Table 48-style bin-prediction table design)
+- Added a Table 48-style optimization-table section to `tasks/2026-05-25-001-predicted-evasion-bin-target-brainstorm.md`.
+- Recommended adding a single Panel C for direct bin-target optimized selection, ranked by predicted probability of high-bin membership and valued with the matched amount-prediction model from Panel A.
+- Flagged that the main table should avoid crossing every candidate bin definition with every amount/rank/bin scenario; alternative bin definitions should first be handled through support diagnostics and, if needed, separate sensitivity tables.
+- Validation: documentation-only update; no Stata or R code was run.
+
+Update: 2026-05-25 (one-step versus two-step bin prediction)
+- Added a design note to `tasks/2026-05-25-001-predicted-evasion-bin-target-brainstorm.md` recommending a one-step direct bin classifier as the baseline for the bin-prediction exercise.
+- Clarified that predicting historical execution as a first stage would be conceptually awkward for the Table 48-style optimization because the optimized program fixes the executed audit count within each list and should not import inspector execution behavior into the ranking score.
+- Noted that a two-step variant could be considered later as a sensitivity, preferably using a detection or observed-evasion gate rather than an execution gate.
+- Validation: documentation-only update; no Stata or R code was run.
+
+Update: 2026-05-25 (selected Panel C one-step design)
+- Updated `tasks/2026-05-25-001-predicted-evasion-bin-target-brainstorm.md` to record the agreed first implementation design: a Table 48-style Panel C using a one-step direct bin classifier for optimized ranking.
+- Clarified that two-step bin prediction is outside the first implementation and only a possible later sensitivity if the one-step Panel C is promising.
+- Validation: documentation-only update; no Stata or R code was run.
+
+---
+
 Date: 2026-05-12
 Task: Add consolidated Table 4 Column 1 predicted-evasion control comparison.
 
@@ -1507,3 +1631,16 @@ Update: 2026-05-21 (Figure 4 predicted-rank decile execution-rate plots)
 - Updated `Code Analyse data/Inspector's Effort report.tex` so the predicted-rank figure captions and notes describe predicted-priority deciles rather than inverted rank percentiles or rank distributions.
 - Output files affected: `Output/figure4_panel_a_predicted_rank_fullaudits.pdf`, `Output/figure4_panel_b_predicted_rank_fullaudits.pdf`, `Output/figure4_panel_a_predicted_rank_fullaudits_top5excluded.pdf`, and `Output/figure4_panel_b_predicted_rank_fullaudits_top5excluded.pdf`.
 - Validation: reran Stata 17 batch mode for `Code Analyse data/6 Figure 4 predicted rank panels.do` successfully. The do-file asserts deciles are between 1 and 10, top predicted rank maps to decile 10, and the lowest predicted rank in each multi-case list maps to decile 1; all four PDFs were regenerated with 10 matched deciles in Panel B.
+
+Update: 2026-05-25 (direct high-evasion-bin optimization companion and Codex handoff)
+- Added `tasks/2026-05-25-001-predicted-evasion-bin-target-brainstorm.md` to record the discussion about predicting high-evasion bins instead of full ranks, including the distinction between post-prediction binning and direct bin-target prediction.
+- Added `Code Analyse data/Replication R/08_Optimization_Exercise_Bin_Target_PanelC.R`, a standalone companion script that rebuilds Panel A amount-prediction benchmarks and adds Panel C direct high-evasion-quartile optimized selection.
+- The implemented Panel C uses a one-step random forest classifier for high-realized-evasion-quartile membership within audit-type-by-detailed-tax-office-by-selection-year lists. The predicted high-bin probability ranks optimized selections, while revenue gains are valued with the matched Panel A amount-prediction model.
+- Regenerated `Output/table_opt_full_and_desk_bin_target_panelc.tex`, `Output/table_opt_full_and_desk_bin_target_panelc_diagnostics.csv`, and `Output/table_opt_full_and_desk_bin_target_support.tex`.
+- Updated `Code Analyse data/Inspector's Effort report.tex` to add the `Predicting high-evasion bins` subsection, include the companion table and support table, and explain the quartile support rule and top-five exclusion timing.
+- Added `CODEX_HANDOFF.md` as a root-level handoff note for resuming work from another computer.
+- Output files affected: the bin-target companion TeX table, diagnostics CSV, support TeX table, and compiled `Code Analyse data/Inspector's Effort report.pdf` plus report auxiliary files.
+- Validation: the R companion script was run with the Dropbox working-data folder as `data_path` and this repo's `Output/` folder as `output_path`; it reported that A1 reproduced current Table 9 values exactly for full and desk audits.
+- Validation: inspected the generated Panel C companion table, support table, and diagnostics CSV. The diagnostics confirm `rows_2020_in_table = 0` for all scenarios, optimized counts match executed counts, and the quartile support rule leaves no singleton or empty supported bins.
+- Validation: compiled the updated Inspector's Effort report and produced the report PDF artifacts now present under `Code Analyse data/`.
+- Open issue: decide whether the bin-target companion should remain a separate companion table, be folded into the main Table 48-style optimization table, or be extended with Figure 4-style bin-probability diagnostics.
