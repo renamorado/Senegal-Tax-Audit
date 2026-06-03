@@ -1,22 +1,22 @@
 \begin{tabular}[t]{lcccccc}
 \toprule
- & \multicolumn{4}{c}{\textbf{Panel A: Optimized selection by predicted evasion}} & \multicolumn{2}{c}{\textbf{Panel C: Optimized selection by predicted high-bin probability}}\\
+ & \multicolumn{4}{c}{\textbf{Panel A: Optimized selection by predicted evasion}} & \multicolumn{2}{c}{\textbf{Panel C: Optimized selection by predicted above-median probability}}\\
 \cmidrule(l{3pt}r{3pt}){2-5} \cmidrule(l{3pt}r{3pt}){6-7}
- & \multicolumn{1}{c}{\shortstack{Realized\\Revenue\\Log(mean)}} & \multicolumn{1}{c}{\shortstack{Predicted\\Revenue\\Log(mean)}} & \multicolumn{1}{c}{\shortstack{$\Delta$ Revenue vs Predicted\\w/ RF Selection\\Among Program Cases}} & \multicolumn{1}{c}{\shortstack{Overlap Between\\Optimized and\\Realized Audit Program}} & \multicolumn{1}{c}{\shortstack{$\Delta$ Revenue vs Predicted\\w/ Bin-Probability Selection\\Among Program Cases}} & \multicolumn{1}{c}{\shortstack{Overlap Between\\Optimized and\\Realized Audit Program}}\\
+ & \multicolumn{1}{c}{\shortstack{Realized\\Revenue\\Log(mean)}} & \multicolumn{1}{c}{\shortstack{Predicted\\Revenue\\Log(mean)}} & \multicolumn{1}{c}{\shortstack{$\Delta$ Revenue vs Predicted\\w/ RF Selection\\Among Program Cases}} & \multicolumn{1}{c}{\shortstack{Overlap Between\\Optimized and\\Realized Audit Program}} & \multicolumn{1}{c}{\shortstack{$\Delta$ Revenue vs Predicted\\w/ Above-Median Selection\\Among Program Cases}} & \multicolumn{1}{c}{\shortstack{Overlap Between\\Optimized and\\Realized Audit Program}}\\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5} \cmidrule(l{3pt}r{3pt}){6-6} \cmidrule(l{3pt}r{3pt}){7-7}
  & (1) & (2) & (3) & (4) & (5) & (6)\\
 \midrule
 \addlinespace[0.45em]
-\multicolumn{5}{l}{\textit{A1: Current weighted two-step amount prediction, all cases}} & \multicolumn{2}{l}{\textit{C1: Direct quartile-target selection, valued with A1 amount prediction}}\\
-\hspace{1em}Full Audits & 21.24 & 21.14 & + 18.09\% & 65\% & + 12.66\% & 62\%\\
-\hspace{1em}Desk Audits & 19.00 & 18.73 & + 31.01\% & 61\% & + 18.09\% & 54\%\\
+\multicolumn{5}{l}{\textit{A1: Current weighted two-step amount prediction, all cases}} & \multicolumn{2}{l}{\textit{C1: Predicted above-median selection, valued with A1 amount prediction}}\\
+\hspace{1em}Full Audits & 21.24 & 21.14 & + 18.09\% & 65\% & + 14.27\% & 63\%\\
+\hspace{1em}Desk Audits & 19.00 & 18.73 & + 31.01\% & 61\% & + 21.06\% & 67\%\\
 \addlinespace[0.45em]
-\multicolumn{5}{l}{\textit{A2: Weighted two-step amount prediction, excluding top five realized cases}} & \multicolumn{2}{l}{\textit{C2: Direct quartile-target selection, valued with A2 amount prediction}}\\
-\hspace{1em}Full Audits & 20.95 & 20.89 & + 18.59\% & 64\% & + 12.61\% & 60\%\\
-\hspace{1em}Desk Audits & 18.74 & 18.49 & + 32.52\% & 61\% & + 18.02\% & 55\%\\
+\multicolumn{5}{l}{\textit{A2: Weighted two-step amount prediction, excluding top five realized cases}} & \multicolumn{2}{l}{\textit{C2: Predicted above-median selection, valued with A2 amount prediction}}\\
+\hspace{1em}Full Audits & 20.95 & 20.89 & + 18.59\% & 64\% & + 13.90\% & 63\%\\
+\hspace{1em}Desk Audits & 18.74 & 18.49 & + 32.52\% & 61\% & + 22.86\% & 67\%\\
 \addlinespace[0.45em]
-\multicolumn{5}{l}{\textit{A3: Unweighted one-step amount prediction, excluding top five realized cases}} & \multicolumn{2}{l}{\textit{C3: Direct quartile-target selection, valued with A3 amount prediction}}\\
-\hspace{1em}Full Audits & 20.95 & 19.39 & + 7.37\% & 79\% & - 7.10\% & 60\%\\
-\hspace{1em}Desk Audits & 18.74 & 17.52 & + 32.58\% & 72\% & - 2.53\% & 55\%\\
+\multicolumn{5}{l}{\textit{A3: Unweighted one-step amount prediction, excluding top five realized cases}} & \multicolumn{2}{l}{\textit{C3: Predicted above-median selection, valued with A3 amount prediction}}\\
+\hspace{1em}Full Audits & 20.95 & 19.39 & + 7.37\% & 79\% & + 0.52\% & 63\%\\
+\hspace{1em}Desk Audits & 18.74 & 17.52 & + 32.58\% & 72\% & + 20.09\% & 67\%\\
 \bottomrule
 \end{tabular}
