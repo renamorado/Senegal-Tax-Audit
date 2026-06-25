@@ -5,9 +5,9 @@
 "A2","A2: Weighted two-step amount prediction, excluding top five realized cases","amount","Desk Audits",852,1702,852,852,518,0,FALSE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 "A3","A3: Unweighted one-step amount prediction, excluding top five realized cases","amount","Full Audits",402,641,402,402,317,0,FALSE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 "A3","A3: Unweighted one-step amount prediction, excluding top five realized cases","amount","Desk Audits",852,1702,852,852,613,0,FALSE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-"C1","C1: Direct top-half-target selection, valued with A1 amount prediction","bin","Full Audits",407,646,407,407,257,0,TRUE,2,"Halves","Fixed Halves",11,3,67,0,0,508,257,"controle x bureau_detailed",7,133
-"C1","C1: Direct top-half-target selection, valued with A1 amount prediction","bin","Desk Audits",857,1707,857,857,574,0,TRUE,2,"Halves","Fixed Halves",11,9,147,0,0,1011,509,"controle x bureau_detailed",19,294
-"C2","C2: Direct top-half-target selection, valued with A2 amount prediction","bin","Full Audits",402,641,402,402,253,0,TRUE,2,"Halves","Fixed Halves",11,3,67,0,0,503,254,"controle x bureau_detailed",7,133
-"C2","C2: Direct top-half-target selection, valued with A2 amount prediction","bin","Desk Audits",852,1702,852,852,572,0,TRUE,2,"Halves","Fixed Halves",11,9,147,0,0,1006,505,"controle x bureau_detailed",18,294
-"C3","C3: Direct top-half-target selection, valued with A3 amount prediction","bin","Full Audits",402,641,402,402,253,0,TRUE,2,"Halves","Fixed Halves",11,3,67,0,0,503,254,"controle x bureau_detailed",7,133
-"C3","C3: Direct top-half-target selection, valued with A3 amount prediction","bin","Desk Audits",852,1702,852,852,572,0,TRUE,2,"Halves","Fixed Halves",11,9,147,0,0,1006,505,"controle x bureau_detailed",18,294
+"C1","C1: Predicted above-median selection, valued with A1 amount prediction","bin","Full Audits",407,646,407,407,257,0,TRUE,2,"Above/below median","Fixed Above/below median",11,3,67,0,0,508,257,"controle x bureau_detailed",7,133
+"C1","C1: Predicted above-median selection, valued with A1 amount prediction","bin","Desk Audits",857,1707,857,857,574,0,TRUE,2,"Above/below median","Fixed Above/below median",11,9,147,0,0,1011,509,"controle x bureau_detailed",19,294
+"C2","C2: Predicted above-median selection, valued with A2 amount prediction","bin","Full Audits",402,641,402,402,253,0,TRUE,2,"Above/below median","Fixed Above/below median",11,3,67,0,0,503,254,"controle x bureau_detailed",7,133
+"C2","C2: Predicted above-median selection, valued with A2 amount prediction","bin","Desk Audits",852,1702,852,852,572,0,TRUE,2,"Above/below median","Fixed Above/below median",11,9,147,0,0,1006,505,"controle x bureau_detailed",18,294
+"C3","C3: Predicted above-median selection, valued with A3 amount prediction","bin","Full Audits",402,641,402,402,253,0,TRUE,2,"Above/below median","Fixed Above/below median",11,3,67,0,0,503,254,"controle x bureau_detailed",7,133
+"C3","C3: Predicted above-median selection, valued with A3 amount prediction","bin","Desk Audits",852,1702,852,852,572,0,TRUE,2,"Above/below median","Fixed Above/below median",11,9,147,0,0,1006,505,"controle x bureau_detailed",18,294

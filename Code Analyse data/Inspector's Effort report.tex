@@ -1260,7 +1260,37 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \end{adjustbox}
 \end{table}
 
-\section{Revision of optimization gains and predicting rank}
+\section{Table 48 optimization variants}
+
+\subsection{Figure 4 with unweighted two-step amount predictions}
+
+\begin{figure}[H]
+    \centering
+    \caption{Predicted Evasion Amount and Realized Execution Rate: Unweighted Two-Step Predictions}
+    \label{fig:figure4_twostep_unweighted_yhatrf_fullaudits}
+    \begin{threeparttable}
+    \begin{subfigure}[t]{0.82\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath figure4_panel_a_twostep_unweighted_yhatrf_fullaudits.pdf}
+        \subcaption{All selected full-audit cases}
+    \end{subfigure}
+
+    \vspace{0.7em}
+
+    \begin{subfigure}[t]{0.82\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath figure4_panel_b_twostep_unweighted_yhatrf_fullaudits.pdf}
+        \subcaption{Algorithm-selected and inspector-selected full-audit cases}
+    \end{subfigure}
+
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: A plots the distribution of detected evasion for all full audits (log of FCFA amounts, gray), as well as the results from a two-step unweighted random forest model predicting detected evasion based on firms' observable characteristics. The blue distribution is predicted evasion for cases that were part of the annual audit program but not actually audited. The green distribution is predicted evasion for cases that were audited. The red solid line plots the realized audit execution rate by one-log-point predicted-evasion bin. B shows the distribution of predicted evasion for all algorithm-selected cases (maroon) and for all inspector-selected cases (orange). The solid lines (maroon and orange) plot realized audit execution rates by one-log-point predicted-evasion bin within each selected-case group. All plotted series are restricted to bins with midpoint at least 14.5. This figure is for full audits only.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\subsection{Predicting ranking}
 
 \begin{landscape}
 \begin{table}[H]\centering
@@ -1274,7 +1304,7 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: This table shows the results from our optimization exercise in which we use the audit results from the realized set of audits to train machine-learning (random forest) models to predict evasion or realized-evasion rank. The unit is an audit-program case, not a unique firm; the same firm can therefore contribute more than one case if it appears more than once in the audit-program data. We optimize which audit cases were conducted in 2018 and 2019. Columns 1 and 2 are shared within each A/B scenario pair: Column 1 shows the realized revenue (evasion and fines) from executed audit cases across all tax offices, and Column 2 shows the predicted revenue, based on the relevant amount-prediction random forest, for cases that experienced an audit. Panel A ranks cases for optimized selection by predicted revenue; Column 3 shows the revenue increase (in percent, compared to the predicted revenue in Column 2), and Column 4 shows the overlap with the realized audit program. Panel B ranks cases for optimized selection by predicted rank; Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A amount-prediction model. A1 and B1 keep all cases and use the current weighted two-step amount prediction for valuation. A2 and B2 use the same weighted two-step amount prediction after excluding the top five realized-revenue audited cases. A3 and B3 use a one-step unweighted amount prediction after the same top-five exclusion. Top five means the five executed audited cases with the largest realized revenue within each audit type in the 2018--2019 optimization sample. In the top-five scenarios, these cases are removed before model training, prediction, recomputation of realized audit-case counts, and optimized selection. After the exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
+\item Notes: This table shows the results from our optimization exercise in which we use audit results from the realized set of audits to train random forest models to predict evasion revenue or realized evasion rank. The unit is an audit program case, not a unique firm; the same firm can therefore appear more than once if it has multiple cases in the audit program data. We optimize which audit cases were conducted in 2018 and 2019. Columns 1 and 2 are shared within each A/B scenario pair. Column 1 shows the realized revenue, evasion and fines, from executed audit cases across all tax offices. Column 2 shows the predicted revenue, based on the relevant revenue prediction model, for cases that experienced an audit. In Panel A, cases are ranked by predicted revenue. Column 3 shows the revenue increase in percent, compared to the predicted revenue in Column 2, from using this ranking for audit selection. Column 4 shows the share of realized audited cases that are also chosen under the optimized program. In Panel B, cases are ranked by predicted realized evasion rank rather than predicted revenue. Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A revenue prediction model. A1 and B1 keep all cases. A2 and B2 repeat the weighted revenue prediction after excluding the five executed audited cases with the largest realized revenue within each audit type. A3 and B3 use an unweighted revenue prediction after the same exclusion. In the top five exclusions, these cases are removed before model training, prediction, recomputation of realized audit counts, and optimized selection. The optimized program is rebuilt within the same implementation lists used in the optimization scripts, with the number of optimized cases fixed to the realized number of executed audits in each list.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -1290,7 +1320,7 @@ This subsection presents the full-audit Table 8 baseline replication together wi
 \item A1 uses the current two-step weighted prediction method: first predict whether an audit would uncover positive evasion, then train a weighted revenue random forest among actually audited cases with positive detected evasion, giving additional weight to high-realized-revenue audit outcomes within tax-office-by-year cells.
 \item A2 repeats the A1 method after removing the five executed audited cases with the largest realized revenue within each audit type in the 2018--2019 optimization sample.
 \item A3 uses the same top-five-excluded sample as A2, but replaces the two-step weighted method with a one-step unweighted revenue random forest trained on actually audited cases with observed realized revenue.
-\item For each A panel, predict revenue for all remaining selected non-safety audit-program cases, keep the 2018 and 2019 optimization years, rank cases by predicted revenue within each tax-office-by-year list, and choose the top-ranked cases until the optimized list has the same number of executed audit cases as the realized implementation in that list.
+\item For each A panel, predict revenue for all remaining selected non-safety audit-program cases, keep the 2018 and 2019 optimization years, rank cases by predicted revenue within each \texttt{inspectorclusteryear} optimization list, and choose the top-ranked cases until the optimized list has the same number of executed audit cases as the realized implementation in that list.
 \item Columns 1 and 2 report the log mean of realized revenue and predicted revenue among actually audited cases. These columns are shared with the paired Panel B scenario because Panel B uses the same amount-prediction model for valuation.
 \item Column 3 reports:
 $$
@@ -1314,7 +1344,7 @@ $$
 \item Second, train a separate unweighted random forest to predict this within-list realized-rank outcome.
 \item Third, use the rank model to predict rank for all remaining selected non-safety audit-program cases.
 \item Fourth, within each detailed tax office by selection year list, sort cases by the Random Forest predicted-rank outcome and create the predicted-rank ordering used for optimization.
-\item Finally, build the optimized program from this predicted-rank ordering rather than from predicted revenue. After any top-five exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
+\item Finally, build the optimized program from this predicted-rank ordering rather than from predicted revenue. After any top-five exclusion, the optimized selection is rebuilt within each \texttt{inspectorclusteryear} list using the remaining realized audit count in that list.
 \item B1 uses rank-based optimized selection on the all-case sample and reports Columns 5 and 6 using the A1 amount-prediction values for the revenue-gain calculation.
 \item B2 uses rank-based optimized selection after the same pre-training top-five exclusion as A2 and reports Columns 5 and 6 using the A2 amount-prediction values.
 \item B3 uses rank-based optimized selection after the same pre-training top-five exclusion as A3 and reports Columns 5 and 6 using the A3 amount-prediction values.
@@ -1326,88 +1356,8 @@ $$
 \item The top-five exclusion is defined separately for full audits and desk audits.
 \item Within each audit type, the excluded cases are the five executed audited cases with the largest realized revenue (evasion and fines) in the 2018--2019 optimization sample.
 \item In A2, A3, B2, and B3, those five cases are removed before random-forest training, prediction, recomputation of realized audit-case counts, and optimized selection.
-\item After the exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
+\item After the exclusion, the optimized selection is rebuilt within each \texttt{inspectorclusteryear} list using the remaining realized audit count in that list.
 \end{itemize}
-
-\subsection{Predicting above-median evasion}
-
-\begin{landscape}
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=1.25\textwidth}
-\begin{threeparttable}
-\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Predicted Above-Median Evasion}
-\label{tab:table_opt_full_and_desk_bin_target_panelc}
-
-\footnotesize
-\input{\OutPath table_opt_full_and_desk_bin_target_panelc.tex}
-
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item Notes: This table is a companion to Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}. It reports an optimization exercise in which we use audit results from the realized set of audits to train machine-learning (random forest) models to predict evasion and above-median realized-evasion membership. The unit is an audit-program case, not a unique firm; the same firm can therefore contribute more than one case if it appears more than once in the audit-program data. We optimize which audit cases were conducted in 2018 and 2019. Columns 1 and 2 are shared within each A/C specification pair: Column 1 shows the realized revenue (evasion and fines) from executed audit cases across all tax offices, and Column 2 shows the predicted revenue, based on the relevant amount-prediction random forest, for cases that experienced an audit. Panel A ranks cases for optimized selection by predicted revenue; Column 3 shows the revenue increase (in percent, compared to the predicted revenue in Column 2), and Column 4 shows the overlap with the realized audit program. Panel C ranks cases for optimized selection by the predicted probability that the case is above the median of realized evasion within its audit-type-by-detailed-tax-office group, pooling selection years within detailed tax office; Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A amount-prediction model. C1 uses predicted above-median probability on the all-case sample and values gains with the A1 amount-prediction model. C2 uses predicted above-median probability after the same pre-training top-five exclusion as A2 and values gains with the A2 amount-prediction model. C3 uses predicted above-median probability after the same pre-training top-five exclusion as A3 and values gains with the A3 amount-prediction model. The above-median target is defined separately by audit type, detailed tax office, and C-panel specification using all executed observed training cases with non-missing realized revenue. Top five means the five executed audited cases with the largest realized revenue within each audit type in the 2018--2019 optimization sample. In the top-five specifications, these cases are removed before model training, prediction, recomputation of realized audit-case counts, and optimized selection. After the exclusion, the optimized selection is rebuilt within each tax-office-by-year list using the remaining realized audit count in that list.
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-\end{landscape}
-
-\noindent\textbf{Steps used to build the predicted above-median specification}
-\medskip
-
-\noindent\textit{Panel C: optimized selection by predicted above-median evasion probability}
-\begin{itemize}
-\item Panel C uses the same selected non-safety samples, 2018--2019 restriction, audit-type split, and top-five exclusion rules as Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}.
-\item First, for each C-panel specification, the script uses executed audit cases with observed realized revenue within each audit-type-by-detailed-tax-office group, pooling selection years. Here, the C-panel specification refers to the sample and valuation pair: C1 keeps all cases, while C2 and C3 apply the same pre-training top-five exclusion used by A2 and A3.
-\item Second, within each audit-type-by-detailed-tax-office training group, it orders executed observed cases by realized revenue and assigns each case to an above-median or below-median realized-evasion class.
-\item Third, it defines the prediction target as an indicator for above-median realized evasion.
-\item Fourth, it trains a one-step unweighted random forest classifier to predict this above-median indicator and predicts the probability of above-median membership for all selected non-safety audit-program cases.
-\item Finally, it builds the optimized program from this predicted above-median probability rather than from predicted revenue. The number of optimized cases is still fixed to match the realized number of executed audits within each tax-office-by-year list.
-\item The prediction target is pooled across years within audit type by detailed tax office, but the optimized selections still follow the pre-existing Table 48/Table 49 program rules: selections are rebuilt within tax-office-by-selection-year lists, with the number of optimized cases fixed to the realized executed-audit count in each list.
-\item The above-median prediction is used only to select the optimized cases. Columns 1 and 2 are shared with the matched Panel A specification, and the revenue gains in Column 5 always use the matched amount-prediction model. Panel C therefore isolates how changing the ranking rule changes the optimized audit set.
-\item Overlap can remain nearly unchanged across C subpanels because it is determined by the optimized case set, not by the amount-prediction model used to value that set. C2 and C3 use the same top-five-excluded probability-ranking sample, so they select the same cases and have the same overlap; C1 uses the all-case probability-ranking sample, but the resulting overlap rounds to the same reported percentage for full audits and a very similar percentage for desk audits.
-\end{itemize}
-
-\begin{table}[H]\centering
-\begin{adjustbox}{max width=1.15\textwidth}
-\begin{threeparttable}
-\caption{Training Target Summary for Predicted Above-Median Evasion}
-\label{tab:table_opt_full_and_desk_bin_target_support}
-\footnotesize
-\input{\OutPath table_opt_full_and_desk_bin_target_support.tex}
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item Notes: This table summarizes the training target used in Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. Above- and below-median realized-evasion classes are defined separately within audit-type-by-detailed-tax-office training groups, pooling selection years within detailed tax office, using executed observed cases with non-missing realized revenue. Singleton classes and empty classes describe thin cells after assigning all available training groups. Above-median rows reports the number of executed observed training cases assigned to the above-median realized-evasion class.
-\end{tablenotes}
-\end{threeparttable}
-\end{adjustbox}
-\end{table}
-
-\begin{figure}[H]
-    \centering
-    \caption{Predicted Above-Median Evasion Probability Bins and Realized Execution Rate, All Full-Audit Cases}
-    \label{fig:figure4_panel_a_binprob_fixed005_fullaudits_office_target}
-    \begin{threeparttable}
-    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_binprob_fixed005_fullaudits_office_target.pdf}
-    \begin{tablenotes}[flushleft]
-    \footnotesize
-    \item Notes: This figure mirrors the original fixed-bin Figure 4 construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. The model is a one-step random forest classifier trained to predict whether an executed full-audit case is above the median of realized evasion within its audit-type-by-detailed-tax-office group, pooling selection years within detailed tax office. The sample is selected non-safety full-audit cases. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of predicted probabilities among executed cases, non-executed cases, and executed above-median cases. The red line plots the realized audit execution rate by fixed probability bin, and the shaded band shows the 95 percent confidence interval.
-    \end{tablenotes}
-    \end{threeparttable}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Fixed Above-Median Evasion Probability Bins}
-    \label{fig:figure4_panel_b_binprob_fixed005_fullaudits_office_target}
-    \begin{threeparttable}
-    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_binprob_fixed005_fullaudits_office_target.pdf}
-    \begin{tablenotes}[flushleft]
-    \footnotesize
-    \item Notes: This figure mirrors the original fixed-bin Figure 4 Panel B construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. The target is above-median realized-evasion membership within audit-type-by-detailed-tax-office groups, pooling selection years within detailed tax office. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of algorithm-selected and inspector-selected full-audit cases across fixed probability bins. The lines plot realized audit execution rates by fixed probability bin separately for algorithm-selected and inspector-selected cases, and the shaded bands show 95 percent confidence intervals.
-    \end{tablenotes}
-    \end{threeparttable}
-\end{figure}
-
-\subsection{Predicting rank}
 
 This subsection reports the predicted-rank diagnostics that accompany the Table 48 optimization exercise. The rank-prediction construction is described in the Table 48 steps above. The diagnostics below use the non-inverted predicted rank order in the Table 4 Column 1 controls; for the Figure 4-style diagnostics only, the horizontal axis groups cases into within-list predicted-priority deciles, where decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The included figures use the B1 all-cases rank scenario exported from the optimization exercise. The top-five-excluded rank scenario is also exported as a diagnostic Figure 4 variant, but is not included in this report section.
 
@@ -1463,6 +1413,159 @@ This subsection reports the predicted-rank diagnostics that accompany the Table 
     \begin{tablenotes}[flushleft]
     \footnotesize
     \item Notes: This figure mirrors Figure 4 Panel B but replaces the predicted evasion amount with the B1 all-cases predicted-rank output exported from the optimization exercise. After the Random Forest predicts the rank outcome, cases are re-ranked within each detailed-tax-office-by-selection-year list. For plotting, cases are grouped into predicted-priority deciles within audit type, detailed tax office, and selection year. Decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The lines plot realized audit execution rates by predicted-priority decile separately for algorithm-selected and inspector-selected full-audit cases, and the shaded bands show 95 percent confidence intervals.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\subsection{Predicting above-median evasion in a tax office}
+
+\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.25\textwidth}
+\begin{threeparttable}
+\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Predicted Above-Median Evasion}
+\label{tab:table_opt_full_and_desk_bin_target_panelc}
+
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_panelc.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table shows a companion optimization exercise in which we use audit results from the realized set of audits to train random forest models to predict evasion revenue and whether a case is above the median of realized evasion. The unit is an audit program case, not a unique firm. We optimize which audit cases were conducted in 2018 and 2019. Columns 1 and 2 are shared within each A/C specification pair. Column 1 shows the realized revenue, evasion and fines, from executed audit cases across all tax offices. Column 2 shows the predicted revenue, based on the relevant revenue prediction model, for cases that experienced an audit. In Panel A, cases are ranked by predicted revenue. Column 3 shows the revenue increase in percent, compared to the predicted revenue in Column 2, from using this ranking for audit selection. Column 4 shows the share of realized audited cases that are also chosen under the optimized program. In Panel C, cases are ranked by the predicted probability that they are above the median of realized evasion within audit type and detailed tax office, pooling years within each detailed tax office. Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A revenue prediction model. C1 keeps all cases and values gains with the A1 revenue prediction model. C2 applies the same top five exclusion as A2 and values gains with the A2 model. C3 applies the same top five exclusion as A3 and values gains with the A3 model. In the top five exclusions, the five executed audited cases with the largest realized revenue within each audit type are removed before model training, prediction, recomputation of realized audit counts, and optimized selection. The optimized program is then rebuilt within the same implementation lists used in Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}, with the number of optimized cases fixed to the realized number of executed audits in each list.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+\end{landscape}
+
+\noindent\textbf{Steps used to build the predicted above-median specification}
+\medskip
+
+\noindent\textit{Panel C: optimized selection by predicted above-median evasion probability}
+\begin{itemize}
+\item Panel C uses the same selected non-safety samples, 2018--2019 restriction, audit-type split, and top-five exclusion rules as Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}.
+\item First, for each C-panel specification, the script uses executed audit cases with observed realized revenue within each audit-type-by-detailed-tax-office group, pooling selection years. Here, the C-panel specification refers to the sample and valuation pair: C1 keeps all cases, while C2 and C3 apply the same pre-training top-five exclusion used by A2 and A3.
+\item Second, within each audit-type-by-detailed-tax-office training group, it orders executed observed cases by realized revenue and assigns each case to an above-median or below-median realized-evasion class.
+\item Third, it defines the prediction target as an indicator for above-median realized evasion.
+\item Fourth, it trains a one-step unweighted random forest classifier to predict this above-median indicator and predicts the probability of above-median membership for all selected non-safety audit-program cases.
+\item Finally, it builds the optimized program from this predicted above-median probability rather than from predicted revenue. The number of optimized cases is still fixed to match the realized number of executed audits within each \texttt{inspectorclusteryear} optimization list.
+\item The prediction target is pooled across years within audit type by detailed tax office, but the optimized selections still follow the pre-existing Table 48/Table 49 program rules: selections are rebuilt within \texttt{inspectorclusteryear}, with the number of optimized cases fixed to the realized executed-audit count in each list.
+\item The above-median prediction is used only to select the optimized cases. Columns 1 and 2 are shared with the matched Panel A specification, and the revenue gains in Column 5 always use the matched amount-prediction model. Panel C therefore isolates how changing the ranking rule changes the optimized audit set.
+\item Overlap can remain nearly unchanged across C subpanels because it is determined by the optimized case set, not by the amount-prediction model used to value that set. C2 and C3 use the same top-five-excluded probability-ranking sample, so they select the same cases and have the same overlap; C1 uses the all-case probability-ranking sample, but the resulting overlap rounds to the same reported percentage for full audits and a very similar percentage for desk audits.
+\end{itemize}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.15\textwidth}
+\begin{threeparttable}
+\caption{Training Target Summary for Predicted Above-Median Evasion}
+\label{tab:table_opt_full_and_desk_bin_target_support}
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_support.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table summarizes the training target used in Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. Above- and below-median realized-evasion classes are defined separately within audit-type-by-detailed-tax-office training groups, pooling selection years within detailed tax office, using executed observed cases with non-missing realized revenue. Singleton classes and empty classes describe thin cells after assigning all available training groups. Above-median rows reports the number of executed observed training cases assigned to the above-median realized-evasion class.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \caption{Predicted Above-Median Evasion Probability Bins and Realized Execution Rate, All Full-Audit Cases}
+    \label{fig:figure4_panel_a_binprob_fixed005_fullaudits_office_target}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_binprob_fixed005_fullaudits_office_target.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors the original fixed-bin Figure 4 construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. The model is a one-step random forest classifier trained to predict whether an executed full-audit case is above the median of realized evasion within its audit-type-by-detailed-tax-office group, pooling selection years within detailed tax office. The sample is selected non-safety full-audit cases. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of predicted probabilities among executed cases, non-executed cases, and executed above-median cases. The red line plots the realized audit execution rate by fixed probability bin, and the shaded band shows the 95 percent confidence interval.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Fixed Above-Median Evasion Probability Bins}
+    \label{fig:figure4_panel_b_binprob_fixed005_fullaudits_office_target}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_binprob_fixed005_fullaudits_office_target.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors the original fixed-bin Figure 4 Panel B construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. The target is above-median realized-evasion membership within audit-type-by-detailed-tax-office groups, pooling selection years within detailed tax office. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of algorithm-selected and inspector-selected full-audit cases across fixed probability bins. The lines plot realized audit execution rates by fixed probability bin separately for algorithm-selected and inspector-selected cases, and the shaded bands show 95 percent confidence intervals.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\subsection{Predicting above-median evasion in a list}
+
+\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.25\textwidth}
+\begin{threeparttable}
+\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Predicted Above-Median Evasion in the List}
+\label{tab:table_opt_full_and_desk_bin_target_panelc_listyear}
+
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_panelc_listyear.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table repeats the predicted above median optimization exercise in Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}, but defines the above median target within the operational list relevant to each audit type rather than within detailed tax office pooled across years. For full audits, above median status is defined within each detailed tax office and selection year. For desk audits, it is defined within each inspector assignment list and selection year. Panel A ranks cases for optimized selection by predicted revenue. Panel C ranks cases by the predicted probability that the case is above the median of realized evasion in its audit type specific list. Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A revenue prediction model. Optimized selections are rebuilt within the same implementation lists used in Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}, with the number of optimized cases fixed to the realized number of executed audits in each list. For desk audits, the above median target and the optimization list are directly aligned. For full audits, the target follows the detailed tax office by year list used in the Figure 4 diagnostics, while the optimized audit count follows the original implementation list used in the optimization scripts.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+\end{landscape}
+
+\noindent\textbf{Steps used to build the list-level predicted above-median specification}
+\medskip
+
+\noindent\textit{Panel C: optimized selection by list-level predicted above-median evasion probability}
+\begin{itemize}
+\item The list-level version uses the same selected non-safety samples, 2018--2019 restriction, audit-type split, valuation models, and top-five exclusion rules as Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}.
+\item The target grouping is audit-type specific. Full-audit targets are built within \texttt{bureau\_detailed $\times$ selectionyear}; desk-audit targets are built within \texttt{inspectorclusteryear}.
+\item Within each target group, executed observed cases with non-missing realized revenue are ordered by realized revenue and assigned to above- or below-median realized-evasion classes.
+\item A one-step unweighted random forest classifier predicts the probability of above-median membership for all selected non-safety audit-program cases.
+\item The optimized program is ranked by this predicted above-median probability, while the number of optimized cases remains fixed to the realized number of executed audits within the original \texttt{inspectorclusteryear} optimization list.
+\item The list-level target is used only to change the ranking rule. Columns 1 and 2 remain the matched Panel A amount-prediction values, and Column 5 values the selected cases using the matched amount-prediction model.
+\end{itemize}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.15\textwidth}
+\begin{threeparttable}
+\caption{Training Target Summary for List-Level Predicted Above-Median Evasion}
+\label{tab:table_opt_full_and_desk_bin_target_listyear_support}
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_listyear_support.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table summarizes the list-level training target used in Table \ref{tab:table_opt_full_and_desk_bin_target_panelc_listyear}. Full-audit targets are defined within \texttt{bureau\_detailed $\times$ selectionyear}; desk-audit targets are defined within \texttt{inspectorclusteryear}. Singleton classes and empty classes describe thin cells after assigning all available training groups. Above-median rows reports the number of executed observed training cases assigned to the above-median realized-evasion class.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \caption{List-Level Predicted Above-Median Evasion Probability Bins and Realized Execution Rate, All Full-Audit Cases}
+    \label{fig:figure4_panel_a_binprob_fixed005_fullaudits_listyear_target}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_binprob_fixed005_fullaudits_listyear_target.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors the fixed-bin Figure 4 construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc_listyear}. The full-audit classifier target is above-median realized-evasion membership within \texttt{bureau\_detailed $\times$ selectionyear}. The sample is selected non-safety full-audit cases. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of predicted probabilities among executed cases, non-executed cases, and executed above-median cases. The red line plots the realized audit execution rate by fixed probability bin, and the shaded band shows the 95 percent confidence interval.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: List-Level Fixed Above-Median Evasion Probability Bins}
+    \label{fig:figure4_panel_b_binprob_fixed005_fullaudits_listyear_target}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_binprob_fixed005_fullaudits_listyear_target.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors the fixed-bin Figure 4 Panel B construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc_listyear}. The full-audit classifier target is above-median realized-evasion membership within \texttt{bureau\_detailed $\times$ selectionyear}. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of algorithm-selected and inspector-selected full-audit cases across fixed probability bins. The lines plot realized audit execution rates by fixed probability bin separately for algorithm-selected and inspector-selected cases, and the shaded bands show 95 percent confidence intervals.
     \end{tablenotes}
     \end{threeparttable}
 \end{figure}

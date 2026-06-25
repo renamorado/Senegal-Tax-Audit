@@ -53,9 +53,29 @@ support_output_file <- file.path(
   "table_opt_full_and_desk_bin_target_support.tex"
 )
 
+listyear_table_output_file <- file.path(
+  revision_output_path,
+  "table_opt_full_and_desk_bin_target_panelc_listyear.tex"
+)
+
+listyear_diagnostics_output_file <- file.path(
+  revision_output_path,
+  "table_opt_full_and_desk_bin_target_panelc_listyear_diagnostics.csv"
+)
+
+listyear_support_output_file <- file.path(
+  revision_output_path,
+  "table_opt_full_and_desk_bin_target_listyear_support.tex"
+)
+
 figure4_prediction_output_file <- file.path(
   revision_output_path,
   "figure4_binprob_decile_fullaudits_c1.dta"
+)
+
+figure4_listyear_prediction_output_file <- file.path(
+  revision_output_path,
+  "figure4_binprob_decile_fullaudits_c1_listyear.dta"
 )
 
 figure4_office_prediction_output_file <- file.path(
@@ -551,7 +571,9 @@ build_scenario_pair <- function(
     bin_label_text,
     exclude_top_realized,
     weighted_revenue_prediction,
-    use_detection_gate
+    use_detection_gate,
+    bin_group_vars = c("controle", "bureau_detailed"),
+    bin_group_label = "controle x bureau_detailed"
 ) {
   message("Building ", amount_id, "/", bin_id, " for ", audit_label(type), ".")
 
@@ -592,8 +614,8 @@ build_scenario_pair <- function(
 
   bin_result <- build_bin_predictions(
     audits,
-    bin_group_vars = c("controle", "bureau_detailed"),
-    bin_group_label = "controle x bureau_detailed",
+    bin_group_vars = bin_group_vars,
+    bin_group_label = bin_group_label,
     bin_count = target_bin_count
   )
 
@@ -606,7 +628,8 @@ build_scenario_pair <- function(
           bin_priority_score,
           realized_high_evasion_bin,
           high_evasion_bin,
-          bin_list_n
+          bin_list_n,
+          bin_target_grouping
         ),
       by = "revision_case_id"
     )
@@ -631,7 +654,7 @@ build_scenario_pair <- function(
           pmin(10, binprob_priority_decile)
         ),
         binprob_decile_assignment = "Within bureau_detailed x selectionyear; 10 = highest predicted above-median probability",
-        binprob_target_assignment = "Realized above-median target within controle x bureau_detailed"
+        binprob_target_assignment = paste0("Realized above-median target within ", bin_group_label)
       ) %>%
       ungroup() %>%
       select(
@@ -745,6 +768,20 @@ scenario_pairs <- tribble(
   "A3", "C3", "A3: Unweighted one-step amount prediction, excluding top five realized cases", "C3: Predicted above-median selection, valued with A3 amount prediction", TRUE, FALSE, FALSE
 )
 
+listyear_target_grouping <- function(type) {
+  if (type == 2) {
+    list(
+      vars = c("bureau_detailed", "selectionyear"),
+      label = "bureau_detailed x selectionyear"
+    )
+  } else {
+    list(
+      vars = c("inspectorclusteryear"),
+      label = "inspectorclusteryear"
+    )
+  }
+}
+
 data_audits <- read_dta(
   file.path(data_path, "datasetforanalysis_predictionexercise_for_all_logs_exercise.dta")
 )
@@ -783,6 +820,40 @@ for (scenario_row in seq_len(nrow(scenario_pairs))) {
   }
 }
 
+listyear_scenario_outputs <- list()
+listyear_diagnostics_outputs <- list()
+listyear_support_outputs <- list()
+listyear_figure4_outputs <- list()
+listyear_output_index <- 1
+
+for (scenario_row in seq_len(nrow(scenario_pairs))) {
+  for (type in c(2, 1)) {
+    target_grouping <- listyear_target_grouping(type)
+
+    result <- build_scenario_pair(
+      data_audits = data_audits,
+      type = type,
+      amount_id = scenario_pairs$amount_id[scenario_row],
+      amount_label = scenario_pairs$amount_label[scenario_row],
+      bin_id = scenario_pairs$bin_id[scenario_row],
+      bin_label_text = scenario_pairs$bin_label_text[scenario_row],
+      exclude_top_realized = scenario_pairs$exclude_top_realized[scenario_row],
+      weighted_revenue_prediction = scenario_pairs$weighted_revenue_prediction[scenario_row],
+      use_detection_gate = scenario_pairs$use_detection_gate[scenario_row],
+      bin_group_vars = target_grouping$vars,
+      bin_group_label = target_grouping$label
+    )
+
+    listyear_scenario_outputs[[listyear_output_index]] <- result$table_values
+    listyear_diagnostics_outputs[[listyear_output_index]] <- result$diagnostics
+    listyear_support_outputs[[listyear_output_index]] <- result$support
+    if (!is.null(result$figure4_predictions)) {
+      listyear_figure4_outputs[[length(listyear_figure4_outputs) + 1]] <- result$figure4_predictions
+    }
+    listyear_output_index <- listyear_output_index + 1
+  }
+}
+
 scenario_levels <- c(scenario_pairs$amount_id, scenario_pairs$bin_id)
 
 results_table <- bind_rows(scenario_outputs) %>%
@@ -806,8 +877,33 @@ support_table <- bind_rows(support_outputs) %>%
   ) %>%
   arrange(scenario_id, audit_type)
 
+listyear_results_table <- bind_rows(listyear_scenario_outputs) %>%
+  mutate(
+    audit_type = factor(audit_type, levels = c("Full Audits", "Desk Audits")),
+    scenario_id = factor(scenario_id, levels = scenario_levels)
+  ) %>%
+  arrange(scenario_id, audit_type)
+
+listyear_diagnostics_table <- bind_rows(listyear_diagnostics_outputs) %>%
+  mutate(
+    audit_type = factor(audit_type, levels = c("Full Audits", "Desk Audits")),
+    scenario_id = factor(scenario_id, levels = scenario_levels)
+  ) %>%
+  arrange(scenario_id, audit_type)
+
+listyear_support_table <- bind_rows(listyear_support_outputs) %>%
+  mutate(
+    audit_type = factor(audit_type, levels = c("Full Audits", "Desk Audits")),
+    scenario_id = factor(scenario_id, levels = scenario_pairs$bin_id)
+  ) %>%
+  arrange(scenario_id, audit_type)
+
 if (length(figure4_outputs) == 0) {
   stop("No C1 full-audit bin-probability predictions were produced for Figure 4 diagnostics.")
+}
+
+if (length(listyear_figure4_outputs) == 0) {
+  stop("No C1 full-audit list-target bin-probability predictions were produced for Figure 4 diagnostics.")
 }
 
 if (length(figure4_multiclass_outputs) == 0) {
@@ -815,6 +911,13 @@ if (length(figure4_multiclass_outputs) == 0) {
 }
 
 figure4_prediction_table <- bind_rows(figure4_outputs) %>%
+  mutate(
+    binprob_priority_decile = as.integer(binprob_priority_decile),
+    binprob_rank_bureauyear = as.integer(binprob_rank_bureauyear),
+    binprob_list_n = as.integer(binprob_list_n)
+  )
+
+figure4_listyear_prediction_table <- bind_rows(listyear_figure4_outputs) %>%
   mutate(
     binprob_priority_decile = as.integer(binprob_priority_decile),
     binprob_rank_bureauyear = as.integer(binprob_rank_bureauyear),
@@ -834,6 +937,13 @@ if (!all(
     figure4_prediction_table$binprob_priority_decile <= 10
 )) {
   stop("Figure 4 predicted high-evasion priority deciles are outside 1--10.")
+}
+
+if (!all(
+  figure4_listyear_prediction_table$binprob_priority_decile >= 1 &
+    figure4_listyear_prediction_table$binprob_priority_decile <= 10
+)) {
+  stop("List-target Figure 4 predicted high-evasion priority deciles are outside 1--10.")
 }
 
 if (!all(figure4_multiclass_table$predicted_realized_quartile >= 1 &
@@ -865,6 +975,24 @@ if (!all(figure4_rank_checks$top_rank_decile == 10)) {
 
 if (!all(figure4_rank_checks$bottom_rank_decile == 1 | figure4_rank_checks$list_n == 1)) {
   stop("At least one multi-case Figure 4 list does not assign the bottom predicted probability to decile 1.")
+}
+
+figure4_listyear_rank_checks <- figure4_listyear_prediction_table %>%
+  group_by(bureau_detailed, selectionyear) %>%
+  summarize(
+    top_rank_decile = binprob_priority_decile[which.min(binprob_rank_bureauyear)],
+    bottom_rank_decile = binprob_priority_decile[which.max(binprob_rank_bureauyear)],
+    list_n = first(binprob_list_n),
+    .groups = "drop"
+  )
+
+if (!all(figure4_listyear_rank_checks$top_rank_decile == 10)) {
+  stop("At least one list-target Figure 4 list does not assign the top predicted probability to decile 10.")
+}
+
+if (!all(figure4_listyear_rank_checks$bottom_rank_decile == 1 |
+         figure4_listyear_rank_checks$list_n == 1)) {
+  stop("At least one multi-case list-target Figure 4 list does not assign the bottom predicted probability to decile 1.")
 }
 
 office_target_audits <- build_base_audits(
@@ -1005,7 +1133,9 @@ if (!all(
 }
 
 write.csv(diagnostics_table, diagnostics_output_file, row.names = FALSE)
+write.csv(listyear_diagnostics_table, listyear_diagnostics_output_file, row.names = FALSE)
 write_dta(figure4_prediction_table, figure4_prediction_output_file)
+write_dta(figure4_listyear_prediction_table, figure4_listyear_prediction_output_file)
 write_dta(figure4_office_prediction_table, figure4_office_prediction_output_file)
 write_dta(figure4_office_top10_prediction_table, figure4_office_top10_prediction_output_file)
 write_dta(figure4_multiclass_table, figure4_multiclass_output_file)
@@ -1114,6 +1244,64 @@ writeLines(
   table_output_file
 )
 
+latex_rows_listyear <- c()
+
+for (scenario_row in seq_len(nrow(scenario_pairs))) {
+  amount_id <- scenario_pairs$amount_id[scenario_row]
+  bin_id <- scenario_pairs$bin_id[scenario_row]
+
+  amount_data <- listyear_results_table %>%
+    filter(.data$scenario_id == .env$amount_id) %>%
+    transmute(
+      audit_type = as.character(.data$audit_type),
+      realized_log_mean = .data$realized_log_mean,
+      predicted_log_mean = .data$predicted_log_mean,
+      amount_gain = .data$revenue_gain,
+      amount_overlap = .data$overlap_share
+    )
+
+  bin_data <- listyear_results_table %>%
+    filter(.data$scenario_id == .env$bin_id) %>%
+    transmute(
+      audit_type = as.character(.data$audit_type),
+      bin_gain = .data$revenue_gain,
+      bin_overlap = .data$overlap_share
+    )
+
+  scenario_data <- amount_data %>%
+    left_join(bin_data, by = "audit_type") %>%
+    arrange(factor(.data$audit_type, levels = c("Full Audits", "Desk Audits")))
+
+  latex_rows_listyear <- c(
+    latex_rows_listyear,
+    "\\addlinespace[0.45em]",
+    paste0(
+      "\\multicolumn{5}{l}{\\textit{", scenario_pairs$amount_label[scenario_row], "}} & ",
+      "\\multicolumn{2}{l}{\\textit{", scenario_pairs$bin_label_text[scenario_row], "}}\\\\"
+    )
+  )
+
+  for (table_row in seq_len(nrow(scenario_data))) {
+    latex_rows_listyear <- c(
+      latex_rows_listyear,
+      paste0(
+        "\\hspace{1em}", scenario_data$audit_type[table_row], " & ",
+        format_number(scenario_data$realized_log_mean[table_row]), " & ",
+        format_number(scenario_data$predicted_log_mean[table_row]), " & ",
+        format_gain(scenario_data$amount_gain[table_row]), " & ",
+        format_share(scenario_data$amount_overlap[table_row]), " & ",
+        format_gain(scenario_data$bin_gain[table_row]), " & ",
+        format_share(scenario_data$bin_overlap[table_row]), "\\\\"
+      )
+    )
+  }
+}
+
+writeLines(
+  c(latex_header, latex_rows_listyear, latex_footer),
+  listyear_table_output_file
+)
+
 support_latex_header <- c(
   "\\begin{tabular}[t]{llllrrrrrrr}",
   "\\toprule",
@@ -1149,10 +1337,37 @@ writeLines(
   support_output_file
 )
 
+support_latex_rows_listyear <- listyear_support_table %>%
+  mutate(
+    latex_row = paste0(
+      as.character(scenario_id), " & ",
+      as.character(audit_type), " & ",
+      latex_escape(target_grouping), " & ",
+      latex_escape(selected_bin_label), " & ",
+      format_integer(total_training_lists), " & ",
+      format_integer(bin_training_rows), " & ",
+      format_integer(min_cases_per_bin), " & ",
+      format_integer(max_cases_per_bin), " & ",
+      format_integer(singleton_bins), " & ",
+      format_integer(empty_bins), " & ",
+      format_integer(high_bin_rows), "\\\\"
+    )
+  ) %>%
+  pull(latex_row)
+
+writeLines(
+  c(support_latex_header, support_latex_rows_listyear, support_latex_footer),
+  listyear_support_output_file
+)
+
 message("Wrote ", table_output_file)
 message("Wrote ", diagnostics_output_file)
 message("Wrote ", support_output_file)
 message("Wrote ", figure4_prediction_output_file)
+message("Wrote ", listyear_table_output_file)
+message("Wrote ", listyear_diagnostics_output_file)
+message("Wrote ", listyear_support_output_file)
+message("Wrote ", figure4_listyear_prediction_output_file)
 message("Wrote ", figure4_office_prediction_output_file)
 message("Wrote ", figure4_office_top10_prediction_output_file)
 message("Wrote ", figure4_multiclass_output_file)

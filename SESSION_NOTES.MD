@@ -2,6 +2,33 @@
 
 ---
 
+Date: 2026-06-23
+Task: Convert Senegal conceptual framework tables from PDF to TeX.
+
+## Files edited
+- `Code Analyse data/table_senegal_conceptual_framework.tex`
+- `Code Analyse data/table_senegal_realized_effects.tex`
+- `SESSION_NOTES.MD`
+
+## Substantive changes
+- Added two standalone LaTeX table files corresponding to the two tables in `Code Analyse data/table for senegal.pdf`.
+- Used booktabs styling with `adjustbox` and `threeparttable`, matching the table environment conventions already used in the report.
+- Preserved the table structure from the PDF/DOCX source while cleaning PDF extraction artifacts such as smart apostrophe encoding and line-break noise.
+
+## Output files affected
+- New table file: `Code Analyse data/table_senegal_conceptual_framework.tex`.
+- New table file: `Code Analyse data/table_senegal_realized_effects.tex`.
+
+## Validation performed
+- Extracted and cross-checked table contents from `Code Analyse data/table for senegal.pdf` and `Code Analyse data/table for senegal.docx`.
+- Compiled a disposable LaTeX smoke-test wrapper that inputs both new table files using `pdflatex -interaction=nonstopmode -halt-on-error table_senegal_smoke_test.tex`; validation succeeded after allowing MiKTeX to write its font cache outside the workspace sandbox.
+- Removed the disposable smoke-test wrapper and generated aux/log/pdf files after validation.
+
+## Open issues / next steps
+- If these are included in the main Overleaf document, ensure the preamble includes `booktabs`, `array`, `adjustbox`, `threeparttable`, and `float`, as in the local report file.
+
+---
+
 Date: 2026-05-25
 Task: Revise direct bin-target companion exercise to fixed quartiles.
 
@@ -1744,3 +1771,75 @@ Update: 2026-06-03 (Table 49 wording cleanup)
 - Added a bullet explaining why overlap can remain unchanged across C subpanels: overlap depends on the optimized set rather than the amount-prediction valuation model; C2 and C3 share the same top-five-excluded probability-ranking sample.
 - Updated the report-input TeX fragments `Output/table_opt_full_and_desk_bin_target_panelc.tex` and `Output/table_opt_full_and_desk_bin_target_support.tex` so embedded headers and row labels use "predicted above-median" and "above/below median" language. Updated the R exporter labels in `Code Analyse data/Replication R/08_Optimization_Exercise_Bin_Target_PanelC.R` so future regeneration preserves this wording.
 - Validation: compiled `Code Analyse data/Inspector's Effort report.tex` twice in place. Both passes wrote `Code Analyse data/Inspector's Effort report.pdf`; the second pass did not request another rerun. `pdflatex` still returned nonzero because MiKTeX could not write its AppData log file, with the same pre-existing multiply defined label, overfull box, and PDF-version warnings.
+
+Update: 2026-06-03 (Table 48 optimization variants and list-level above-median target)
+- Reorganized `Code Analyse data/Inspector's Effort report.tex` so the optimization section now has three subsections: 3.1 predicting ranking, 3.2 predicting above-median evasion in a tax office, and 3.3 predicting above-median evasion in a list. The current predicted-rank table, support table, Figure 4-style diagnostics, and step explanation now sit under 3.1; the current office-pooled above-median version sits under 3.2; the new list-level version sits under 3.3.
+- Updated `Code Analyse data/Replication R/08_Optimization_Exercise_Bin_Target_PanelC.R` with a type-specific target-grouping helper for the new list-level above-median export. Full-audit targets are defined within `bureau_detailed x selectionyear`; desk-audit targets are defined within `inspectorclusteryear`. Optimized selections and executed-count constraints continue to be rebuilt within `inspectorclusteryear`, matching the existing Table 48 optimization scripts.
+- Added `Code Analyse data/6 Figure 4 bin probability fixed005 listyear-target panels.do`, a wrapper around the fixed 0.05 probability-bin Figure 4 diagnostic that reads the list-level C1 full-audit prediction export and writes `_listyear_target` outputs.
+- New output files: `Output/table_opt_full_and_desk_bin_target_panelc_listyear.tex`, `Output/table_opt_full_and_desk_bin_target_panelc_listyear_diagnostics.csv`, `Output/table_opt_full_and_desk_bin_target_listyear_support.tex`, `Output/figure4_binprob_decile_fullaudits_c1_listyear.dta`, `Output/figure4_binprob_fixed005_fullaudits_listyear_target_support.tex`, `Output/figure4_panel_a_binprob_fixed005_fullaudits_listyear_target.pdf`, and `Output/figure4_panel_b_binprob_fixed005_fullaudits_listyear_target.pdf`. Rerunning the R companion also refreshed the existing office-pooled Panel C table, diagnostics, and support outputs.
+- Validation: parsed the updated R script successfully, reran the Panel C companion with the Dropbox working-data folder as `data_path` and this repo's `Output/` folder as `output_path`, and A1 benchmark validation passed. The run wrote all existing and new list-level outputs; package-version warnings were the only R warnings.
+- Validation: checked the new list-level support table. Full audits have 28 target groups, 508 C1 training rows, 7 singleton classes, and 0 empty classes. Desk audits use `inspectorclusteryear` as the list identifier and are thin in places: 147 target groups, 1011 C1 training rows, 78 singleton classes, and 19 empty classes; C2/C3 have 81 singleton classes and 19 empty classes.
+- Validation: reran Stata batch mode for the new list-level Figure 4 wrapper successfully. The support table reports 944 selected non-safety full-audit rows across 0.05 probability bins; the 0.95--1.00 bin is empty.
+- Validation: compiled `Code Analyse data/Inspector's Effort report.tex` twice in place. The second pass wrote `Code Analyse data/Inspector's Effort report.pdf` and cleared unresolved references; the compile still reports the pre-existing multiply defined labels, overfull boxes, PDF-version warnings, and MiKTeX AppData log warning.
+
+Update: 2026-06-05 (optimization table-note wording cleanup)
+- Edited the table notes for Tables 48, 51, and 53 in `Code Analyse data/Inspector's Effort report.tex`.
+- Recast the notes to mirror the original Table 9 tone: realized audit results train random forest models, the 2018--2019 audit program is optimized, Columns 1--2 report realized and predicted revenue, and the optimization columns report revenue gains and overlap.
+- Removed raw variable names from these table notes and replaced them with readable labels such as detailed tax office, implementation list, and inspector assignment list.
+- Clarified the difference between the above-median exercises: Table 51 defines the target within audit type and detailed tax office while pooling years; Table 53 defines it within the operational list relevant to each audit type.
+- Output files affected: `Code Analyse data/Inspector's Effort report.pdf`.
+- Validation: recompiled `Code Analyse data/Inspector's Effort report.tex` once with `pdflatex`. The compile succeeded and wrote a 150-page PDF; the log still reports the pre-existing multiply defined labels, overfull boxes, PDF-version warnings, and MiKTeX AppData log warning.
+
+Update: 2026-06-16 (Figure 4 with unweighted two-step amount predictions)
+- Added `Code Analyse data/Replication R/09_Figure4_TwoStep_Unweighted_Amount_Prediction.R`, a standalone R export that keeps the original optimization-style detection/evasion gate (`y4 > 1`) but removes the top-quartile second-stage revenue weights from the amount Random Forest.
+- Added `Code Analyse data/6 Figure 4 two-step unweighted yhatrf panels.do`, a standalone Stata workflow that reads the exported full-audit predictions and generates Figure 4-style Panel A and Panel B diagnostics.
+- Added a new subsection to Section 3 of `Code Analyse data/Inspector's Effort report.tex` titled `Figure 4 with unweighted two-step amount predictions`, with the two new plots included as subfigures in one figure environment and a single combined notes block.
+- New output files: `Output/fullaudits_predicted_twostep_unweighted.dta`, `Output/figure4_panel_a_twostep_unweighted_yhatrf_fullaudits.pdf`, and `Output/figure4_panel_b_twostep_unweighted_yhatrf_fullaudits.pdf`.
+- Validation: ran the R export successfully with R 4.5.1. It wrote 944 selected non-safety full-audit rows and trained the amount RF on 457 positive-evasion rows; package-version warnings were the only R warnings.
+- Validation: checked the exported DTA contains `yhatrf`, `y2`, `y4`, `algorithm`, `dgid`, `selection`, `safeties`, and `controle`, with nonmissing `yhatrf` for all 944 rows.
+- Validation: ran `stata-mp /e do "Code Analyse data\6 Figure 4 two-step unweighted yhatrf panels.do"` successfully through `end of do-file`; both new PDFs were written to `Output/`.
+- Validation: compiled `Code Analyse data/Inspector's Effort report.tex` into `.codex_tmp/report_compile_twostep_unweighted/`. The compile succeeded after rerunning with filesystem escalation for MiKTeX user-log access and produced a 151-page PDF; remaining warnings are the pre-existing multiply defined labels, overfull boxes, PDF-version inclusion warnings, and MiKTeX update notice.
+
+Update: 2026-06-16 (Figure 4 unweighted two-step color sync)
+- Updated `Code Analyse data/6 Figure 4 two-step unweighted yhatrf panels.do` so the unweighted two-step Figure 4 replication uses the same palette as the existing Figure 4-style plots: navy/green/gray/red in Panel A and maroon/orange in Panel B.
+- Updated the combined figure notes in `Code Analyse data/Inspector's Effort report.tex` so the color references match the regenerated plots.
+- Outputs refreshed: `Output/figure4_panel_a_twostep_unweighted_yhatrf_fullaudits.pdf`, `Output/figure4_panel_b_twostep_unweighted_yhatrf_fullaudits.pdf`, and `Code Analyse data/Inspector's Effort report.pdf`.
+- Validation: reran `stata-mp /e do "Code Analyse data\6 Figure 4 two-step unweighted yhatrf panels.do"` successfully through `end of do-file`, then recompiled the report with MiKTeX `pdflatex`; the compile wrote a 151-page PDF with only the existing nonfatal warnings.
+
+Update: 2026-06-16 (Figure 4 unweighted two-step paper-style support)
+- Revised `Code Analyse data/6 Figure 4 two-step unweighted yhatrf panels.do` so both panels use the original Figure 4-style one-log-point bins while restricting plotted series to bins with midpoint above 12.5.
+- The support restriction removes the mechanical zero-gate mass point from the plotted execution lines: 53 cases with `mid_bin <= 12.5` are excluded from the plotted construction, leaving 891 selected non-safety full-audit cases across one-log-point bins in Panel A.
+- Checked that the restricted Panel A support is not capped at 22: the regenerated bin table includes `mid_bin == 22.5` with 25 cases and `mid_bin == 23.5` with 3 cases.
+- Updated the combined figure notes in `Code Analyse data/Inspector's Effort report.tex` to document the one-log-point-bin construction and `mid_bin > 12.5` restriction.
+- Outputs refreshed: `Output/figure4_panel_a_twostep_unweighted_yhatrf_fullaudits.pdf`, `Output/figure4_panel_b_twostep_unweighted_yhatrf_fullaudits.pdf`, and `Code Analyse data/Inspector's Effort report.pdf`.
+- Validation: reran the Stata figure script successfully, checked the cropped one-log-point support for Panels A and B, and recompiled the report with MiKTeX `pdflatex`; the compile wrote a 151-page PDF with only the existing nonfatal warnings.
+
+Update: 2026-06-16 (Figure 4 unweighted two-step x-axis lower bound)
+- Updated `Code Analyse data/6 Figure 4 two-step unweighted yhatrf panels.do` so both Panel A and Panel B explicitly start the x-axis at 12.5 while preserving the observed right tail in each panel.
+- Outputs refreshed: `Output/figure4_panel_a_twostep_unweighted_yhatrf_fullaudits.pdf` and `Output/figure4_panel_b_twostep_unweighted_yhatrf_fullaudits.pdf`.
+- Validation: reran the Stata figure script successfully. An in-place report compile could not overwrite `Code Analyse data/Inspector's Effort report.pdf` because that PDF was locked by another process, so the report was compiled twice to `.codex_tmp/report_compile_xaxis/`; the second pass produced a 151-page PDF with only the existing nonfatal warnings.
+
+Update: 2026-06-16 (Figure 4 unweighted two-step inclusive 12.5 bin)
+- Revised `Code Analyse data/6 Figure 4 two-step unweighted yhatrf panels.do` so both panels keep one-log-point bins with `mid_bin >= 12.5`, allowing the 12.5 bin to appear.
+- Matched the original Figure 4-style x-axis more closely by using ticks from 12.5 to 25 in 2.5-log-point increments for both panels.
+- Updated `Code Analyse data/Inspector's Effort report.tex` notes to describe the inclusive support restriction.
+- Validation: reran the Stata figure generator successfully and confirmed both panel PDFs were regenerated. Recompiled `Code Analyse data/Inspector's Effort report.tex` twice in place; the second pass wrote a 151-page PDF with only the existing nonfatal warnings.
+
+Update: 2026-06-16 (Figure 4 unweighted two-step 14.5 start)
+- Revised `Code Analyse data/6 Figure 4 two-step unweighted yhatrf panels.do` so both panels start at `mid_bin >= 14.5`, the first observed post-gate predicted-evasion bin.
+- Updated the x-axis ticks to begin at 14.5 and updated the combined figure notes in `Code Analyse data/Inspector's Effort report.tex`.
+- Validation: reran the Stata figure generator successfully and confirmed both panel PDFs were regenerated. Recompiled `Code Analyse data/Inspector's Effort report.tex` twice in place; the second pass wrote a 151-page PDF with only the existing nonfatal warnings.
+
+
+Update: 2026-06-24 (realized-effects table merged cells)
+- Updated `Code Analyse data/table_senegal_realized_effects.tex` so the Corruption and Inspector bias entries are merged across the three audit-process rows using `\multirow`, matching the source PDF table structure.
+- Added a file-level comment noting the `multirow` package requirement and increased row spacing in the realized-effects table so the merged cells fit without overfull multirow boxes.
+- Validation: compiled a disposable smoke-test wrapper with `booktabs`, `array`, `adjustbox`, `threeparttable`, `float`, and `multirow`; both Senegal table files compiled successfully. Removed the temporary wrapper and generated aux/log/pdf files afterward.
+
+Update: 2026-06-24 (realized-effects merged-cell vertical alignment)
+- Changed the two merged cells in `Code Analyse data/table_senegal_realized_effects.tex` from top-aligned `\multirow[t]` to centered `\multirow[c]`, so the shared Corruption and Inspector bias text visually sits across all three audit-process rows rather than reading as part of the first row.
+- Validation: reran the disposable LaTeX smoke test with `multirow`; both Senegal table files compiled successfully, then temporary compile files were removed.
+
+Update: 2026-06-24 (realized-effects merged-cell vertical offset)
+- Adjusted the two centered `\multirow` cells in `Code Analyse data/table_senegal_realized_effects.tex` with a negative vertical move (`[-2.2cm]`) so the shared Corruption and Inspector bias text sits visually around the middle of the three audit-process rows. This compensates for `multirow` not knowing the true height of wrapped `p{}` rows.
+- Validation: reran the disposable LaTeX smoke test with `multirow`, rendered the test PDF to PNG, and checked the rendered right-column text bands were concentrated around the middle body rows rather than the first row. Removed all temporary compile/render files afterward.
