@@ -3501,12 +3501,12 @@ local ++spec
 esttab ry2_1 ry2_2 ry3_1 ry3_2 ry4_1 ry4_2  
 		using "$output\3 regression main outcomes riskscore.tex",
 		order( algorithm overlap random riskscore 1.algorithm#c.riskscore )
+		nomtitles nonumbers fragment
 		label se keep( algorithm  riskscore 1.algorithm#c.riskscore)
-		mtitles("Full audits" "Desk audits" "Full audits"  "Desk audits"  "Full audits"  "Desk audits") 
 		s( N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
 		b(%5.2f) se(%5.2f) coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random" riskscore "Risk score" 1.algorithm#c.riskscore "Alg. x Risk score")
-		prehead("") posthead("\hline") postfoot("\hline")
+		posthead("") postfoot("\hline")
 		replace
 		substitute(\_ _)
 	;
@@ -3517,12 +3517,12 @@ esttab ry2_1 ry2_2 ry3_1 ry3_2 ry4_1 ry4_2
 esttab ry2_3 ry2_4 ry3_3 ry3_4 ry4_3 ry4_4 
 		using "$output\3 regression main outcomes riskscore control.tex",
 		order( algorithm overlap random riskscore 1.algorithm#c.riskscore L1turnover )
+		nomtitles nonumbers fragment
 		label se keep( algorithm  riskscore 1.algorithm#c.riskscore L1turnover)
-		mtitles("Full audits" "Desk audits" "Full audits"  "Desk audits"  "Full audits"  "Desk audits") 
 		s( N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
 		b(%5.2f) se(%5.2f) coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random" riskscore "Risk score" 1.algorithm#c.riskscore "Alg. x Risk score" L1turnover "Lagged log(turnover)")
-		prehead("") posthead("\hline") postfoot("\hline")
+		posthead("") postfoot("\hline")
 		replace
 		substitute(\_ _)
 	;
@@ -3533,16 +3533,22 @@ esttab ry2_3 ry2_4 ry3_3 ry3_4 ry4_3 ry4_4
 esttab ry2_5 ry2_6 ry3_5 ry3_6 ry4_5 ry4_6 
 		using "$output\3 regression main outcomes riskscore unweighted.tex",
 		order( algorithm overlap random uw_riskscore 1.algorithm#c.uw_riskscore)
+		nomtitles nonumbers fragment
 		label se keep( algorithm  uw_riskscore 1.algorithm#c.uw_riskscore)
-		mtitles("Full audits" "Desk audits" "Full audits"  "Desk audits"  "Full audits"  "Desk audits") 
 		s( N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
 		b(%5.2f) se(%5.2f) coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random" uw_riskscore "Unw. Risk score" 1.algorithm#c.uw_riskscore "Alg. x Unw. Risk score" L1turnover "Lagged log(turnover)")
-		prehead("") posthead("\hline") postfoot("\hline")
+		posthead("") postfoot("\hline")
 		replace
 		substitute(\_ _)
 	;
 #delim cr
+
+*Strip the leading blank line from the three body-only fragments
+shell powershell -Command "Set-Content -LiteralPath '$output\3 regression main outcomes riskscore.tex' -Value ((Get-Content -Raw -LiteralPath '$output\3 regression main outcomes riskscore.tex') -replace '^(\r\n)+','') -NoNewline"
+shell powershell -Command "Set-Content -LiteralPath '$output\3 regression main outcomes riskscore control.tex' -Value ((Get-Content -Raw -LiteralPath '$output\3 regression main outcomes riskscore control.tex') -replace '^(\r\n)+','') -NoNewline"
+shell powershell -Command "Set-Content -LiteralPath '$output\3 regression main outcomes riskscore unweighted.tex' -Value ((Get-Content -Raw -LiteralPath '$output\3 regression main outcomes riskscore unweighted.tex') -replace '^(\r\n)+','') -NoNewline"
+
 
 *******************************
 *Algorithm components
