@@ -20,10 +20,24 @@ clear all
 		global rootdir "C:\Users\49354415\Dropbox\Trabalho\2017 WB\Senegal tax audits"
 	}
 
+if strpos("`c(username)'","wb648862") { 										// World Bank local machine
+	global rootdir "C:\Users\wb648862\Dropbox\Senegal tax audits"
+}
+
 		global rawdata "$rootdir"
 		global analysisdata "$rootdir\Analysis all data\replication_package\Working data"
 		global wastedata "$rootdir\Analysis all data\replication_package\Intermediate data"
 		global output "$rootdir\Analysis all data\replication_package\Output"
+
+	* Temporary local-output override: source data paths remain in Dropbox.
+	local localproject "C:/Users/`c(username)'/Documents/Projects/Senegal Tax Audits"
+	capture confirm file "`localproject'/Agents.md"
+	if !_rc {
+		capture mkdir "`localproject'/output"
+		capture mkdir "`localproject'/output/tables"
+		global output "`localproject'/output/tables"
+		adopath ++ "`localproject'/ado"
+	}
 
 local date: disp  c(current_date)
 di "`date'"
@@ -394,6 +408,27 @@ matrix countCP[`r', `c'] = `r(N)'
 esttab matrix(countCP) using "$output\11 balance CP.tex", 
 nomtitle
 prehead(\begin{tabular}{llcccccc})
+postfoot(\hline \end{tabular}) 
+replace
+;
+#delim cr
+
+matrix countCP_reorder = J(28, 6, 0)
+forvalues i = 1/28 {
+	matrix countCP_reorder[`i', 1] = countCP[`i', 2]
+	matrix countCP_reorder[`i', 2] = countCP[`i', 1]
+	matrix countCP_reorder[`i', 3] = countCP[`i', 3]
+	matrix countCP_reorder[`i', 4] = countCP[`i', 4]
+	matrix countCP_reorder[`i', 5] = countCP[`i', 5]
+	matrix countCP_reorder[`i', 6] = countCP[`i', 6]
+}
+matrix countVGCP = countVG, countCP_reorder
+matrix colnames countVGCP = "& Algorithm" "Discretion" "Overlap" "Total" "Algorithm" "Random" "Discretion" "Overlap" "Replacement" "Total"
+
+#delim ;
+esttab matrix(countVGCP) using "$output\11 balance VG CP.tex", 
+nomtitle
+prehead(\begin{tabular}{llcccccccccc} \hline & & \multicolumn{4}{c}{Full audits} & \multicolumn{6}{c}{Desk audits} \\ \cline{3-6} \cline{7-12})
 postfoot(\hline \end{tabular}) 
 replace
 ;

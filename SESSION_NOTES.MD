@@ -1844,6 +1844,56 @@ Update: 2026-06-24 (realized-effects merged-cell vertical offset)
 - Adjusted the two centered `\multirow` cells in `Code Analyse data/table_senegal_realized_effects.tex` with a negative vertical move (`[-2.2cm]`) so the shared Corruption and Inspector bias text sits visually around the middle of the three audit-process rows. This compensates for `multirow` not knowing the true height of wrapped `p{}` rows.
 - Validation: reran the disposable LaTeX smoke test with `multirow`, rendered the test PDF to PNG, and checked the rendered right-column text bands were concentrated around the middle body rows rather than the first row. Removed all temporary compile/render files afterward.
 
+Update: 2026-06-25 (combined B.6/B.7 local balance table)
+- Updated `Code Analyse data/1 Summary Statistics.do` so user `wb648862` reads source data from `C:\Users\wb648862\Dropbox\Senegal tax audits` while generated outputs are routed to this repo's local `output/tables` path. On this Windows checkout, that resolves to the existing `Output/tables` directory because `Output` already exists.
+- Added a guarded local repo block that creates the local output folder and adds the repo `ado` folder to Stata's adopath for local schemes; source data globals remain Dropbox-backed.
+- Added the combined `countVGCP` matrix export using the existing `esttab matrix()` pattern, with grouped Full audits and Desk audits headers. Existing `countVG` and `countCP` construction and separate exports were left intact.
+- Output files affected: local `Output/tables/11 balance VG.tex`, `Output/tables/11 balance CP.tex`, and new `Output/tables/11 balance VG CP.tex`; the full summary run also routed its other generated summary outputs to `Output/tables`.
+- Validation: reran `stata-mp /e do "Code Analyse data\1 Summary Statistics.do"` successfully through `end of do-file`; final log contains no `r(#)` errors. Confirmed Dropbox `Analysis all data/replication_package/Output/11 balance VG.tex` and `11 balance CP.tex` kept their 2025-12-04 2:47:30 PM timestamps.
+- Open issues / next steps: no Dropbox manuscript files were edited; manuscript integration can be handled separately if needed.
+
+Update: 2026-06-29 (hide Algorithm X Random in three main-result tables)
+- Edited `Code Analyse data/2 Regressions main results.do` so the existing `esttab` exports for `1 regression evasion rates.tex`, `1 regression main outcomes summarized ITT.tex`, and `1 regression main outcomes summarized ITT ppml.tex` no longer display the `random` coefficient row labeled `Algorithm X Random`.
+- Kept the underlying regression specifications unchanged; this is a display-only table edit that changes `order()` and `keep()` from `algorithm overlap random` to `algorithm overlap` in the three targeted export blocks.
+- Output files intended to be affected: `Output/1 regression evasion rates.tex`, `Output/1 regression main outcomes summarized ITT.tex`, and `Output/1 regression main outcomes summarized ITT ppml.tex` at the path resolved by the do-file's `$output` global.
+- Validation: confirmed the source-code edit in the do-file. Batch validation with `StataMP-64.exe /e do "Code Analyse data\2 Regressions main results.do"` did not complete because the do-file sets `rootdir` only for user `49354415`; on user `wb648862`, `$analysisdata` resolves to `\Analysis all data\replication_package\Working data`, and Stata stops with `r(601)` when `datasetforanalysis.dta` is not found.
+- Open issues / next steps: to fully regenerate and inspect the three TeX outputs on this machine, the do-file needs a valid local `rootdir` branch for user `wb648862` or another way to point `$analysisdata` and `$output` to the intended Dropbox/local paths.
+
+Update: 2026-06-29 (local wb648862 branch for main regressions and validated local table rewrite)
+- Updated `Code Analyse data/2 Regressions main results.do` to add a `wb648862` root-path branch pointing to `C:\Users\wb648862\Dropbox\Senegal tax audits` for inputs.
+- Added the same local-output pattern used in recent repo workflows: for user `wb648862`, the do-file now adds the repo `ado` path and writes generated outputs to `C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output` instead of Dropbox.
+- Kept the earlier display-only table change in place for the three requested exports: `1 regression evasion rates.tex`, `1 regression main outcomes summarized ITT.tex`, and `1 regression main outcomes summarized ITT ppml.tex` now omit the printed `Algorithm x Random` row while leaving the regression specifications unchanged.
+- Output files affected: local `Output/1 regression evasion rates.tex`, `Output/1 regression main outcomes summarized ITT.tex`, and `Output/1 regression main outcomes summarized ITT ppml.tex`.
+- Validation: ran `StataMP-64.exe /e do "Code Analyse data\2 Regressions main results.do"` successfully through `end of do-file`.
+- Validation: confirmed the three target tables were written to the repo `Output/` folder with fresh timestamps.
+- Validation: compared the new local outputs to the existing Dropbox versions and verified that the displayed `Algorithm` and `Inspectors x Overlap` coefficients, standard errors, and summary-stat rows match; the only intended difference is that the `Algorithm x Random` row is absent from the local rewritten tables.
+
+Update: 2026-06-29 (split alternative-outcomes export into Panel B and Panel C fragments)
+- Updated `Code Analyse data/2 Regressions main results.do` so the existing `1 regression infractions and years alternative outcomes.tex` export is retained and two additional raw `esttab` fragments are generated alongside it: `Output/1 regression infractions and years alternative outcomes_panelB.tex` for the first 6 columns and `Output/1 regression infractions and years alternative outcomes_panelC_raw.tex` for the last 2 columns.
+- Kept the underlying alternative-outcome regressions unchanged; the edit only splits the export layer and preserves the existing model order within each new fragment.
+- Reapplied the local `wb648862` path/output override and the existing display-only `Algorithm x Random` suppression for the three previously adjusted main-result exports so the do-file remains runnable from this checkout.
+- Output files affected: `Output/1 regression infractions and years alternative outcomes.tex`, `Output/1 regression infractions and years alternative outcomes_panelB.tex`, and `Output/1 regression infractions and years alternative outcomes_panelC_raw.tex`.
+- Validation: ran `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data\2 Regressions main results.do"` successfully through `end of do-file`.
+- Validation: confirmed the three target TeX files were rewritten with fresh timestamps on 2026-06-29.
+- Validation: compared the regenerated split fragments against the corresponding columns of the regenerated legacy 8-column export and verified that Panel B columns 1-6 and Panel C coefficient/stat cells exactly match the legacy values; Panel C is intentionally renumbered to columns `(1)` and `(2)`.
+
+Update: 2026-06-30 (hide overlap and random rows in placement-FE and dispute tables)
+- Updated `Code Analyse data/2 Regressions main results.do` so the `esttab` exports for `1 regression main outcomes placement fe.tex` and `1 dispute summary.tex` now print only the `Algorithm` row.
+- Kept the underlying regression specifications, samples, fixed effects, and reported statistics unchanged; this is a display-only suppression implemented by changing the two target blocks to `order( algorithm )` and `keep( algorithm )`.
+- Output files affected: local `Output/1 regression main outcomes placement fe.tex` and `Output/1 dispute summary.tex`.
+- Validation: ran `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data\2 Regressions main results.do"` successfully through `end of do-file`.
+- Validation: confirmed both regenerated TeX files have fresh 2026-06-30 timestamps and no longer contain the printed `Inspectors x Overlap` or `Algorithm x Random` rows.
+- Validation: compared each regenerated file against a saved pre-edit copy and verified that the displayed `Algorithm` coefficient row, `N`, `R2`, and `Mean outcome` rows are unchanged.
+- Open issues / next steps: none for this display-only table edit.
+
+Update: 2026-06-30 (restore dispute summary and hide overlap/random in control-experience table)
+- Updated `Code Analyse data/2 Regressions main results.do` so `1 dispute summary.tex` again prints `Algorithm`, `Inspectors x Overlap`, and `Algorithm x Random`, while `1 regression main outcomes control experience.tex` now omits the printed `Inspectors x Overlap` and `Algorithm x Random` rows.
+- Kept all underlying regression specifications unchanged; the control-experience change is display-only and dispute-summary generation was restored to its previous export settings.
+- Output files affected: local `Output/1 dispute summary.tex` and `Output/1 regression main outcomes control experience.tex`, plus the copied `C:\Users\wb648862\Documents\Projects\Senegal_Audits\output\1 regression main outcomes control experience.tex`.
+- Validation: ran `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data\2 Regressions main results.do"` successfully through `end of do-file`.
+- Validation: compared regenerated `Output/1 dispute summary.tex` against the saved pre-change version and verified that they match exactly.
+- Validation: compared the regenerated control-experience table against its saved pre-edit copy and verified that the `Algorithm`, `N`, `R2`, and `Mean outcome` rows are unchanged while the printed `Inspectors x Overlap` and `Algorithm x Random` rows are removed.
+- Open issues / next steps: none for this display-only table update.
 Update: 2026-07-01 (body-only riskscore appendix fragments)
 - Updated `Code Analyse data/2 Regressions main results.do` so the three riskscore appendix exports now write body-only LaTeX fragments: `3 regression main outcomes riskscore.tex`, `3 regression main outcomes riskscore control.tex`, and `3 regression main outcomes riskscore unweighted.tex` no longer print the column-number row, the `Full audits` / `Desk audits` row, the initial header `\hline`, or any table/tabular scaffolding.
 - Kept the underlying regression specifications, model order, labels, stars, and reported summary rows unchanged; this is a display-only export change for wrapper-friendly `\input{...}` use inside a shared master tabular.
@@ -1851,3 +1901,17 @@ Update: 2026-07-01 (body-only riskscore appendix fragments)
 - Output files affected: local `Output/3 regression main outcomes riskscore.tex`, `Output/3 regression main outcomes riskscore control.tex`, and `Output/3 regression main outcomes riskscore unweighted.tex`.
 - Validation: saved pre-edit baseline copies under `Output/_codex_baselines/`, reran `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data\2 Regressions main results.do"` successfully, confirmed the regenerated fragments start directly at `Algorithm`, and verified that all substantive coefficient/SE/stat rows match the old outputs once the pre-edit files' leading blank line plus old header block are removed.
 - Open issues / next steps: the saved pre-edit baseline files contained an extra leading blank line before the old header rows, so the exact body comparison needed to drop four old lines in practice (blank line, number row, audit-type row, initial `\hline`) rather than only three.
+
+Update: 2026-07-01 (desk-audit column reorder in combined balance table)
+- Updated `Code Analyse data/1 Summary Statistics.do` so the combined `countVGCP` export reorders only the Desk-audit columns for `11 balance VG CP.tex` to `Algorithm`, `Random`, `Discretion`, `Overlap`, `Replacement`, `Total`.
+- Kept the underlying `countCP` counting logic and the standalone `11 balance CP.tex` export unchanged; the edit only builds a reordered copy for the combined `VG CP` table.
+- Output file affected: local `Output/tables/11 balance VG CP.tex`.
+- Validation: ran `C:\Program Files\StataNow19\StataMP-64.exe /e do "Code Analyse data\1 Summary Statistics.do"` successfully through `end of do-file`.
+- Validation: confirmed the regenerated combined table now prints Desk-audit columns as `Algorithm`, `Random`, `Discretion`, `Overlap`, `Replacement`, `Total`.
+- Validation: spot-checked that values stayed attached to their original methods after reordering: for example, DGE 2018 Desk audits now show `Algorithm = 72` and `Random = 60` (previously the same values appeared under those methods in the old order), and the `All` total row now shows `Algorithm = 1070`, `Random = 364`, `Discretion = 1297`, `Overlap = 161`, `Replacement = 506`, `Total = 3237`.
+
+Update: 2026-07-01 (inspector-characteristics exports switched to fragment output)
+- Updated `Code Analyse data/2 Regressions main results.do` so the inspector-characteristics `esttab` exports now use `fragment` output for the relevant appendix-facing tables, including `2 regression inspector characteristics selection desk audits.tex`.
+- Kept the underlying regression specifications, samples, and displayed coefficient sets unchanged where intended; this is an export-wrapper change so the tables can be embedded inside shared LaTeX scaffolding without duplicating tabular headers and footers.
+- Output files affected: local `Output/2 regression inspector characteristics selection desk audits.tex` plus the companion inspector-characteristics exports regenerated by the same do-file run.
+- Validation: not rerun separately in this commit step; current worktree includes regenerated fragment-style output files consistent with the source-code edit.
