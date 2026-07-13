@@ -413,22 +413,23 @@ replace
 ;
 #delim cr
 
+*Desk-audit order in the combined table: Algorithm, Discretion, Random, Overlap, Replacement, Total
 matrix countCP_reorder = J(28, 6, 0)
 forvalues i = 1/28 {
 	matrix countCP_reorder[`i', 1] = countCP[`i', 2]
-	matrix countCP_reorder[`i', 2] = countCP[`i', 1]
-	matrix countCP_reorder[`i', 3] = countCP[`i', 3]
+	matrix countCP_reorder[`i', 2] = countCP[`i', 3]
+	matrix countCP_reorder[`i', 3] = countCP[`i', 1]
 	matrix countCP_reorder[`i', 4] = countCP[`i', 4]
 	matrix countCP_reorder[`i', 5] = countCP[`i', 5]
 	matrix countCP_reorder[`i', 6] = countCP[`i', 6]
 }
 matrix countVGCP = countVG, countCP_reorder
-matrix colnames countVGCP = "& Algorithm" "Discretion" "Overlap" "Total" "Algorithm" "Random" "Discretion" "Overlap" "Replacement" "Total"
+matrix colnames countVGCP = "& Algorithm" "Discretion" "Overlap" "Total" "Algorithm" "Discretion" "Random" "Overlap" "Replacement" "Total"
 
 #delim ;
 esttab matrix(countVGCP) using "$output\11 balance VG CP.tex", 
 nomtitle
-prehead(\begin{tabular}{llcccccccccc} \hline & & \multicolumn{4}{c}{Full audits} & \multicolumn{6}{c}{Desk audits} \\ \cline{3-6} \cline{7-12})
+prehead(\begin{tabular}{llcccc|cccccc} \hline & & \multicolumn{4}{c|}{Full audits} & \multicolumn{6}{c}{Desk audits} \\ \cline{3-6} \cline{7-12})
 postfoot(\hline \end{tabular}) 
 replace
 ;
