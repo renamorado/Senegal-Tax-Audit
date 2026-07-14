@@ -1922,3 +1922,27 @@ Update: 2026-07-13 (audit-objectives figure orange palette)
 - Kept the data construction, labels, bar order, graph layout, and export names unchanged.
 - Outputs affected: `Output/IS_audit_objectives.gph`, `Output/IS_audit_objectives.pdf`, and `Output/IS_audit_objectives.png` when the figure block is run.
 - Validation: reran the targeted figure block successfully with Stata 17, regenerated the GPH/PDF/PNG outputs, and visually confirmed that all five bars are distinguishable in a monotonic dark-to-light orange sequence.
+
+Update: 2026-07-14 (balancing-position body-only LaTeX fragment)
+- Added a second `esttab` export in `Code Analyse data/1 Summary Statistics.do` for `Output/tables/12 regression balancing test position fragment.tex`; the regressions and the existing complete-table export code remain unchanged.
+- The new export reuses the same eight stored estimates, headings, labels, significance stars, and summary statistics, while `fragment` plus the revised footer omit only the surrounding `tabular` environment.
+- The repository's prior complete table contained a stale 3,049-observation result. The current canonical `Working data/datasetforanalysis.dta` and the manuscript's complete table both produce/use 3,034 observations, so the repository complete table and new fragment were regenerated together from that canonical dataset. Dropbox data were read only and no Dropbox files were written or modified.
+- Output files affected: `Output/tables/12 regression balancing test position.tex`, new `Output/tables/12 regression balancing test position fragment.tex`, and the final fragment handoff at `C:\Users\User\Documents\Projects\Senegal_Audits\output\12 regression balancing test position fragment.tex`.
+- Validation: Stata 17 completed the targeted preparation, eight regressions, and both exports without an `r(#)` error. Both outputs report `N = 3,034`; the regenerated complete table is byte-identical to the manuscript complete table, and removing only the complete table's opening and closing `tabular` commands produces an exact line-for-line match to the fragment.
+- Validation: confirmed eight numbered columns and no `table` or `tabular` commands in the fragment. The manuscript complete table was not changed.
+- Open issues / next steps: none.
+
+Update: 2026-07-14 (current-data path rewiring for five core analysis scripts)
+- Updated the path setup in `Code Analyse data/1 Summary Statistics.do`, `2 Regressions main results.do`, `3 Analysis taxpayer survey.do`, `4 Prediction exercise.do`, and `5 Deterrence.do` for Windows user `User`.
+- The five scripts now read the current `C:\Users\User\Dropbox\Senegal tax audits\Analysis all data\replication_package\Working data\datasetforanalysis.dta`; regression logic, samples, variables, fixed effects, and clustering were not changed.
+- Routed generated summary-statistics outputs to the repository's `Output/tables` folder and the other four scripts' outputs to the repository's `Output` folder, preventing direct runs from overwriting Dropbox outputs.
+- Outputs affected: none during this path-only edit; Stata was deliberately not run.
+- Validation: statically confirmed all five scripts resolve the current dataset and intended local output directories, and confirmed those paths exist. Rechecked the five Dropbox do-files and the Dropbox Table 12 output by hash and timestamp; none changed.
+- Open issues / next steps: `Code Analyse data/MASTER Analysis.do` remains unchanged and still invokes the Dropbox copies of the five do-files rather than these repository copies.
+
+Update: 2026-07-14 (remove extra rule from balancing-position fragment statistics)
+- Changed only the fragment export in `Code Analyse data/1 Summary Statistics.do` so its statistics labels use `label("N" "R2" "Mean outcome")` rather than prefixing `N` with `\hline`; the complete-table export remains unchanged.
+- Synchronized `Output/tables/12 regression balancing test position fragment.tex` and `C:\Users\User\Documents\Projects\Senegal_Audits\output\12 regression balancing test position fragment.tex` by removing the same `\hline` prefix from the `N` row.
+- Outputs affected: the two fragment files only. No Dropbox files were edited.
+- Validation: confirmed the repository and manuscript fragments are byte-identical, contain the unchanged eight-column results, and retain no `table` or `tabular` wrapper commands. Stata was not rerun because this is a one-line export-format change.
+- Open issues / next steps: none.

@@ -22,6 +22,9 @@ clear all
 	if strpos("`c(username)'","wb648862") {
 		global rootdir "C:\Users\wb648862\Dropbox\Senegal tax audits"
 	}
+	if strpos("`c(username)'","User") {
+		global rootdir "C:\Users\User\Dropbox\Senegal tax audits"
+	}
 
 		global rawdata "$rootdir"
 		global analysisdata "$rootdir\Analysis all data\replication_package\Working data"
@@ -32,6 +35,11 @@ clear all
 		global ados "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\ado"
 		adopath ++ "$ados"
 		global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
+	}
+	if strpos("`c(username)'","User") {
+		global ados "C:\Users\User\Documents\Projects\Senegal-Tax-Audit\ado"
+		adopath ++ "$ados"
+		global output "C:\Users\User\Documents\Projects\Senegal-Tax-Audit\Output"
 	}
 
 local date: disp  c(current_date)

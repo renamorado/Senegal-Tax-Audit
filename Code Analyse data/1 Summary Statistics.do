@@ -24,13 +24,17 @@ if strpos("`c(username)'","wb648862") { 										// World Bank local machine
 	global rootdir "C:\Users\wb648862\Dropbox\Senegal tax audits"
 }
 
+if strpos("`c(username)'","User") {
+	global rootdir "C:\Users\User\Dropbox\Senegal tax audits"
+}
+
 		global rawdata "$rootdir"
 		global analysisdata "$rootdir\Analysis all data\replication_package\Working data"
 		global wastedata "$rootdir\Analysis all data\replication_package\Intermediate data"
 		global output "$rootdir\Analysis all data\replication_package\Output"
 
 	* Temporary local-output override: source data paths remain in Dropbox.
-	local localproject "C:/Users/`c(username)'/Documents/Projects/Senegal Tax Audits"
+	local localproject "C:/Users/`c(username)'/Documents/Projects/Senegal-Tax-Audit"
 	capture confirm file "`localproject'/Agents.md"
 	if !_rc {
 		capture mkdir "`localproject'/output"
@@ -667,6 +671,23 @@ esttab r1* r2* r3* r4*
 		coeflabels(algorithm "Algorithm case" x "log(Mean Turnover)" x3 "log(Mean Tax Liability)" profitrate "Profit rate")
 		prehead("\begin{tabular}{lrrrrrrrr} \hline \hline \\") 
 		posthead(\hline) postfoot("\hline \end{tabular}")
+		replace
+		substitute(\_ _)
+	;
+#delim cr
+
+*Export fragment-only version
+#delim ;
+esttab r1* r2* r3* r4*
+		using "$output\12 regression balancing test position fragment.tex",
+		order(algorithm x x3 profitrate )
+		label se keep(algorithm x x3 profitrate )
+		mtitles("P(top)" "P(middle)" "P(top)" "P(middle)" "P(top)" "P(middle)" "P(top)" "P(middle)")
+		s(N r2 pp, label("N" "R2" "Mean outcome" ))
+		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+		coeflabels(algorithm "Algorithm case" x "log(Mean Turnover)" x3 "log(Mean Tax Liability)" profitrate "Profit rate")
+		fragment
+		posthead(\hline) postfoot("\hline")
 		replace
 		substitute(\_ _)
 	;
