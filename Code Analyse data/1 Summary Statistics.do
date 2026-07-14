@@ -969,8 +969,8 @@ forvalues controltype = 1/2 {
 		ytitle("% of Inspectors Reporting Objective Among Top 2", size(3.2))  
 		ylabel(, angle(0) format(%10.0gc) labsize(medsmall))  
 		graphregion(ic(white) fc(white) lc(white)) plotr(ic(white)  fc(white) lc(white)) ylab(, nogrid)   
-		bar(1, color(blue*1)) bar(2, color(blue*0.6)) bar(3, color(ebg))
-		bar(4, color(ltblue*1.1)) bar(5, color(ltblue*0.7)) bar(6, color(lavender))  
+		bar(1, color("166 54 3")) bar(2, color("230 85 13")) bar(3, color("253 141 60"))
+		bar(4, color("253 190 133")) bar(5, color("253 208 162")) bar(6, color("254 237 222"))
 		legend(off)  ; 
 		
 	#delim cr	
