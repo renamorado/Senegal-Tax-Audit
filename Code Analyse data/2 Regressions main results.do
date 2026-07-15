@@ -19,11 +19,28 @@ clear all
 	if strpos("`c(username)'","49354415") { 										// Alipio's computer
 		global rootdir "C:\Users\49354415\Dropbox\Trabalho\2017 WB\Senegal tax audits"
 	}
+	if strpos("`c(username)'","wb648862") {
+		global rootdir "C:\Users\wb648862\Dropbox\Senegal tax audits"
+	}
+	if strpos("`c(username)'","User") {
+		global rootdir "C:\Users\User\Dropbox\Senegal tax audits"
+	}
 
 		global rawdata "$rootdir"
 		global analysisdata "$rootdir\Analysis all data\replication_package\Working data"
 		global wastedata "$rootdir\Analysis all data\replication_package\Intermediate data"
 		global output "$rootdir\Analysis all data\replication_package\Output"
+
+	if strpos("`c(username)'","wb648862") {
+		global ados "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\ado"
+		adopath ++ "$ados"
+		global output "C:\Users\wb648862\Documents\Projects\Senegal Tax Audits\Output"
+	}
+	if strpos("`c(username)'","User") {
+		global ados "C:\Users\User\Documents\Projects\Senegal-Tax-Audit\ado"
+		adopath ++ "$ados"
+		global output "C:\Users\User\Documents\Projects\Senegal-Tax-Audit\Output"
+	}
 
 local date: disp  c(current_date)
 di "`date'"
@@ -352,8 +369,8 @@ local ++spec
 #delim ;
 esttab  ry3_2_experience  ry3_1_experience  ry3_1_experience2 ry4_2_experience  ry4_1_experience  ry4_1_experience2
 		using "$output\1 regression main outcomes control experience.tex",
-		order( algorithm overlap random y16 yearsexperience)
-		label se keep( algorithm overlap random y16 yearsexperience)
+		order( algorithm y16 yearsexperience)
+		label se keep( algorithm y16 yearsexperience)
 		mtitles("Full audits"  "Desk audits" "Desk audits" "Full audits"   "Desk audits" "Desk audits" "Full audits" "Desk audits" "Desk audits") 
 		s(taxcenteryear inspectoryear  N r2 pp, label("Tax center x Year" "Inspector x Year" "\hline N" "R2" "Mean outcome")) 
 		b(%5.2f) se(%5.2f)
@@ -370,9 +387,9 @@ esttab  ry3_2_experience  ry3_1_experience  ry3_1_experience2 ry4_2_experience  
 #delim ;
 esttab ry2_9 ry2_10 ry2_11 ry3_9 ry3_10 ry3_11 ry4_9 ry4_10 ry4_11 
 		using "$output\1 regression main outcomes placement fe.tex",
-		order( algorithm overlap random )
+		order( algorithm )
 		b(%5.2f) se(%5.2f)
-		label se keep( algorithm overlap random)
+		label se keep( algorithm)
 		mtitles("Full audits"  "Desk audits" "Desk audits" "Full audits"   "Desk audits" "Desk audits" "Full audits" "Desk audits" "Desk audits") 
 		s(taxcenteryear inspectoryear  N r2 pp, label("Tax center x Year" "Inspector x Year" "\hline N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
@@ -407,8 +424,8 @@ esttab ry2_1 ry2_4 ry2_5  ry3_1 ry3_4 ry3_5 ry4_1 ry4_4 ry4_5
 #delim ;
 esttab ry6_1  ry6_4 ry6_5  ry7_1 ry7_4 ry7_5
 		using "$output\1 regression evasion rates.tex",
-		order( algorithm overlap random )
-		label se keep( algorithm overlap random)
+		order( algorithm overlap )
+		label se keep( algorithm overlap)
 		b(%5.2f) se(%5.2f)
 		mtitles("Full audits" "Desk audits"  "Desk audits" "Full audits" "Desk audits"  "Desk audits") 
 		s(taxcenteryear inspectoryear  N r2 pp, label("Tax center x Year" "Inspector x Year" "\hline N" "R2" "Mean outcome")) 
@@ -483,8 +500,8 @@ restore
 #delim ;
 esttab reghdfey2_1 reghdfey2_2 reghdfey3_1 reghdfey3_2 reghdfey4_1 reghdfey4_2
 		using "$output\1 regression main outcomes summarized ITT.tex",
-		order( algorithm overlap random )
-		label se keep( algorithm overlap random)
+		order( algorithm overlap )
+		label se keep( algorithm overlap)
 		b(%5.2f) se(%5.2f)
 mtitles("Full audits" "Desk audits"  "Full audits" "Desk audits"  "Full audits" "Desk audits" ) 
 		s(N r2 pp, label("N" "R2" "Mean outcome")) 
@@ -502,8 +519,8 @@ mtitles("Full audits" "Desk audits"  "Full audits" "Desk audits"  "Full audits" 
 #delim ;
 esttab ppmlhdfey2_1 ppmlhdfey2_2 ppmlhdfey3_1 ppmlhdfey3_2 ppmlhdfey4_1 ppmlhdfey4_2
 		using "$output\1 regression main outcomes summarized ITT ppml.tex",
-		order( algorithm overlap random )
-		label se keep( algorithm overlap random)
+		order( algorithm overlap )
+		label se keep( algorithm overlap)
 		nomtitles nonumber
 		b(%5.2f) se(%5.2f)
 		s(N r2_p pp, label("N" "Pseudo-R2" "Mean outcome")) 
@@ -2004,6 +2021,34 @@ esttab rsharemediumseveremain_1 rsharemediumseveremain_2 rsharemediumsevere_1 rs
 		replace
 		substitute(\_ _)
 	;
+esttab rsharemediumseveremain_1 rsharemediumseveremain_2 rsharemediumsevere_1 rsharemediumsevere_2 ranyinfraction_main_1 ranyinfraction_main_2
+		using "$output\1 regression infractions and years alternative outcomes_panelB.tex",
+		order( algorithm )
+		label se keep( algorithm)
+		mtitles("Full audits" "Desk audits"  "Full audits" "Desk audits"  "Full audits"   "Desk audits") 
+		b(%5.2f) se(%5.2f)
+		s(N r2 pp, label("N" "R2" "Mean outcome")) 
+		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
+		coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random" safeties "Replacement" norm_sequencing "Norm. Position on List" norm_sequencing2 "Norm. Position Squared")
+		prehead("") 
+		posthead(\hline) postfoot("\hline")
+		replace
+		substitute(\_ _)
+	;
+esttab ranysevereinfraction_main_1 ranysevereinfraction_main_2
+		using "$output\1 regression infractions and years alternative outcomes_panelC_raw.tex",
+		order( algorithm )
+		label se keep( algorithm)
+		mtitles("Full audits" "Desk audits") 
+		b(%5.2f) se(%5.2f)
+		s(N r2 pp, label("N" "R2" "Mean outcome")) 
+		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
+		coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random" safeties "Replacement" norm_sequencing "Norm. Position on List" norm_sequencing2 "Norm. Position Squared")
+		prehead("") 
+		posthead(\hline) postfoot("\hline")
+		replace
+		substitute(\_ _)
+	;
 #delim cr
 
 ************************************
@@ -3158,7 +3203,7 @@ local ++spec
 esttab rmeanage_1 rmeanage_2  rmastersphd_1 rmastersphd_2  renthusiasm_1 renthusiasm_2  rhighexperience_1 rhighexperience_2 
 		using "$output\2 regression inspector characteristics.tex",
 		order( algorithm)
-		nomtitles nonumbers
+		nomtitles nonumbers fragment
 		label se keep( algorithm overlap )
 		b(%5.2f) se(%5.2f)
 		s(N r2 pp, label("N" "R2" "Mean outcome")) 
@@ -3177,7 +3222,7 @@ esttab rmeanage_1 rmeanage_2  rmastersphd_1 rmastersphd_2  renthusiasm_1 renthus
 esttab rmeanage_1 rmaxage_1 ryearsexperience_1 rmaxyearsexperience_1 rmastersphd_1 rmaxedu_1 renthusiasm_1 
 		using "$output\2 regression inspector characteristics VG.tex",
 		order(algorithm)
-		nomtitles nonumbers
+		nomtitles nonumbers fragment
 		label se keep( algorithm)
 		b(%5.2f) se(%5.2f)		s(N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
@@ -3194,7 +3239,7 @@ esttab rmeanage_1 rmaxage_1 ryearsexperience_1 rmaxyearsexperience_1 rmastersphd
 esttab rmeanage_3 rmaxage_3 ryearsexperience_3 rmaxyearsexperience_3 rmastersphd_3 rmaxedu_3 renthusiasm_3
 		using "$output\2 regression inspector characteristics VG robustness.tex",
 		order(algorithm overlap random)
-		nomtitles nonumbers
+		nomtitles nonumbers fragment
 		b(%5.2f) se(%5.2f)		label se keep( algorithm )
 		s(N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
@@ -3212,7 +3257,7 @@ esttab rmeanage_3 rmaxage_3 ryearsexperience_3 rmaxyearsexperience_3 rmastersphd
 esttab rmeanage_4 rmaxage_4 ryearsexperience_4 rmaxyearsexperience_4 rmastersphd_4 rmaxedu_4 renthusiasm_4
 		using "$output\2 regression inspector characteristics VG robustness data availability.tex",
 		order(algorithm)
-		nomtitles nonumbers
+		nomtitles nonumbers fragment
 		b(%5.2f) se(%5.2f)		label se keep( algorithm)
 		s(N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
@@ -3253,7 +3298,7 @@ local spec = 0
 esttab rmeanage_1 rmastersphd_1 renthusiasm_1 rhighexperience_1 
 		using "$output\2 regression inspector characteristics selection.tex",
 		order( algorithm overlap random)
-		nomtitles nonumbers
+		nomtitles nonumbers fragment
 		b(%5.2f) se(%5.2f)		label se keep( algorithm overlap )
 		s(N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
@@ -3302,7 +3347,7 @@ foreach outcome in started y2 y3 y4 startedalgorithm sharestartedalgorithm morea
 esttab rstarted ry2 ry3 ry4 rstartedalgorithm rsharestartedalgorithm rmorealgorithm renthusiasm_selection
 		using "$output\2 regression inspector characteristics selection desk audits.tex",
 		order( mastersphd_selection highage_selection highexperience_selection)
-		nomtitles nonumbers
+		nomtitles nonumbers fragment
 		b(%5.2f) se(%5.2f)
 		label se keep( mastersphd_selection highage_selection highexperience_selection )
 		s(N r2 pp, label("N" "R2" "Mean outcome")) 
@@ -3501,12 +3546,12 @@ local ++spec
 esttab ry2_1 ry2_2 ry3_1 ry3_2 ry4_1 ry4_2  
 		using "$output\3 regression main outcomes riskscore.tex",
 		order( algorithm overlap random riskscore 1.algorithm#c.riskscore )
+		nomtitles nonumbers fragment
 		label se keep( algorithm  riskscore 1.algorithm#c.riskscore)
-		mtitles("Full audits" "Desk audits" "Full audits"  "Desk audits"  "Full audits"  "Desk audits") 
 		s( N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
 		b(%5.2f) se(%5.2f) coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random" riskscore "Risk score" 1.algorithm#c.riskscore "Alg. x Risk score")
-		prehead("") posthead("\hline") postfoot("\hline")
+		posthead("") postfoot("\hline")
 		replace
 		substitute(\_ _)
 	;
@@ -3517,12 +3562,12 @@ esttab ry2_1 ry2_2 ry3_1 ry3_2 ry4_1 ry4_2
 esttab ry2_3 ry2_4 ry3_3 ry3_4 ry4_3 ry4_4 
 		using "$output\3 regression main outcomes riskscore control.tex",
 		order( algorithm overlap random riskscore 1.algorithm#c.riskscore L1turnover )
+		nomtitles nonumbers fragment
 		label se keep( algorithm  riskscore 1.algorithm#c.riskscore L1turnover)
-		mtitles("Full audits" "Desk audits" "Full audits"  "Desk audits"  "Full audits"  "Desk audits") 
 		s( N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
 		b(%5.2f) se(%5.2f) coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random" riskscore "Risk score" 1.algorithm#c.riskscore "Alg. x Risk score" L1turnover "Lagged log(turnover)")
-		prehead("") posthead("\hline") postfoot("\hline")
+		posthead("") postfoot("\hline")
 		replace
 		substitute(\_ _)
 	;
@@ -3533,16 +3578,22 @@ esttab ry2_3 ry2_4 ry3_3 ry3_4 ry4_3 ry4_4
 esttab ry2_5 ry2_6 ry3_5 ry3_6 ry4_5 ry4_6 
 		using "$output\3 regression main outcomes riskscore unweighted.tex",
 		order( algorithm overlap random uw_riskscore 1.algorithm#c.uw_riskscore)
+		nomtitles nonumbers fragment
 		label se keep( algorithm  uw_riskscore 1.algorithm#c.uw_riskscore)
-		mtitles("Full audits" "Desk audits" "Full audits"  "Desk audits"  "Full audits"  "Desk audits") 
 		s( N r2 pp, label("N" "R2" "Mean outcome")) 
 		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant   
 		b(%5.2f) se(%5.2f) coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm" random "Algorithm x Random" uw_riskscore "Unw. Risk score" 1.algorithm#c.uw_riskscore "Alg. x Unw. Risk score" L1turnover "Lagged log(turnover)")
-		prehead("") posthead("\hline") postfoot("\hline")
+		posthead("") postfoot("\hline")
 		replace
 		substitute(\_ _)
 	;
 #delim cr
+
+*Strip the leading blank line from the three body-only fragments
+shell powershell -Command "Set-Content -LiteralPath '$output\3 regression main outcomes riskscore.tex' -Value ((Get-Content -Raw -LiteralPath '$output\3 regression main outcomes riskscore.tex') -replace '^(\r\n)+','') -NoNewline"
+shell powershell -Command "Set-Content -LiteralPath '$output\3 regression main outcomes riskscore control.tex' -Value ((Get-Content -Raw -LiteralPath '$output\3 regression main outcomes riskscore control.tex') -replace '^(\r\n)+','') -NoNewline"
+shell powershell -Command "Set-Content -LiteralPath '$output\3 regression main outcomes riskscore unweighted.tex' -Value ((Get-Content -Raw -LiteralPath '$output\3 regression main outcomes riskscore unweighted.tex') -replace '^(\r\n)+','') -NoNewline"
+
 
 *******************************
 *Algorithm components

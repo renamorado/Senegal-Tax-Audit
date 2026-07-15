@@ -19,11 +19,18 @@ clear all
 	if strpos("`c(username)'","49354415") { 										// Alipio's computer
 		global rootdir "C:\Users\49354415\Dropbox\Trabalho\2017 WB\Senegal tax audits"
 	}
+	if strpos("`c(username)'","User") {
+		global rootdir "C:\Users\User\Dropbox\Senegal tax audits"
+	}
 
 		global rawdata "$rootdir"
 		global analysisdata "$rootdir\Analysis all data\replication_package\Working data"
 		global wastedata "$rootdir\Analysis all data\replication_package\Intermediate data"
 		global output "$rootdir\Analysis all data\replication_package\Output"
+
+	if strpos("`c(username)'","User") {
+		global output "C:\Users\User\Documents\Projects\Senegal-Tax-Audit\Output"
+	}
 
 local date: disp  c(current_date)
 di "`date'"

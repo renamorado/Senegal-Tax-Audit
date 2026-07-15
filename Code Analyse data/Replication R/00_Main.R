@@ -33,4 +33,5 @@ source(paste0(r_code_path, "04_Compare_Predicted_vs_Realized.R"))
 source(paste0(r_code_path, "06_Compare_Algorithm_vs_Inspector.R"))
 source(paste0(r_code_path, "06_Compare_Algorithm_vs_Inspector_Desk.R"))
 source(paste0(r_code_path, "07_Optimization_Exercise.R"))
+source("C:/Users/wb648862/Documents/Projects/Senegal Tax Audits/Code Analyse data/Replication R/07_Optimization_Exercise_Unweighted_Top5_Revision.R")
 

@@ -1,0 +1,23 @@
+\begin{tabular}{lccc|ccc|ccc} \toprule
+\multicolumn{1}{l}{} & \multicolumn{3}{c}{P(Execution)} & \multicolumn{3}{c}{P(Detection | Execution)} & \multicolumn{3}{c}{log(Evasion) | Detection} \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10} \multicolumn{1}{l}{} & Full audits & Desk audits & Desk audits & Full audits & Desk audits & Desk audits & Full audits & Desk audits & Desk audits \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) & (9) \\ \midrule
+Algorithm   &       -0.07\sym{**} &       -0.04\sym{*}  &       -0.04\sym{*}  &        0.02\sym{**} &        0.03\sym{***}&        0.03\sym{***}&       -0.04         &       -0.06         &       -0.00         \\
+            &      (0.03)         &      (0.02)         &      (0.02)         &      (0.01)         &      (0.01)         &      (0.01)         &      (0.12)         &      (0.10)         &      (0.11)         \\
+\addlinespace
+ & & & & [0.01 ,0.03***] & & [0.02*,0.03***] & [-0.06,0.00] & & [-0.12,0.08] \\  Inspectors x Overlap&        0.13\sym{*}  &        0.05         &        0.04         &        0.01         &        0.01         &        0.01         &        0.24         &       -0.27         &       -0.31         \\
+            &      (0.07)         &      (0.05)         &      (0.05)         &      (0.01)         &      (0.02)         &      (0.02)         &      (0.27)         &      (0.21)         &      (0.26)         \\
+\addlinespace
+Algorithm x Random&                     &        0.03         &        0.03         &                     &        0.01         &        0.01         &                     &       -0.07         &       -0.12         \\
+            &                     &      (0.03)         &      (0.03)         &                     &      (0.01)         &      (0.01)         &                     &      (0.13)         &      (0.13)         \\
+\addlinespace
+Predicted evasion&       -0.32\sym{***}&       -0.20\sym{***}&       -0.17\sym{***}&        0.25\sym{***}&        0.17\sym{***}&        0.16\sym{***}&        0.38         &       -0.82\sym{***}&       -0.82\sym{***}\\
+            &      (0.03)         &      (0.01)         &      (0.01)         &      (0.02)         &      (0.01)         &      (0.01)         &      (0.42)         &      (0.24)         &      (0.30)         \\
+\addlinespace
+Predicted evasion squared&        0.01\sym{***}&        0.01\sym{***}&        0.01\sym{***}&       -0.01\sym{***}&       -0.00\sym{***}&       -0.00\sym{***}&        0.02\sym{*}  &        0.05\sym{***}&        0.05\sym{***}\\
+            &      (0.00)         &      (0.00)         &      (0.00)         &      (0.00)         &      (0.00)         &      (0.00)         &      (0.01)         &      (0.01)         &      (0.01)         \\
+\midrule
+Tax center x Year&         Yes         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         \\
+Inspector x Year&          No         &          No         &         Yes         &          No         &          No         &         Yes         &          No         &          No         &         Yes         \\
+N           &         646         &        1707         &        1707         &         407         &         857         &         855         &         359         &         595         &         592         \\
+R2          &        0.35         &        0.29         &        0.36         &        0.94         &        0.92         &        0.93         &        0.79         &        0.66         &        0.70         \\
+Mean outcome&        0.63         &        0.50         &        0.50         &        0.88         &        0.69         &        0.69         &       19.41         &       17.72         &       17.71         \\
+\bottomrule \end{tabular}

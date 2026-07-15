@@ -20,10 +20,28 @@ clear all
 		global rootdir "C:\Users\49354415\Dropbox\Trabalho\2017 WB\Senegal tax audits"
 	}
 
+if strpos("`c(username)'","wb648862") { 										// World Bank local machine
+	global rootdir "C:\Users\wb648862\Dropbox\Senegal tax audits"
+}
+
+if strpos("`c(username)'","User") {
+	global rootdir "C:\Users\User\Dropbox\Senegal tax audits"
+}
+
 		global rawdata "$rootdir"
 		global analysisdata "$rootdir\Analysis all data\replication_package\Working data"
 		global wastedata "$rootdir\Analysis all data\replication_package\Intermediate data"
 		global output "$rootdir\Analysis all data\replication_package\Output"
+
+	* Temporary local-output override: source data paths remain in Dropbox.
+	local localproject "C:/Users/`c(username)'/Documents/Projects/Senegal-Tax-Audit"
+	capture confirm file "`localproject'/Agents.md"
+	if !_rc {
+		capture mkdir "`localproject'/output"
+		capture mkdir "`localproject'/output/tables"
+		global output "`localproject'/output/tables"
+		adopath ++ "`localproject'/ado"
+	}
 
 local date: disp  c(current_date)
 di "`date'"
@@ -399,6 +417,27 @@ replace
 ;
 #delim cr
 
+matrix countCP_reorder = J(28, 6, 0)
+forvalues i = 1/28 {
+	matrix countCP_reorder[`i', 1] = countCP[`i', 2]
+	matrix countCP_reorder[`i', 2] = countCP[`i', 1]
+	matrix countCP_reorder[`i', 3] = countCP[`i', 3]
+	matrix countCP_reorder[`i', 4] = countCP[`i', 4]
+	matrix countCP_reorder[`i', 5] = countCP[`i', 5]
+	matrix countCP_reorder[`i', 6] = countCP[`i', 6]
+}
+matrix countVGCP = countVG, countCP_reorder
+matrix colnames countVGCP = "& Algorithm" "Discretion" "Overlap" "Total" "Algorithm" "Random" "Discretion" "Overlap" "Replacement" "Total"
+
+#delim ;
+esttab matrix(countVGCP) using "$output\11 balance VG CP.tex", 
+nomtitle
+prehead(\begin{tabular}{llcccccccccc} \hline & & \multicolumn{4}{c}{Full audits} & \multicolumn{6}{c}{Desk audits} \\ \cline{3-6} \cline{7-12})
+postfoot(\hline \end{tabular}) 
+replace
+;
+#delim cr
+
 **********************************************************
 **********************************************************
 *AUDIT PROBABILITIES
@@ -632,6 +671,23 @@ esttab r1* r2* r3* r4*
 		coeflabels(algorithm "Algorithm case" x "log(Mean Turnover)" x3 "log(Mean Tax Liability)" profitrate "Profit rate")
 		prehead("\begin{tabular}{lrrrrrrrr} \hline \hline \\") 
 		posthead(\hline) postfoot("\hline \end{tabular}")
+		replace
+		substitute(\_ _)
+	;
+#delim cr
+
+*Export fragment-only version
+#delim ;
+esttab r1* r2* r3* r4*
+		using "$output\12 regression balancing test position fragment.tex",
+		order(algorithm x x3 profitrate )
+		label se keep(algorithm x x3 profitrate )
+		mtitles("P(top)" "P(middle)" "P(top)" "P(middle)" "P(top)" "P(middle)" "P(top)" "P(middle)")
+		s(N r2 pp, label("N" "R2" "Mean outcome" ))
+		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+		coeflabels(algorithm "Algorithm case" x "log(Mean Turnover)" x3 "log(Mean Tax Liability)" profitrate "Profit rate")
+		fragment
+		posthead(\hline) postfoot("\hline")
 		replace
 		substitute(\_ _)
 	;
@@ -934,8 +990,8 @@ forvalues controltype = 1/2 {
 		ytitle("% of Inspectors Reporting Objective Among Top 2", size(3.2))  
 		ylabel(, angle(0) format(%10.0gc) labsize(medsmall))  
 		graphregion(ic(white) fc(white) lc(white)) plotr(ic(white)  fc(white) lc(white)) ylab(, nogrid)   
-		bar(1, color(blue*1)) bar(2, color(blue*0.6)) bar(3, color(ebg))
-		bar(4, color(ltblue*1.1)) bar(5, color(ltblue*0.7)) bar(6, color(lavender))  
+		bar(1, color("166 54 3")) bar(2, color("230 85 13")) bar(3, color("253 141 60"))
+		bar(4, color("253 190 133")) bar(5, color("253 208 162")) bar(6, color("254 237 222"))
 		legend(off)  ; 
 		
 	#delim cr	

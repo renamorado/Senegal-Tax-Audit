@@ -1,4 +1,6 @@
 \documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage{booktabs}% http://ctan.org/pkg/booktabs
 \usepackage{amsmath}
 \usepackage[margin=0.9in]{geometry}   % slightly tighter 
@@ -20,7 +22,11 @@
 %\author{Roldan Enamorado}
 \date{February, 2026}
 \setcounter{tocdepth}{4}
-\newcommand{\OutPath}{Output/}
+\IfFileExists{Output/table4_main_outcomes_replicated.tex}{%
+  \newcommand{\OutPath}{Output/}%
+}{%
+  \newcommand{\OutPath}{../Output/}%
+}
 % Helper: one row (label + Desk + Full)
 \newcommand{\BinRow}[3]{%
 \textbf{#1} &
@@ -122,12 +128,12 @@
 \centering
 \begin{subfigure}[t]{0.48\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{Output/#3}
+  \includegraphics[width=\linewidth]{\OutPath#3}
   \subcaption{Desk audits}
 \end{subfigure}\hfill
 \begin{subfigure}[t]{0.48\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{Output/#4}
+  \includegraphics[width=\linewidth]{\OutPath#4}
   \subcaption{Full audits}
 \end{subfigure}
 \end{figure}
@@ -217,7 +223,7 @@
 \label{tab:exec_rate_full_panels}
 
 \footnotesize
-\input{Output/inspectors_reg_panels_Full_exec_rate.tex}
+\input{\OutPath inspectors_reg_panels_Full_exec_rate.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -236,7 +242,7 @@
 \label{tab:exec_rate_full_panels_inspector}
 
 \footnotesize
-\input{Output/inspectors_reg_panels_Full_exec_rate_inspector.tex}
+\input{\OutPath inspectors_reg_panels_Full_exec_rate_inspector.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -259,14 +265,14 @@
     \begin{tabular}{cc}
     \multicolumn{2}{c}{A: Share of Void Cases} \\
     A1: 2018 vs 2019     &  A2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_v_Algorithm_2018_2019_full.pdf}  &  \includegraphics[width=0.5\linewidth]{Output/scatter_share_v_Algorithm_2018_avg_full.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_v_Algorithm_2018_2019_full.pdf}  &  \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_v_Algorithm_2018_avg_full.pdf} \\
     \multicolumn{2}{c}{B: Below-Median Evasion Rate} \\
     B1: 2018 vs 2019     &  B2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_med_er_Algorithm_2018_2019_full.pdf}  &  \includegraphics[width=0.5\linewidth]{Output/scatter_share_med_er_Algorithm_2018_avg_full.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_med_er_Algorithm_2018_2019_full.pdf}  &  \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_med_er_Algorithm_2018_avg_full.pdf} \\
     \multicolumn{2}{c}{C: Bottom-Quartile Evasion Rate} \\
     C1: 2018 vs 2019     &  C2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_botq_er_Algorithm_2018_2019_full.pdf} & 
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_botq_er_Algorithm_2018_avg_full.pdf}   \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_botq_er_Algorithm_2018_2019_full.pdf} & 
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_botq_er_Algorithm_2018_avg_full.pdf}   \\
     \end{tabular}
     \begin{tablenotes}
     \footnotesize \item Notes: This figure relates tax office-level exposure in year $t$ to low-yield algorithm-selected audits to the execution rate of algorithm-selected audits in year $t+1$. The sample includes selected full audits only (excluding safety cases) and is aggregated at the tax office $\times$ year level. The estimation sample keeps offices observed in at least two periods in the relevant comparison window (2018 vs 2019, or 2018 vs the 2019--2020 average specification). An audit is classified as void when it is executed and uncovered evasion value equals zero. Evasion rate is defined for executed audits as uncovered evasion value divided by uncovered evasion value plus average turnover; average turnover is constructed as the average reported sales (2014--2020). Panel A uses the share of void audits; Panel B the share of audits below the median evasion-rate cutoff; Panel C the share in the bottom quartile of the evasion-rate distribution. Median and quartile evasion-rate cutoffs are computed within selection-year $\times$ selection method. For Panels A--C, low-yield shares on the horizontal axis use executed algorithm-selected audits as denominators. The vertical-axis execution measure is the algorithm execution rate, defined as executed algorithm-selected audits divided by assigned algorithm-selected audits. Column 1 compares 2018 and 2019. Column 2 compares 2018 with the average of 2019 and 2020, computed as the row mean. Points in the scatterplot represent tax offices observed during the whole analysis period (2018--2020), and lines show unweighted linear fits.
@@ -291,16 +297,16 @@
     \begin{tabular}{cc}
     \multicolumn{2}{c}{A: Share of Void Cases (Algorithm / Inspectors)} \\
     A1: 2018 vs 2019     &  A2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_v_relIns_Algorithm_2018_2019_full.pdf}  &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_v_relIns_Algorithm_2018_avg_full.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_v_relIns_Algorithm_2018_2019_full.pdf}  &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_v_relIns_Algorithm_2018_avg_full.pdf} \\
     \multicolumn{2}{c}{B: Below-Median Evasion Rate (Algorithm / Inspectors)} \\
     B1: 2018 vs 2019     &  B2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_med_er_relIns_Algorithm_2018_2019_full.pdf}  &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_med_er_relIns_Algorithm_2018_avg_full.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_med_er_relIns_Algorithm_2018_2019_full.pdf}  &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_med_er_relIns_Algorithm_2018_avg_full.pdf} \\
     \multicolumn{2}{c}{C: Bottom-Quartile Evasion Rate (Algorithm / Inspectors)} \\
     C1: 2018 vs 2019     &  C2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_botq_er_relIns_Algorithm_2018_2019_full.pdf} &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_botq_er_relIns_Algorithm_2018_avg_full.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_botq_er_relIns_Algorithm_2018_2019_full.pdf} &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_botq_er_relIns_Algorithm_2018_avg_full.pdf} \\
     \end{tabular}
     \begin{tablenotes}
 \footnotesize \item Notes: This figure relates tax office level exposure in year $t$ to low-yield algorithm-selected audits to the relative execution rate of algorithm-selected audits in year $t+1$, with all measures expressed as Algorithm relative to Inspectors within the same tax office-year. The sample includes selected full audits only, and is aggregated at the tax office $\times$ year level. The estimation sample further keeps only offices observed in at least two periods in the relevant comparison window (2018 vs 2019, or the 2018 vs 2019--2020 average specification). An audit is classified as void when it is executed and uncovered evasion value equals zero. Evasion rate is defined for executed audits as uncovered evasion value divided by uncovered evasion value plus average turnover; average turnover is constructed as the average reported sales (2014-2020). Panel A uses the share of void audits; Panel B the share of audits below the median evasion-rate cutoff; Panel C the share in the bottom quartile of the evasion-rate distribution. Median and quartile evasion rate cutoffs are computed within selection-year and  selection method. For Panels A--C, low yield shares use method-specific executed audits as denominators and are presented in the horizontal axis. The vertical-axis execution measure uses method-specific assigned audits as denominator. In the relative specification, each Algorithm measure is divided by the corresponding Inspectors measure. Ratios are set to missing when inspector denominators are zero, and observations with zero method-specific denominators are excluded for the corresponding measure. Column 1 compares 2018 and 2019. Column 2 compares 2018 with the average of 2019 and 2020, computed as the row mean. Points in the scatterplot represent tax offices observed during the whole analysis period (2018--2020), and lines show unweighted linear fits. 
@@ -320,20 +326,20 @@
     \begin{tabular}{@{}cc@{}}
     \multicolumn{2}{c}{A: Average number of inspectors} \\
     A1: Deciles of predicted evasion     &  A2: Quintiles of predicted evasion\\
-    \includegraphics[width=0.46\linewidth]{Output/avg_ninspectors_binplot_yhatrf_Full_decile_whole_sample.pdf}  &
-    \includegraphics[width=0.46\linewidth]{Output/avg_ninspectors_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_ninspectors_binplot_yhatrf_Full_decile_whole_sample.pdf}  &
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_ninspectors_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
     \multicolumn{2}{c}{B: Average duration [Admin. data]} \\
     B1: Deciles of predicted evasion     &  B2: Quintiles of predicted evasion\\
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_admin_binplot_yhatrf_Full_decile_whole_sample.pdf}  &
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_admin_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_admin_binplot_yhatrf_Full_decile_whole_sample.pdf}  &
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_admin_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
     \multicolumn{2}{c}{C: Average duration [Taxpayer data]} \\
     C1: Deciles of predicted evasion     &  C2: Quintiles of predicted evasion\\
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_tp_binplot_yhatrf_Full_decile_whole_sample.pdf} &
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_tp_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_tp_binplot_yhatrf_Full_decile_whole_sample.pdf} &
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_tp_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
     \multicolumn{2}{c}{D: Average duration [Inspector survey]} \\
     D1: Deciles of predicted evasion     &  D2: Quintiles of predicted evasion\\
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_self_binplot_yhatrf_Full_decile_whole_sample.pdf} &
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_self_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_self_binplot_yhatrf_Full_decile_whole_sample.pdf} &
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_self_binplot_yhatrf_Full_quintile_whole_sample.pdf} \\
     \end{tabular}
     \begin{tablenotes}
     
@@ -353,20 +359,20 @@
     \begin{tabular}{@{}cc@{}}
     \multicolumn{2}{c}{A: Average number of inspectors} \\
     A1: Deciles of predicted evasion     &  A2: Quintiles of predicted evasion\\
-    \includegraphics[width=0.46\linewidth]{Output/avg_ninspectors_binplot_yhatrf_Full_decile_outcomeavail.pdf}  &
-    \includegraphics[width=0.46\linewidth]{Output/avg_ninspectors_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_ninspectors_binplot_yhatrf_Full_decile_outcomeavail.pdf}  &
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_ninspectors_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
     \multicolumn{2}{c}{B: Average duration [Admin. data]} \\
     B1: Deciles of predicted evasion     &  B2: Quintiles of predicted evasion\\
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_admin_binplot_yhatrf_Full_decile_outcomeavail.pdf}  &
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_admin_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_admin_binplot_yhatrf_Full_decile_outcomeavail.pdf}  &
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_admin_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
     \multicolumn{2}{c}{C: Average duration [Taxpayer data]} \\
     C1: Deciles of predicted evasion     &  C2: Quintiles of predicted evasion\\
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_tp_binplot_yhatrf_Full_decile_outcomeavail.pdf} &
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_tp_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_tp_binplot_yhatrf_Full_decile_outcomeavail.pdf} &
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_tp_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
     \multicolumn{2}{c}{D: Average duration [Inspector survey]} \\
     D1: Deciles of predicted evasion     &  D2: Quintiles of predicted evasion\\
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_self_binplot_yhatrf_Full_decile_outcomeavail.pdf} &
-    \includegraphics[width=0.46\linewidth]{Output/avg_duration_self_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_self_binplot_yhatrf_Full_decile_outcomeavail.pdf} &
+    \includegraphics[width=0.46\linewidth]{\OutPath avg_duration_self_binplot_yhatrf_Full_quintile_outcomeavail.pdf} \\
     \end{tabular}
     \begin{tablenotes}
     
@@ -383,16 +389,16 @@
     \begin{tabular}{cc}
     \multicolumn{2}{c}{A: Share of Detected Audits} \\
     A1: 2018 vs 2019     &  A2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_det_Algorithm_2018_2019_full_success.pdf}  &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_det_Algorithm_2018_avg_full_success.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_det_Algorithm_2018_2019_full_success.pdf}  &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_det_Algorithm_2018_avg_full_success.pdf} \\
     \multicolumn{2}{c}{B: Above-Median Evasion Rate} \\
     B1: 2018 vs 2019     &  B2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_abvmed_er_Algorithm_2018_2019_full_success.pdf}  &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_abvmed_er_Algorithm_2018_avg_full_success.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_abvmed_er_Algorithm_2018_2019_full_success.pdf}  &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_abvmed_er_Algorithm_2018_avg_full_success.pdf} \\
     \multicolumn{2}{c}{C: Top-Quartile Evasion Rate} \\
     C1: 2018 vs 2019     &  C2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_topq_er_Algorithm_2018_2019_full_success.pdf} &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_topq_er_Algorithm_2018_avg_full_success.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_topq_er_Algorithm_2018_2019_full_success.pdf} &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_topq_er_Algorithm_2018_avg_full_success.pdf} \\
     \end{tabular}
     \begin{tablenotes}
     \footnotesize \item Notes: This figure relates tax office-level exposure in year $t$ to successful algorithm-selected audits to the execution rate of algorithm-selected audits in year $t+1$. The sample includes selected full audits only (excluding safety cases) and is aggregated at the tax office $\times$ year level. The estimation sample keeps offices observed in at least two periods in the relevant comparison window (2018 vs 2019, or 2018 vs the 2019--2020 average specification). An audit is classified as detected when it is executed and uncovered evasion value is strictly positive (complement of a void audit). Evasion rate is defined for executed audits as uncovered evasion value divided by uncovered evasion value plus average turnover; average turnover is constructed as the average reported sales (2014--2020). Panel A uses the share of detected audits; Panel B the share of audits above the median evasion-rate cutoff; Panel C the share in the top quartile of the evasion-rate distribution. Median and quartile evasion-rate cutoffs are computed within selection-year $\times$ selection method. For Panels A--C, shares on the horizontal axis use executed algorithm-selected audits as denominators. The vertical-axis execution measure is the algorithm execution rate, defined as executed algorithm-selected audits divided by assigned algorithm-selected audits. Column 1 compares 2018 and 2019. Column 2 compares 2018 with the average of 2019 and 2020, computed as the row mean. Points represent tax offices observed during the whole analysis period (2018--2020), and lines show unweighted linear fits.
@@ -409,15 +415,15 @@
     \begin{tabular}{cc}
     A: Share of Detected Audits &
     B: Above-Median Evasion Rate \\[0.3em]
-    \includegraphics[width=0.42\textwidth]{Output/scatter_share_det_Algorithm_2018_2019_full_success.pdf} &
-    \includegraphics[width=0.42\textwidth]{Output/scatter_share_abvmed_er_Algorithm_2018_2019_full_success.pdf} \\
+    \includegraphics[width=0.42\textwidth]{\OutPath scatter_share_det_Algorithm_2018_2019_full_success.pdf} &
+    \includegraphics[width=0.42\textwidth]{\OutPath scatter_share_abvmed_er_Algorithm_2018_2019_full_success.pdf} \\
     \end{tabular}
 
     \vspace{0.5em}
 
     \begin{tabular}{c}
     C: Top-Quartile Evasion Rate \\[0.3em]
-    \includegraphics[width=0.42\textwidth]{Output/scatter_share_topq_er_Algorithm_2018_2019_full_success.pdf} \\
+    \includegraphics[width=0.42\textwidth]{\OutPath scatter_share_topq_er_Algorithm_2018_2019_full_success.pdf} \\
     \end{tabular}
 
     \vspace{0.5em}
@@ -437,15 +443,15 @@
     \begin{tabular}{cc}
     A: Share of Detected Audits &
     B: Above-Median Evasion Rate \\[0.3em]
-    \includegraphics[width=0.42\textwidth]{Output/scatter_share_det_relIns_Algorithm_2018_2019_full_success.pdf} &
-    \includegraphics[width=0.42\textwidth]{Output/scatter_share_abvmed_er_relIns_Algorithm_2018_2019_full_success.pdf} \\
+    \includegraphics[width=0.42\textwidth]{\OutPath scatter_share_det_relIns_Algorithm_2018_2019_full_success.pdf} &
+    \includegraphics[width=0.42\textwidth]{\OutPath scatter_share_abvmed_er_relIns_Algorithm_2018_2019_full_success.pdf} \\
     \end{tabular}
 
     \vspace{0.5em}
 
     \begin{tabular}{c}
     C: Top-Quartile Evasion Rate \\[0.3em]
-    \includegraphics[width=0.42\textwidth]{Output/scatter_share_topq_er_relIns_Algorithm_2018_2019_full_success.pdf} \\
+    \includegraphics[width=0.42\textwidth]{\OutPath scatter_share_topq_er_relIns_Algorithm_2018_2019_full_success.pdf} \\
     \end{tabular}
 
     \vspace{0.5em}
@@ -467,16 +473,16 @@
     \begin{tabular}{cc}
     \multicolumn{2}{c}{A: Share of Detected Audits (Algorithm / Inspectors)} \\
     A1: 2018 vs 2019     &  A2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_det_relIns_Algorithm_2018_2019_full_success.pdf}  &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_det_relIns_Algorithm_2018_avg_full_success.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_det_relIns_Algorithm_2018_2019_full_success.pdf}  &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_det_relIns_Algorithm_2018_avg_full_success.pdf} \\
     \multicolumn{2}{c}{B: Above-Median Evasion Rate (Algorithm / Inspectors)} \\
     B1: 2018 vs 2019     &  B2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_abvmed_er_relIns_Algorithm_2018_2019_full_success.pdf}  &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_abvmed_er_relIns_Algorithm_2018_avg_full_success.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_abvmed_er_relIns_Algorithm_2018_2019_full_success.pdf}  &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_abvmed_er_relIns_Algorithm_2018_avg_full_success.pdf} \\
     \multicolumn{2}{c}{C: Top-Quartile Evasion Rate (Algorithm / Inspectors)} \\
     C1: 2018 vs 2019     &  C2: 2018 vs 2019-2020 average\\
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_topq_er_relIns_Algorithm_2018_2019_full_success.pdf} &
-    \includegraphics[width=0.5\linewidth]{Output/scatter_share_topq_er_relIns_Algorithm_2018_avg_full_success.pdf} \\
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_topq_er_relIns_Algorithm_2018_2019_full_success.pdf} &
+    \includegraphics[width=0.5\linewidth]{\OutPath scatter_share_topq_er_relIns_Algorithm_2018_avg_full_success.pdf} \\
     \end{tabular}
     \begin{tablenotes}
     \footnotesize \item Notes: This figure relates tax office-level exposure in year $t$ to successful algorithm-selected audits to the relative execution rate of algorithm-selected audits in year $t+1$, with all measures expressed as Algorithm relative to Inspectors within the same tax office-year. The sample includes selected full audits only and is aggregated at the tax office $\times$ year level. The estimation sample keeps only offices observed in at least two periods in the relevant comparison window (2018 vs 2019, or 2018 vs 2019--2020 average). An audit is classified as detected when it is executed and uncovered evasion value is strictly positive. Panel A uses the detection share; Panel B the share above the median evasion-rate cutoff; Panel C the share in the top quartile of the evasion-rate distribution. Median and quartile evasion-rate cutoffs are computed within selection-year $\times$ selection method. For Panels A--C, shares use method-specific executed audits as denominators. The vertical-axis execution measure uses method-specific assigned audits as denominator. In the relative specification, each Algorithm measure is divided by the corresponding Inspectors measure. Ratios are set to missing when inspector denominators are zero, and observations with zero method-specific denominators are excluded for the corresponding measure. Column 1 compares 2018 and 2019. Column 2 compares 2018 with the average of 2019 and 2020. Points represent tax offices observed during 2018--2020, and lines show unweighted linear fits.
@@ -486,13 +492,346 @@
 \end{comment}
 
 
-\section{Audit productivity}
+\section{Main regression estimates adding predicted evasion controls}
 
+\begin{figure}[H]
+    \centering
+    \caption{Predicted Evasion Amount and Realized Execution Rate, All Cases: Optimization-Weighted Predictions}
+    \label{fig:figure4_panel_a_weighted_yhatrf_fullaudits}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_weighted_yhatrf_fullaudits.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: A plots the distribution of detected evasion for all full audits (log of FCFA amounts), as well as the results from an optimization-weighted random forest model predicting detected evasion based on firms' observable characteristics. The blue distribution is optimization-weighted predicted evasion for cases that were part of the annual audit program but not actually audited. The green distribution is optimization-weighted predicted evasion for cases that were audited. The solid line plots the realized audit execution rate by level of optimization-weighted predicted evasion. This figure is for full audits only.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Optimization-Weighted Predictions}
+    \label{fig:figure4_panel_b_weighted_yhatrf_fullaudits}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_weighted_yhatrf_fullaudits.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: B shows the distribution of optimization-weighted predicted evasion for all algorithm-selected cases (purple) and for all inspector-selected cases (orange). The solid lines (purple and orange) plot the realized audit execution rates by level of optimization-weighted predicted evasion. This figure is for full audits only.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Current and Top-Quartile-Weighted Predicted Evasion Scores}
+    \label{fig:yhatrf_weighted_vs_unweighted_scatterplots}
+    \begin{threeparttable}
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath yhatrf_weighted_vs_unweighted_fullaudits.pdf}
+        \subcaption{Full audits, selected cases}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath yhatrf_weighted_vs_unweighted_fullaudits_executed.pdf}
+        \subcaption{Full audits, executed cases}
+    \end{subfigure}
+
+    \vspace{0.7em}
+
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath yhatrf_weighted_vs_unweighted_deskaudits.pdf}
+        \subcaption{Desk audits, selected cases}
+    \end{subfigure}\hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath yhatrf_weighted_vs_unweighted_deskaudits_executed.pdf}
+        \subcaption{Desk audits, executed cases}
+    \end{subfigure}
+
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure compares two random-forest predictions of detected evasion for selected audit cases. The horizontal axis reports the prediction from the baseline model, while the vertical axis reports the prediction from the model that places additional weight on high-evasion audit outcomes during training. Predictions are measured as log FCFA amounts. Panels A and C include selected full and desk audits, respectively; Panels B and D restrict to cases that were actually executed. The light gray dotted line is the 45-degree line, where the two predictions are equal. The solid line is an unweighted linear fit, and the fitted equation is reported inside each panel. Both axes use the same scale within each panel and start at zero.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\subsection{Testing bureau FE}
+
+This subsection compares the full-audit columns from Table 4 under the original full-audit fixed effects and under broad bureau $\times$ selection-year fixed effects.
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.2\textwidth}
+\begin{threeparttable}
+\caption{Table 4 Full-Audit Columns: Bureau FE Comparison}
+\label{tab:table4_fullaudit_fe_comparison}
+\footnotesize
+\input{\OutPath table4_fullaudit_fe_comparison.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table re-estimates the full-audit columns from Table 4. The dependent variables are the probability that a selected case was executed, the probability of detection conditional on execution, and log evasion conditional on detection. All columns use the selected non-safety sample, the same controls as the original specification (\texttt{algorithm}, \texttt{overlap}, \texttt{random}, and \texttt{safeties}), and robust standard errors. For each outcome, the first column uses the original \texttt{inspectorclusteryear} fixed effects and the second column uses broad \texttt{bureau} $\times$ \texttt{selectionyear} fixed effects, not \texttt{bureau\_detailed}.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\subsection{Table 4 with predicted evasion controls}
+
+This subsection presents the Table 4 baseline replication together with variants that keep the original nine-column layout and add predicted-evasion controls.
+
+\newcommand{\TableFourRobustnessNotes}[1]{%
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of a regression of the main audit outcomes on the selection method of the case, for full and desk audits separately. Specifications for full audits control for tax office x year fixed effects, which corresponds to the selection list for full audits. For desk audits, we show specifications with tax office x year fixed effects, and inspector x year fixed effects, the latter corresponding to the list for desk audits. The first outcome (Columns 1 to 3) is the probability that the case on the list was actually executed by the inspectors. The second outcome (Columns 4 to 6) is the probability that the audit resulted in a penalty (initial or final notice), conditional on the case being conducted. The third outcome (Columns 7 to 9) is the log amount of the evasion plus penalties uncovered, conditional on the case ending in positive penalty. The evasion amount is obtained from the final notice, which we complement with the initial notice when the final notice is not available. The sample includes all cases selected in the 2018, 2019, and 2020 audit programs. The data includes the selection and audits of the Large Taxpayer Unit, Medium Taxpayer Units 1 and 2, Liberal Professionals, and the regional SME units of Dakar Plateau, Grand Dakar, Pikine Guediawaye, and Ngor Almadies. Robust standard errors (Huber-White) are shown in parentheses, and clustered at the inspector x year level when inspector fixed effects are included. Lee bounds are shown in brackets for the coefficient on the algorithm-selection dummy, computed based on the attrition between algorithm and inspector cases for variables after audit execution. #1 Table C.1 shows intent-to-treat effects, Table C.3 shows robustness to controlling for audit slot fixed effects, and Table C.4 shows the results when using the evasion rate (instead of the evasion amount) as the outcome. Figure D.1 shows the distribution of audit list (= inspector x year) fixed effects for columns 3, 6 and 9.
+}
+
+\newcommand{\RestrictedPredictedEvasionTable}[5]{%
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=#1}
+\begin{threeparttable}
+\caption{#2}
+\label{tab:#3}
+\footnotesize
+\input{\OutPath #4.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: #5
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+}
+
+\newcommand{\RestrictedTableFourNote}{Restricted-sample version of the Table 4 decile-control specification. The Table 4 rows include the rebuilt Lee-bounds row, and predicted-evasion decile controls are recomputed within the active restricted sample.}
+\newcommand{\RestrictedTableFiveNote}{Restricted-sample version of the Table 5 full-audit decile-control specification. Duration variables, availability indicators, and predicted-evasion decile controls are recomputed within the active restricted sample.}
+\newcommand{\RestrictedTableSixNote}{Restricted-sample version of the Table 6 taxpayer-survey decile-control specification. Survey indexes and predicted-evasion decile controls are recomputed within the active restricted sample.}
+\newcommand{\RestrictedTableEightNote}{Restricted-sample version of the Table 8 full-audit decile-control specification. The observable-characteristics ladder is unchanged, and Column 6 contains predicted-evasion decile controls recomputed within the active restricted sample.}
+
+\begin{landscape}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Table 4: Main Results Probability of Execution Varying Predicted Evasion Control Specification}
+\label{tab:table4_col1_predicted_evasion_control_comparison}
+
+\footnotesize
+\input{\OutPath table4_col1_predicted_evasion_control_comparison.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Column 1 of Table 4, where the dependent variable is the probability that a selected full-audit case was executed by the inspectors. All specifications use the selected non-safety full-audit sample, include the original selection-method and replacement controls, and absorb the original full-audit list fixed effects. Robust standard errors are shown in parentheses. Predicted evasion is the Random Forest prediction of uncovered evasion. Quintiles, deciles, top-split deciles, and integer ranks are formed within audit type by detailed tax office by selection year; for full audits, this detailed-tax-office-by-year cell is the selection list. The columns are ordered from simpler controls to richer list-specific controls: Columns 2--4 add linear, quadratic, and cubic continuous controls; Columns 5--6 add the within-list predicted-evasion rank to the linear and quadratic controls; Columns 7--9 use quintile, decile, and top-split-decile controls; Columns 10--12 allow predicted-evasion slopes to vary by list; Column 13 allows the rank slope to vary by list; Columns 14--16 absorb quintile-by-list, decile-by-list, and top-split-decile-by-list fixed effects; Column 17 allows a quadratic polynomial in within-list rank to vary by list; and Column 18 allows a quadratic predicted-evasion polynomial to vary by list for the non-LTU subsample. The non-LTU subsample excludes the Large Taxpayer Unit and keeps Medium, Liberal, and SME offices. The top-split decile control keeps deciles 1--8 and splits each list's ninth and tenth deciles into two equal-size bins. Rank 1 is the highest-predicted-evasion case in the list, rank 2 is the second-highest, and larger rank values correspond to lower predicted evasion. Singleton bin-by-list cells are dropped in Columns 14--16 because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-evasion control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Table 4: Main Results Probability of Execution Varying Predicted Evasion Control Specification, Optimization-Weighted Predictions}
+\label{tab:table4_col1_predicted_evasion_control_comparison_optimization_weighted}
+
+\footnotesize
+\input{\OutPath table4_col1_predicted_evasion_control_comparison_optimization_weighted.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Column 1 of Table 4, where the dependent variable is the probability that a selected full-audit case was executed by the inspectors. All specifications use the selected non-safety full-audit sample, include the original selection-method and replacement controls, and absorb the original full-audit list fixed effects. Robust standard errors are shown in parentheses. Predicted evasion is the optimization-exercise weighted Random Forest prediction of uncovered evasion, generated from the weighted prediction datasets exported by the optimization exercise. Column 1 keeps the original specification and does not add a predicted-evasion control; Columns 2--18 repeat the same predicted-evasion control specifications used in Table \ref{tab:table4_col1_predicted_evasion_control_comparison}, replacing only the current predicted-evasion measure with the optimization-weighted predicted-evasion measure. Quintiles, deciles, top-split deciles, and integer ranks are formed within audit type by detailed tax office by selection year; for full audits, this detailed-tax-office-by-year cell is the selection list. The columns are ordered from simpler controls to richer list-specific controls: Columns 2--4 add linear, quadratic, and cubic continuous controls; Columns 5--6 add the within-list predicted-evasion rank to the linear and quadratic controls; Columns 7--9 use quintile, decile, and top-split-decile controls; Columns 10--12 allow predicted-evasion slopes to vary by list; Column 13 allows the rank slope to vary by list; Columns 14--16 absorb quintile-by-list, decile-by-list, and top-split-decile-by-list fixed effects; Column 17 allows a quadratic polynomial in within-list rank to vary by list; and Column 18 allows a quadratic predicted-evasion polynomial to vary by list for the non-LTU subsample. The non-LTU subsample excludes the Large Taxpayer Unit and keeps Medium, Liberal, and SME offices. The top-split decile control keeps deciles 1--8 and splits each list's ninth and tenth deciles into two equal-size bins. Rank 1 is the highest-predicted-evasion case in the list, rank 2 is the second-highest, and larger rank values correspond to lower predicted evasion. Singleton bin-by-list cells are dropped in Columns 14--16 because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-evasion control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.05\textwidth}
+\begin{threeparttable}
+\caption{Table 4 Column 1 Predicted-Evasion Bin Support}
+\label{tab:table4_col1_predicted_evasion_bin_support}
+
+\footnotesize
+\input{\OutPath table4_col1_predicted_evasion_bin_support.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table reports support for the selected non-safety full-audit sample used in the Table 4 Column 1 robustness comparison. Bins are formed within audit type by detailed tax office by selection year, matching the comparison table. Algorithm N and Inspector N split total support by selection method. Executed N and the execution rate summarize the outcome used in Column 1. In the top-split specification, bins 9a and 9b are the lower and upper halves of decile 9, while bins 10a and 10b are the lower and upper halves of decile 10.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes}
+\label{tab:table4_main_outcomes_replicated}
+
+\footnotesize
+\input{\OutPath table4_main_outcomes_replicated_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This replicated specification does not add predicted-evasion controls.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Predicted Evasion Control}
+\label{tab:table4_main_outcomes_yhatrf_control}
+
+\footnotesize
+\input{\OutPath table4_main_outcomes_yhatrf_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls linearly for the Random-Forest predicted evasion measure (\texttt{yhatrf}).}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Predicted Evasion Quadratic Control}
+\label{tab:table4_main_outcomes_yhatrf_quadratic_control}
+
+\footnotesize
+\input{\OutPath table4_main_outcomes_yhatrf_quadratic_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for the Random-Forest predicted evasion measure (\texttt{yhatrf}) and its square.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Predicted Evasion Decile Controls}
+\label{tab:table4_main_outcomes_yhatrf_deciles_control}
+
+\footnotesize
+\input{\OutPath table4_main_outcomes_yhatrf_deciles_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for predicted-evasion deciles formed within the regression fixed-effect strata used in each column.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\RestrictedPredictedEvasionTable{1.4\textwidth}{Algorithm Selection and Audit Outcomes, with Predicted Evasion Decile Controls (Selection Years 2018 and 2019)}{table4_main_outcomes_yhatrf_deciles_control_selectionyear_2018_2019}{table4_main_outcomes_yhatrf_deciles_control_selectionyear_2018_2019_with_lee}{\RestrictedTableFourNote}
+\RestrictedPredictedEvasionTable{1.4\textwidth}{Algorithm Selection and Audit Outcomes, with Predicted Evasion Decile Controls (LTU and Medium Tax Centers)}{table4_main_outcomes_yhatrf_deciles_control_ltu_medium}{table4_main_outcomes_yhatrf_deciles_control_ltu_medium_with_lee}{\RestrictedTableFourNote}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Predicted Evasion Quintile Controls}
+\label{tab:table4_main_outcomes_yhatrf_quintiles_control}
+
+\footnotesize
+\input{\OutPath table4_main_outcomes_yhatrf_quintiles_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for predicted-evasion quintiles formed within the regression fixed-effect strata used in each column.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with 15 Predicted-Evasion Bin Controls}
+\label{tab:table4_main_outcomes_yhatrf_15bins_control}
+
+\footnotesize
+\input{\OutPath table4_main_outcomes_yhatrf_15bins_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification additionally controls for 15 predicted-evasion bins formed within the regression fixed-effect strata used in each column.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection and Audit Outcomes, with Top-Split Predicted-Evasion Decile Controls}
+\label{tab:table4_main_outcomes_yhatrf_topsplit_control}
+
+\footnotesize
+\input{\OutPath table4_main_outcomes_yhatrf_topsplit_control_with_lee.tex}
+
+\begin{tablenotes}[flushleft]
+\TableFourRobustnessNotes{This robustness specification controls for predicted-evasion deciles formed within the regression fixed-effect strata used in each column, after splitting each stratum's ninth and tenth deciles into two equal-size bins each.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth, max totalheight=0.82\textheight}
+\begin{threeparttable}
+\caption{Bin support for Table 4 predicted-evasion robustness specifications}
+\label{tab:table4_main_outcomes_yhatrf_bin_support}
+
+\scriptsize
+\input{\OutPath table4_main_outcomes_yhatrf_bin_support.tex}
+
+\begin{tablenotes}[flushleft]
+\scriptsize
+\item Notes: Bins are formed on \texttt{yhatrf} within the regression fixed-effect strata used in each Table 4 column. The support table reports the number of FE strata, nonempty stratum-by-bin cells, total observations, observations by selection method, and whether both methods appear in the relevant sample.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\end{landscape}
+
+
+\begin{landscape}
 \subsection{Table 5 with predicted evasion controls}
 
 This section presents the full-audit Table 5 top-panel variants for the audit-productivity discussion. The tables below keep the original sample and layout and add predicted-evasion controls in the robustness specifications.
 
-\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Table 5 Panel A1 Column 1: Number of Agents Varying Predicted Evasion Control Specification}
+\label{tab:table5_col1_ninspectors_predicted_evasion_control_comparison}
+
+\footnotesize
+\input{\OutPath table5_col1_ninspectors_predicted_evasion_control_comparison.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Panel A1 Column 1 of Table 5, where the dependent variable is the number of agents recorded on a selected full-audit case. The outcome is set to missing for non-executed cases, matching the Table 5 exporter. All specifications use the selected non-safety full-audit sample, include the original selection-method and replacement controls, and absorb inspector-cluster $\times$ year fixed effects. Robust standard errors are shown in parentheses. Predicted evasion is the Random Forest prediction of uncovered evasion. Quintiles, deciles, top-split deciles, and integer ranks are formed within lists, defined here as the inspector-cluster $\times$ year groups. Column 1 keeps the original specification and does not add a predicted-evasion control; Columns 2--16 add the same predicted-evasion control families used in the consolidated Table 4 Column 1 comparison. The top-split decile control keeps deciles 1--8 and splits each list's ninth and tenth deciles into two equal-size bins. Rank 1 is the highest-predicted-evasion case in the list, rank 2 is the second-highest, and larger rank values correspond to lower predicted evasion. Singleton bin-by-list cells are dropped in Columns 14--16 because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-evasion control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Table 5 Panel A1 Column 1: Number of Agents Varying Predicted Evasion Control Specification, Optimization-Weighted Predictions}
+\label{tab:table5_col1_ninspectors_predicted_evasion_control_comparison_optimization_weighted}
+
+\footnotesize
+\input{\OutPath table5_col1_ninspectors_predicted_evasion_control_comparison_optimization_weighted.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Panel A1 Column 1 of Table 5, where the dependent variable is the number of agents recorded on a selected full-audit case. The outcome is set to missing for non-executed cases, matching the Table 5 exporter. All specifications use the selected non-safety full-audit sample, include the original selection-method and replacement controls, and absorb inspector-cluster $\times$ year fixed effects. Robust standard errors are shown in parentheses. Predicted evasion is the optimization-exercise weighted Random Forest prediction of uncovered evasion, generated from the weighted prediction dataset exported by the optimization exercise. No regression weights are used. Column 1 keeps the original specification and does not add a predicted-evasion control; Columns 2--16 repeat the same predicted-evasion control specifications used in Table \ref{tab:table5_col1_ninspectors_predicted_evasion_control_comparison}, replacing only the current predicted-evasion measure with the optimization-weighted predicted-evasion measure. Quintiles, deciles, top-split deciles, and integer ranks are formed within lists, defined here as the inspector-cluster $\times$ year groups. The top-split decile control keeps deciles 1--8 and splits each list's ninth and tenth deciles into two equal-size bins. Singleton bin-by-list cells are dropped in Columns 14--16 because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-evasion control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
 
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=1.4\textwidth}
@@ -501,7 +840,7 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 \label{tab:table5_fullaudits_replicated}
 
 \footnotesize
-\input{Output/table5_fullaudits_replicated.tex}
+\input{\OutPath table5_fullaudits_replicated.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -518,7 +857,7 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 \label{tab:table5_fullaudits_yhatrf_control}
 
 \footnotesize
-\input{Output/table5_fullaudits_yhatrf_control.tex}
+\input{\OutPath table5_fullaudits_yhatrf_control.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -535,7 +874,7 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 \label{tab:table5_fullaudits_yhatrf_quadratic_control}
 
 \footnotesize
-\input{Output/table5_fullaudits_yhatrf_quadratic_control.tex}
+\input{\OutPath table5_fullaudits_yhatrf_quadratic_control.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -552,15 +891,18 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 \label{tab:table5_fullaudits_yhatrf_deciles_control}
 
 \footnotesize
-\input{Output/table5_fullaudits_yhatrf_deciles_control.tex}
+\input{\OutPath table5_fullaudits_yhatrf_deciles_control.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted-evasion deciles formed on the pooled regression-eligible full-audit sample. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted-evasion deciles formed within inspector-cluster $\times$ year fixed-effect strata. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
 \end{table}
+
+\RestrictedPredictedEvasionTable{1.4\textwidth}{Resources Allocated to Audits and Audit Productivity, Full Audits, with Predicted Evasion Decile Controls (Selection Years 2018 and 2019)}{table5_fullaudits_yhatrf_deciles_control_selectionyear_2018_2019}{table5_fullaudits_yhatrf_deciles_control_selectionyear_2018_2019}{\RestrictedTableFiveNote}
+\RestrictedPredictedEvasionTable{1.4\textwidth}{Resources Allocated to Audits and Audit Productivity, Full Audits, with Predicted Evasion Decile Controls (LTU and Medium Tax Centers)}{table5_fullaudits_yhatrf_deciles_control_ltu_medium}{table5_fullaudits_yhatrf_deciles_control_ltu_medium}{\RestrictedTableFiveNote}
 
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=1.4\textwidth}
@@ -569,11 +911,62 @@ This section presents the full-audit Table 5 top-panel variants for the audit-pr
 \label{tab:table5_fullaudits_yhatrf_quintiles_control}
 
 \footnotesize
-\input{Output/table5_fullaudits_yhatrf_quintiles_control.tex}
+\input{\OutPath table5_fullaudits_yhatrf_quintiles_control.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted-evasion quintiles formed on the pooled regression-eligible full-audit sample. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of regressions of outcomes on the selection method of the case, with fixed effects at the inspector-cluster $\times$ year level. The specifications additionally control for predicted-evasion quintiles formed within inspector-cluster $\times$ year fixed-effect strata. The sample includes all full audit cases selected from the 2018, 2019, and 2020 audit programs, excluding safety cases, for which we had data on the outcome variables. Panel A1 shows the results for the resource outcomes, and Panel B1 shows the results for the productivity outcomes. Column 1 shows the results for the number of agents involved in the audit, which is obtained from the audit records. Column 2 shows the results for audit duration as reported by taxpayers in the taxpayer survey. The survey asked them about their last full audit experience. Column 3 uses the difference between the date of initial notice and the date of the start of the audit (either verification announcement or information request or start date of audit) as a proxy for the duration of the audit. This measure is available only for cases that had an initial notice. We drop negative values, trim the data at the 99th percentile, and control for dummies indicating availability of date of initial notice and final notice. These controls are helpful because the definition of the start date may vary depending on the availability of information. Column 4 measures the duration of the audit using the self-reported number of days inspectors worked on a case, reported on a spreadsheet that inspectors needed to fill out during the 2019 audit program. Columns 5 to 8 use as outcomes the log of the ratio of evasion over the different cost measures used in Columns 1 to 4. We multiplied the answer by the number of inspectors that worked in the case. Robust standard errors (Huber-White formula) are shown in parentheses.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Resources Allocated to Audits and Audit Productivity, Full Audits, with 15 Predicted-Evasion Bin Controls (Panels A1 and B1 only)}
+\label{tab:table5_fullaudits_yhatrf_15bins_control}
+
+\footnotesize
+\input{\OutPath table5_fullaudits_yhatrf_15bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This robustness specification matches the Table 5 top-panel specification above and additionally controls for 15 predicted-evasion bins formed within inspector-cluster $\times$ year fixed-effect strata.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth}
+\begin{threeparttable}
+\caption{Resources Allocated to Audits and Audit Productivity, Full Audits, with Top-Split Predicted-Evasion Decile Controls (Panels A1 and B1 only)}
+\label{tab:table5_fullaudits_yhatrf_topsplit_control}
+
+\footnotesize
+\input{\OutPath table5_fullaudits_yhatrf_topsplit_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This robustness specification matches the Table 5 top-panel specification above and controls for predicted-evasion deciles formed within inspector-cluster $\times$ year fixed-effect strata, after splitting each stratum's ninth and tenth deciles into two equal-size bins each.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth, max totalheight=0.82\textheight}
+\begin{threeparttable}
+\caption{Bin support for Table 5 predicted-evasion robustness specifications}
+\label{tab:table5_fullaudits_yhatrf_bin_support}
+
+\scriptsize
+\input{\OutPath table5_fullaudits_yhatrf_bin_support.tex}
+
+\begin{tablenotes}[flushleft]
+\scriptsize
+\item Notes: Bins are formed on \texttt{yhatrf} within the inspector-cluster $\times$ year fixed-effect strata used in Table 5. The support table reports the number of FE strata, nonempty stratum-by-bin cells, total observations, observations by selection method, and whether both methods appear in the relevant sample.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
@@ -592,7 +985,7 @@ This subsection presents the baseline Table 6 replication together with variants
 \label{tab:table6_indices_replicated}
 
 \footnotesize
-\input{Output/table6_indices_replicated.tex}
+\input{\OutPath table6_indices_replicated.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -609,7 +1002,7 @@ This subsection presents the baseline Table 6 replication together with variants
 \label{tab:table6_indices_yhatrf_control}
 
 \footnotesize
-\input{Output/table6_indices_yhatrf_control.tex}
+\input{\OutPath table6_indices_yhatrf_control.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -626,7 +1019,7 @@ This subsection presents the baseline Table 6 replication together with variants
 \label{tab:table6_indices_yhatrf_quadratic_control}
 
 \footnotesize
-\input{Output/table6_indices_yhatrf_quadratic_control.tex}
+\input{\OutPath table6_indices_yhatrf_quadratic_control.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -643,15 +1036,18 @@ This subsection presents the baseline Table 6 replication together with variants
 \label{tab:table6_indices_yhatrf_deciles_control}
 
 \footnotesize
-\input{Output/table6_indices_yhatrf_deciles_control.tex}
+\input{\OutPath table6_indices_yhatrf_deciles_control.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted-evasion deciles formed on the pooled regression-eligible survey-analysis sample. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted-evasion deciles formed within center $\times$ selection-year fixed-effect strata. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
 \end{table}
+
+\RestrictedPredictedEvasionTable{\textwidth}{Algorithm Selection, Perceived Audit Efficiency and Corruption, with Predicted Evasion Decile Controls (Selection Years 2018 and 2019)}{table6_indices_yhatrf_deciles_control_selectionyear_2018_2019}{table6_indices_yhatrf_deciles_control_selectionyear_2018_2019}{\RestrictedTableSixNote}
+\RestrictedPredictedEvasionTable{\textwidth}{Algorithm Selection, Perceived Audit Efficiency and Corruption, with Predicted Evasion Decile Controls (LTU and Medium Tax Centers)}{table6_indices_yhatrf_deciles_control_ltu_medium}{table6_indices_yhatrf_deciles_control_ltu_medium}{\RestrictedTableSixNote}
 
 \begin{table}[H]\centering
 \begin{adjustbox}{max width=\textwidth}
@@ -660,15 +1056,519 @@ This subsection presents the baseline Table 6 replication together with variants
 \label{tab:table6_indices_yhatrf_quintiles_control}
 
 \footnotesize
-\input{Output/table6_indices_yhatrf_quintiles_control.tex}
+\input{\OutPath table6_indices_yhatrf_quintiles_control.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted-evasion quintiles formed on the pooled regression-eligible survey-analysis sample. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results with fixed effects at the year and tax office level for outcomes from the taxpayer survey. The specifications additionally control for predicted-evasion quintiles formed within center $\times$ selection-year fixed-effect strata. Given the lower number of observations in the survey, we do not run the desk audit regression with year $\times$ inspector fixed effects, as is done with outcomes from the administrative data. Robust standard errors are in parentheses. The table shows the association between audit selection method and taxpayers' perception of the efficiency of audits (Columns 1 to 3), and of the incidence of corruption during audits (Columns 4 to 6). The sample of surveyed taxpayers is a subsample of the audit cases selected by the yearly audit programs between 2018 and 2020. Panel A shows the results for all firms interviewed in the survey, conditional on them self-reporting an audit in recent years. Panel B is restricted to firms for which we can confirm that an audit as part of the yearly audit program took place, according to the administrative audit reports. The two outcomes are (1) an index of perceived efficiency of audits, and (2) an index of perceived corruption of audits. Each measure is constructed by combining three questions into a normalized index following Anderson (2008). To measure efficiency, we combine the questions on taxpayers' assessment of the auditor's (i) technical knowledge, (ii) efficiency during the audit, and (iii) capacity to uncover all evaded taxes. For corruption, we combine the questions on the perception of (i) the auditor's dishonesty during the audit, (ii) the frequency of bribes paid to inspectors among firms similar to the respondent's, and (iii) the existence of a preferential tax audit treatment for firms connected with the tax administration. The coefficients are measured in terms of standard deviation of the respective indexes.
 \end{tablenotes}
 \end{threeparttable}
 \end{adjustbox}
 \end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection, Perceived Audit Efficiency and Corruption, with 15 Predicted-Evasion Bin Controls}
+\label{tab:table6_indices_yhatrf_15bins_control}
+
+\footnotesize
+\input{\OutPath table6_indices_yhatrf_15bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This robustness specification matches the Table 6 survey-index specification above and additionally controls for 15 predicted-evasion bins formed within center $\times$ selection-year fixed-effect strata.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Algorithm Selection, Perceived Audit Efficiency and Corruption, with Top-Split Predicted-Evasion Decile Controls}
+\label{tab:table6_indices_yhatrf_topsplit_control}
+
+\footnotesize
+\input{\OutPath table6_indices_yhatrf_topsplit_control.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This robustness specification matches the Table 6 survey-index specification above and controls for predicted-evasion deciles formed within center $\times$ selection-year fixed-effect strata, after splitting each stratum's ninth and tenth deciles into two equal-size bins each.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.4\textwidth, max totalheight=0.82\textheight}
+\begin{threeparttable}
+\caption{Bin support for Table 6 predicted-evasion robustness specifications}
+\label{tab:table6_indices_yhatrf_bin_support}
+
+\scriptsize
+\input{\OutPath table6_indices_yhatrf_bin_support.tex}
+
+\begin{tablenotes}[flushleft]
+\scriptsize
+\item Notes: Bins are formed on \texttt{yhatrf} within the center $\times$ selection-year fixed-effect strata used in Table 6. The support table reports the number of FE strata, nonempty stratum-by-bin cells, total observations, observations by selection method, and whether both methods appear in each Panel A and Panel B sample.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+\end{landscape}
+
+\subsection{Table 8 with predicted evasion controls}
+
+This subsection presents the full-audit Table 8 baseline replication together with variants that keep the original observable-characteristics ladder and add predicted-evasion controls in a sixth column.
+
+\newcommand{\TableEightRobustnessNotes}[1]{%
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. OLS results of a regression of the main audit outcomes on the selection method of the case for full audits. We show specifications for full audits controlling for tax office x year fixed effects, which corresponds to the selection list for full audits. Each column progressively adds control variables at the firm level: Column 1 has no controls, Column 2 controls for turnover (log), Column 3 controls in addition for the profit rate (profit over turnover), Column 4 controls in addition for the firm productivity (turnover divided by the wage bill), and Column 5 controls in addition for further firm characteristics. #1 The first outcome (A) is the probability that the case on the list was conducted by the inspectors. The second outcome (B) is the probability that an audit results in a penalty (initial or final notice), conditional on the case being conducted. The third outcome (C) is the log amount of the evasion plus penalties, conditional on the case ending in positive penalty. The evasion amount is obtained from the final notice and complemented with the initial notice when the final notice is not available. The sample includes all full audt cases selected in the 2018, 2019, and 2020 audit programs. The data includes the selection and audits of the Large Taxpayer Unit, Medium Taxpayer Units 1 and 2, Liberal Professionals, and the regional SME units of Dakar Plateau, Grand Dakar, Pikine Guediawaye, and Ngor Almadies. Robust standard errors (Huber-White) are shown in parentheses, and inspector x year levels when inspector fixed effects are included.
+}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics}
+\label{tab:table8_fullaudits_replicated}
+
+\footnotesize
+\input{\OutPath table8_fullaudits_replicated.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Control}
+\label{tab:table8_fullaudits_yhatrf_control}
+
+\footnotesize
+\input{\OutPath table8_fullaudits_yhatrf_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls linearly for predicted evasion.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Quadratic Control}
+\label{tab:table8_fullaudits_yhatrf_quadratic_control}
+
+\footnotesize
+\input{\OutPath table8_fullaudits_yhatrf_quadratic_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for predicted evasion and its square.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Decile Controls}
+\label{tab:table8_fullaudits_yhatrf_deciles_control}
+
+\footnotesize
+\input{\OutPath table8_fullaudits_yhatrf_deciles_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for predicted-evasion deciles formed within inspector $\times$ year fixed-effect strata.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\RestrictedPredictedEvasionTable{\textwidth}{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Decile Controls (Selection Years 2018 and 2019)}{table8_fullaudits_yhatrf_deciles_control_selectionyear_2018_2019}{table8_fullaudits_yhatrf_deciles_control_selectionyear_2018_2019}{\RestrictedTableEightNote}
+\RestrictedPredictedEvasionTable{\textwidth}{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Decile Controls (LTU and Medium Tax Centers)}{table8_fullaudits_yhatrf_deciles_control_ltu_medium}{table8_fullaudits_yhatrf_deciles_control_ltu_medium}{\RestrictedTableEightNote}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Predicted Evasion Quintile Controls}
+\label{tab:table8_fullaudits_yhatrf_quintiles_control}
+
+\footnotesize
+\input{\OutPath table8_fullaudits_yhatrf_quintiles_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for predicted-evasion quintiles formed within inspector $\times$ year fixed-effect strata.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with 15 Predicted-Evasion Bin Controls}
+\label{tab:table8_fullaudits_yhatrf_15bins_control}
+
+\footnotesize
+\input{\OutPath table8_fullaudits_yhatrf_15bins_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for 15 predicted-evasion bins formed within inspector $\times$ year fixed-effect strata.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{threeparttable}
+\caption{Explaining the Execution Gap for Full Audits: The Role of Observable Characteristics, with Top-Split Predicted-Evasion Decile Controls}
+\label{tab:table8_fullaudits_yhatrf_topsplit_control}
+
+\footnotesize
+\input{\OutPath table8_fullaudits_yhatrf_topsplit_control.tex}
+
+\begin{tablenotes}[flushleft]
+\TableEightRobustnessNotes{Column 6 additionally controls for predicted-evasion deciles formed within inspector $\times$ year fixed-effect strata, after splitting each stratum's ninth and tenth deciles into two equal-size bins each.}
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=\textwidth, max totalheight=0.82\textheight}
+\begin{threeparttable}
+\caption{Bin support for Table 8 predicted-evasion robustness specifications}
+\label{tab:table8_fullaudits_yhatrf_bin_support}
+
+\scriptsize
+\input{\OutPath table8_fullaudits_yhatrf_bin_support.tex}
+
+\begin{tablenotes}[flushleft]
+\scriptsize
+\item Notes: Bins are formed on \texttt{yhatrf} within the inspector $\times$ year fixed-effect strata used in Table 8. The support table reports the number of FE strata, nonempty stratum-by-bin cells, total observations, observations by selection method, and whether both methods appear in the relevant sample.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\section{Table 48 optimization variants}
+
+\subsection{Figure 4 with unweighted two-step amount predictions}
+
+\begin{figure}[H]
+    \centering
+    \caption{Predicted Evasion Amount and Realized Execution Rate: Unweighted Two-Step Predictions}
+    \label{fig:figure4_twostep_unweighted_yhatrf_fullaudits}
+    \begin{threeparttable}
+    \begin{subfigure}[t]{0.82\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath figure4_panel_a_twostep_unweighted_yhatrf_fullaudits.pdf}
+        \subcaption{All selected full-audit cases}
+    \end{subfigure}
+
+    \vspace{0.7em}
+
+    \begin{subfigure}[t]{0.82\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{\OutPath figure4_panel_b_twostep_unweighted_yhatrf_fullaudits.pdf}
+        \subcaption{Algorithm-selected and inspector-selected full-audit cases}
+    \end{subfigure}
+
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: A plots the distribution of detected evasion for all full audits (log of FCFA amounts, gray), as well as the results from a two-step unweighted random forest model predicting detected evasion based on firms' observable characteristics. The blue distribution is predicted evasion for cases that were part of the annual audit program but not actually audited. The green distribution is predicted evasion for cases that were audited. The red solid line plots the realized audit execution rate by one-log-point predicted-evasion bin. B shows the distribution of predicted evasion for all algorithm-selected cases (maroon) and for all inspector-selected cases (orange). The solid lines (maroon and orange) plot realized audit execution rates by one-log-point predicted-evasion bin within each selected-case group. All plotted series are restricted to bins with midpoint at least 14.5. This figure is for full audits only.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\subsection{Predicting ranking}
+
+\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.25\textwidth}
+\begin{threeparttable}
+\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Panel Revision}
+\label{tab:table_opt_full_and_desk_unweighted_top5_revision}
+
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_unweighted_top5_revision.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table shows the results from our optimization exercise in which we use audit results from the realized set of audits to train random forest models to predict evasion revenue or realized evasion rank. The unit is an audit program case, not a unique firm; the same firm can therefore appear more than once if it has multiple cases in the audit program data. We optimize which audit cases were conducted in 2018 and 2019. Columns 1 and 2 are shared within each A/B scenario pair. Column 1 shows the realized revenue, evasion and fines, from executed audit cases across all tax offices. Column 2 shows the predicted revenue, based on the relevant revenue prediction model, for cases that experienced an audit. In Panel A, cases are ranked by predicted revenue. Column 3 shows the revenue increase in percent, compared to the predicted revenue in Column 2, from using this ranking for audit selection. Column 4 shows the share of realized audited cases that are also chosen under the optimized program. In Panel B, cases are ranked by predicted realized evasion rank rather than predicted revenue. Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A revenue prediction model. A1 and B1 keep all cases. A2 and B2 repeat the weighted revenue prediction after excluding the five executed audited cases with the largest realized revenue within each audit type. A3 and B3 use an unweighted revenue prediction after the same exclusion. In the top five exclusions, these cases are removed before model training, prediction, recomputation of realized audit counts, and optimized selection. The optimized program is rebuilt within the same implementation lists used in the optimization scripts, with the number of optimized cases fixed to the realized number of executed audits in each list.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+\end{landscape}
+
+\noindent\textbf{Steps used to build the table}
+\medskip
+
+\noindent\textit{Panel A: amount-based optimized selection}
+\begin{itemize}
+\item Start from selected annual audit-program cases, exclude safety cases, and run the exercise separately for full audits and desk audits.
+\item A1 uses the current two-step weighted prediction method: first predict whether an audit would uncover positive evasion, then train a weighted revenue random forest among actually audited cases with positive detected evasion, giving additional weight to high-realized-revenue audit outcomes within tax-office-by-year cells.
+\item A2 repeats the A1 method after removing the five executed audited cases with the largest realized revenue within each audit type in the 2018--2019 optimization sample.
+\item A3 uses the same top-five-excluded sample as A2, but replaces the two-step weighted method with a one-step unweighted revenue random forest trained on actually audited cases with observed realized revenue.
+\item For each A panel, predict revenue for all remaining selected non-safety audit-program cases, keep the 2018 and 2019 optimization years, rank cases by predicted revenue within each \texttt{inspectorclusteryear} optimization list, and choose the top-ranked cases until the optimized list has the same number of executed audit cases as the realized implementation in that list.
+\item Columns 1 and 2 report the log mean of realized revenue and predicted revenue among actually audited cases. These columns are shared with the paired Panel B scenario because Panel B uses the same amount-prediction model for valuation.
+\item Column 3 reports:
+$$
+100 \times \left(
+\frac{\text{mean predicted revenue under optimized selection}}
+{\text{mean predicted revenue among realized audited cases}}
+- 1
+\right).
+$$
+\item Column 4 reports:
+$$
+\frac{\text{number of realized audited cases also selected by the optimized rule}}
+{\text{number of cases selected by the optimized rule}}.
+$$
+\end{itemize}
+
+\noindent\textit{Panel B: rank-based optimized selection}
+\begin{itemize}
+\item Panel B uses the same selected non-safety samples, 2018--2019 restriction, and audit-type split as Panel A.
+\item First, among actually audited cases, construct the realized-evasion rank separately within each detailed tax office by selection year list. Within each list, the case with the largest realized evasion is assigned rank 1, and larger rank values correspond to lower realized-evasion priority.
+\item Second, train a separate unweighted random forest to predict this within-list realized-rank outcome.
+\item Third, use the rank model to predict rank for all remaining selected non-safety audit-program cases.
+\item Fourth, within each detailed tax office by selection year list, sort cases by the Random Forest predicted-rank outcome and create the predicted-rank ordering used for optimization.
+\item Finally, build the optimized program from this predicted-rank ordering rather than from predicted revenue. After any top-five exclusion, the optimized selection is rebuilt within each \texttt{inspectorclusteryear} list using the remaining realized audit count in that list.
+\item B1 uses rank-based optimized selection on the all-case sample and reports Columns 5 and 6 using the A1 amount-prediction values for the revenue-gain calculation.
+\item B2 uses rank-based optimized selection after the same pre-training top-five exclusion as A2 and reports Columns 5 and 6 using the A2 amount-prediction values.
+\item B3 uses rank-based optimized selection after the same pre-training top-five exclusion as A3 and reports Columns 5 and 6 using the A3 amount-prediction values.
+\item The rank prediction is used only to select the optimized cases. Columns 1 and 2 are shared with the matched Panel A scenario, and the revenue gains in Column 5 always use the matched amount-prediction model. Panel B therefore isolates how changing the ranking rule changes the optimized audit set.
+\end{itemize}
+
+\noindent\textit{Top-five exclusion}
+\begin{itemize}
+\item The top-five exclusion is defined separately for full audits and desk audits.
+\item Within each audit type, the excluded cases are the five executed audited cases with the largest realized revenue (evasion and fines) in the 2018--2019 optimization sample.
+\item In A2, A3, B2, and B3, those five cases are removed before random-forest training, prediction, recomputation of realized audit-case counts, and optimized selection.
+\item After the exclusion, the optimized selection is rebuilt within each \texttt{inspectorclusteryear} list using the remaining realized audit count in that list.
+\end{itemize}
+
+This subsection reports the predicted-rank diagnostics that accompany the Table 48 optimization exercise. The rank-prediction construction is described in the Table 48 steps above. The diagnostics below use the non-inverted predicted rank order in the Table 4 Column 1 controls; for the Figure 4-style diagnostics only, the horizontal axis groups cases into within-list predicted-priority deciles, where decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The included figures use the B1 all-cases rank scenario exported from the optimization exercise. The top-five-excluded rank scenario is also exported as a diagnostic Figure 4 variant, but is not included in this report section.
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.15\textwidth}
+\begin{threeparttable}
+\caption{Table 4 Column 1 with Predicted-Rank Controls}
+\label{tab:table4_col1_predicted_rank_control_comparison}
+\footnotesize
+\input{\OutPath table4_col1_predicted_rank_control_comparison.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table re-estimates Column 1 of Table 4, where the dependent variable is the probability that a selected full-audit case was executed by the inspectors. Column 1 keeps the original specification and does not add a predicted-rank control. Columns 2--10 add increasingly flexible controls for the unweighted Random Forest predicted rank, conditional on the original inspector-cluster-by-year list fixed effects. Columns 2--4 use the raw within-list predicted rank order additively, interacted with the list, and as a quadratic polynomial interacted with the list. Columns 5--7 repeat those three specifications using the within-list rank percentile, where 0 is the highest predicted priority and 1 is the lowest predicted priority. Column 8 adds within-list rank-decile fixed effects. Column 9 absorbs rank-decile-by-list fixed effects. Column 10 adds top-priority indicators for the top 10 percent and top quartile within each list. The Random Forest first predicts the realized within-list evasion rank, then those predictions are sorted within each detailed-tax-office-by-selection-year full-audit list to create the predicted rank order used in this table. The rank measures are not inverted in the regressions: rank 1, percentile 0, decile 1, and the top-priority indicators indicate the highest predicted evasion priority. All specifications include the original selection-method and replacement controls and absorb the original inspector-cluster-by-year fixed effects. Robust standard errors are shown in parentheses. Column 9 drops singleton decile-by-list cells because they do not contribute identifying variation after those fixed effects are absorbed. The predicted-rank control coefficients are omitted from the table.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=0.95\textwidth}
+\begin{threeparttable}
+\caption{Support for Table 4 Column 1 Predicted-Rank Controls}
+\label{tab:table4_col1_predicted_rank_support}
+\footnotesize
+\input{\OutPath table4_col1_predicted_rank_support.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table reports support for the selected non-safety full-audit sample used in Table \ref{tab:table4_col1_predicted_rank_control_comparison}. Predicted-rank bins are formed within detailed tax office by selection year, matching the full-audit list used for the rank prediction. Decile 1, the top 10 percent, and the top quartile are the highest-priority predicted-rank bins.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \caption{Predicted Priority Decile and Realized Execution Rate, All Full-Audit Cases}
+    \label{fig:figure4_panel_a_predicted_rank_fullaudits}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_predicted_rank_fullaudits.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors Figure 4 Panel A but replaces the predicted evasion amount with the B1 all-cases predicted-rank output exported from the optimization exercise. The model is an unweighted random forest trained on executed full audits with observed detected evasion. The realized training target ranks detected evasion within detailed tax office by selection year, with the highest detected evasion assigned rank 1. After prediction, cases are re-ranked within each detailed-tax-office-by-selection-year list using the Random Forest predicted rank outcome. For plotting, cases are grouped into predicted-priority deciles within audit type, detailed tax office, and selection year. Decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The line plots the realized audit execution rate by predicted-priority decile, and the shaded band shows the 95 percent confidence interval.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Predicted Priority Decile}
+    \label{fig:figure4_panel_b_predicted_rank_fullaudits}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_predicted_rank_fullaudits.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors Figure 4 Panel B but replaces the predicted evasion amount with the B1 all-cases predicted-rank output exported from the optimization exercise. After the Random Forest predicts the rank outcome, cases are re-ranked within each detailed-tax-office-by-selection-year list. For plotting, cases are grouped into predicted-priority deciles within audit type, detailed tax office, and selection year. Decile 10 is the highest predicted priority and decile 1 is the lowest predicted priority. The lines plot realized audit execution rates by predicted-priority decile separately for algorithm-selected and inspector-selected full-audit cases, and the shaded bands show 95 percent confidence intervals.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\subsection{Predicting above-median evasion in a tax office}
+
+\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.25\textwidth}
+\begin{threeparttable}
+\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Predicted Above-Median Evasion}
+\label{tab:table_opt_full_and_desk_bin_target_panelc}
+
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_panelc.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table shows a companion optimization exercise in which we use audit results from the realized set of audits to train random forest models to predict evasion revenue and whether a case is above the median of realized evasion. The unit is an audit program case, not a unique firm. We optimize which audit cases were conducted in 2018 and 2019. Columns 1 and 2 are shared within each A/C specification pair. Column 1 shows the realized revenue, evasion and fines, from executed audit cases across all tax offices. Column 2 shows the predicted revenue, based on the relevant revenue prediction model, for cases that experienced an audit. In Panel A, cases are ranked by predicted revenue. Column 3 shows the revenue increase in percent, compared to the predicted revenue in Column 2, from using this ranking for audit selection. Column 4 shows the share of realized audited cases that are also chosen under the optimized program. In Panel C, cases are ranked by the predicted probability that they are above the median of realized evasion within audit type and detailed tax office, pooling years within each detailed tax office. Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A revenue prediction model. C1 keeps all cases and values gains with the A1 revenue prediction model. C2 applies the same top five exclusion as A2 and values gains with the A2 model. C3 applies the same top five exclusion as A3 and values gains with the A3 model. In the top five exclusions, the five executed audited cases with the largest realized revenue within each audit type are removed before model training, prediction, recomputation of realized audit counts, and optimized selection. The optimized program is then rebuilt within the same implementation lists used in Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}, with the number of optimized cases fixed to the realized number of executed audits in each list.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+\end{landscape}
+
+\noindent\textbf{Steps used to build the predicted above-median specification}
+\medskip
+
+\noindent\textit{Panel C: optimized selection by predicted above-median evasion probability}
+\begin{itemize}
+\item Panel C uses the same selected non-safety samples, 2018--2019 restriction, audit-type split, and top-five exclusion rules as Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}.
+\item First, for each C-panel specification, the script uses executed audit cases with observed realized revenue within each audit-type-by-detailed-tax-office group, pooling selection years. Here, the C-panel specification refers to the sample and valuation pair: C1 keeps all cases, while C2 and C3 apply the same pre-training top-five exclusion used by A2 and A3.
+\item Second, within each audit-type-by-detailed-tax-office training group, it orders executed observed cases by realized revenue and assigns each case to an above-median or below-median realized-evasion class.
+\item Third, it defines the prediction target as an indicator for above-median realized evasion.
+\item Fourth, it trains a one-step unweighted random forest classifier to predict this above-median indicator and predicts the probability of above-median membership for all selected non-safety audit-program cases.
+\item Finally, it builds the optimized program from this predicted above-median probability rather than from predicted revenue. The number of optimized cases is still fixed to match the realized number of executed audits within each \texttt{inspectorclusteryear} optimization list.
+\item The prediction target is pooled across years within audit type by detailed tax office, but the optimized selections still follow the pre-existing Table 48/Table 49 program rules: selections are rebuilt within \texttt{inspectorclusteryear}, with the number of optimized cases fixed to the realized executed-audit count in each list.
+\item The above-median prediction is used only to select the optimized cases. Columns 1 and 2 are shared with the matched Panel A specification, and the revenue gains in Column 5 always use the matched amount-prediction model. Panel C therefore isolates how changing the ranking rule changes the optimized audit set.
+\item Overlap can remain nearly unchanged across C subpanels because it is determined by the optimized case set, not by the amount-prediction model used to value that set. C2 and C3 use the same top-five-excluded probability-ranking sample, so they select the same cases and have the same overlap; C1 uses the all-case probability-ranking sample, but the resulting overlap rounds to the same reported percentage for full audits and a very similar percentage for desk audits.
+\end{itemize}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.15\textwidth}
+\begin{threeparttable}
+\caption{Training Target Summary for Predicted Above-Median Evasion}
+\label{tab:table_opt_full_and_desk_bin_target_support}
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_support.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table summarizes the training target used in Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. Above- and below-median realized-evasion classes are defined separately within audit-type-by-detailed-tax-office training groups, pooling selection years within detailed tax office, using executed observed cases with non-missing realized revenue. Singleton classes and empty classes describe thin cells after assigning all available training groups. Above-median rows reports the number of executed observed training cases assigned to the above-median realized-evasion class.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \caption{Predicted Above-Median Evasion Probability Bins and Realized Execution Rate, All Full-Audit Cases}
+    \label{fig:figure4_panel_a_binprob_fixed005_fullaudits_office_target}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_binprob_fixed005_fullaudits_office_target.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors the original fixed-bin Figure 4 construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. The model is a one-step random forest classifier trained to predict whether an executed full-audit case is above the median of realized evasion within its audit-type-by-detailed-tax-office group, pooling selection years within detailed tax office. The sample is selected non-safety full-audit cases. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of predicted probabilities among executed cases, non-executed cases, and executed above-median cases. The red line plots the realized audit execution rate by fixed probability bin, and the shaded band shows the 95 percent confidence interval.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: Fixed Above-Median Evasion Probability Bins}
+    \label{fig:figure4_panel_b_binprob_fixed005_fullaudits_office_target}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_binprob_fixed005_fullaudits_office_target.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors the original fixed-bin Figure 4 Panel B construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}. The target is above-median realized-evasion membership within audit-type-by-detailed-tax-office groups, pooling selection years within detailed tax office. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of algorithm-selected and inspector-selected full-audit cases across fixed probability bins. The lines plot realized audit execution rates by fixed probability bin separately for algorithm-selected and inspector-selected cases, and the shaded bands show 95 percent confidence intervals.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\subsection{Predicting above-median evasion in a list}
+
+\begin{landscape}
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.25\textwidth}
+\begin{threeparttable}
+\caption{Optimization Gains from Machine-Learning Algorithm Trained on Audit Outcome Data: Predicted Above-Median Evasion in the List}
+\label{tab:table_opt_full_and_desk_bin_target_panelc_listyear}
+
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_panelc_listyear.tex}
+
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table repeats the predicted above median optimization exercise in Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}, but defines the above median target within the operational list relevant to each audit type rather than within detailed tax office pooled across years. For full audits, above median status is defined within each detailed tax office and selection year. For desk audits, it is defined within each inspector assignment list and selection year. Panel A ranks cases for optimized selection by predicted revenue. Panel C ranks cases by the predicted probability that the case is above the median of realized evasion in its audit type specific list. Columns 5 and 6 report the corresponding revenue increase and overlap, with revenue gains valued using the paired Panel A revenue prediction model. Optimized selections are rebuilt within the same implementation lists used in Table \ref{tab:table_opt_full_and_desk_unweighted_top5_revision}, with the number of optimized cases fixed to the realized number of executed audits in each list. For desk audits, the above median target and the optimization list are directly aligned. For full audits, the target follows the detailed tax office by year list used in the Figure 4 diagnostics, while the optimized audit count follows the original implementation list used in the optimization scripts.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+\end{landscape}
+
+\noindent\textbf{Steps used to build the list-level predicted above-median specification}
+\medskip
+
+\noindent\textit{Panel C: optimized selection by list-level predicted above-median evasion probability}
+\begin{itemize}
+\item The list-level version uses the same selected non-safety samples, 2018--2019 restriction, audit-type split, valuation models, and top-five exclusion rules as Table \ref{tab:table_opt_full_and_desk_bin_target_panelc}.
+\item The target grouping is audit-type specific. Full-audit targets are built within \texttt{bureau\_detailed $\times$ selectionyear}; desk-audit targets are built within \texttt{inspectorclusteryear}.
+\item Within each target group, executed observed cases with non-missing realized revenue are ordered by realized revenue and assigned to above- or below-median realized-evasion classes.
+\item A one-step unweighted random forest classifier predicts the probability of above-median membership for all selected non-safety audit-program cases.
+\item The optimized program is ranked by this predicted above-median probability, while the number of optimized cases remains fixed to the realized number of executed audits within the original \texttt{inspectorclusteryear} optimization list.
+\item The list-level target is used only to change the ranking rule. Columns 1 and 2 remain the matched Panel A amount-prediction values, and Column 5 values the selected cases using the matched amount-prediction model.
+\end{itemize}
+
+\begin{table}[H]\centering
+\begin{adjustbox}{max width=1.15\textwidth}
+\begin{threeparttable}
+\caption{Training Target Summary for List-Level Predicted Above-Median Evasion}
+\label{tab:table_opt_full_and_desk_bin_target_listyear_support}
+\footnotesize
+\input{\OutPath table_opt_full_and_desk_bin_target_listyear_support.tex}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Notes: This table summarizes the list-level training target used in Table \ref{tab:table_opt_full_and_desk_bin_target_panelc_listyear}. Full-audit targets are defined within \texttt{bureau\_detailed $\times$ selectionyear}; desk-audit targets are defined within \texttt{inspectorclusteryear}. Singleton classes and empty classes describe thin cells after assigning all available training groups. Above-median rows reports the number of executed observed training cases assigned to the above-median realized-evasion class.
+\end{tablenotes}
+\end{threeparttable}
+\end{adjustbox}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \caption{List-Level Predicted Above-Median Evasion Probability Bins and Realized Execution Rate, All Full-Audit Cases}
+    \label{fig:figure4_panel_a_binprob_fixed005_fullaudits_listyear_target}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_a_binprob_fixed005_fullaudits_listyear_target.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors the fixed-bin Figure 4 construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc_listyear}. The full-audit classifier target is above-median realized-evasion membership within \texttt{bureau\_detailed $\times$ selectionyear}. The sample is selected non-safety full-audit cases. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of predicted probabilities among executed cases, non-executed cases, and executed above-median cases. The red line plots the realized audit execution rate by fixed probability bin, and the shaded band shows the 95 percent confidence interval.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \caption{Realized Execution Rate for Algorithm Cases and Inspector Cases: List-Level Fixed Above-Median Evasion Probability Bins}
+    \label{fig:figure4_panel_b_binprob_fixed005_fullaudits_listyear_target}
+    \begin{threeparttable}
+    \includegraphics[width=0.82\textwidth]{\OutPath figure4_panel_b_binprob_fixed005_fullaudits_listyear_target.pdf}
+    \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item Notes: This figure mirrors the fixed-bin Figure 4 Panel B construction but replaces predicted evasion amount with the C1 predicted above-median probability from Table \ref{tab:table_opt_full_and_desk_bin_target_panelc_listyear}. The full-audit classifier target is above-median realized-evasion membership within \texttt{bureau\_detailed $\times$ selectionyear}. The x-axis uses fixed 0.05-wide bins of the predicted probability of above-median realized evasion. The shaded areas report the distribution of algorithm-selected and inspector-selected full-audit cases across fixed probability bins. The lines plot realized audit execution rates by fixed probability bin separately for algorithm-selected and inspector-selected cases, and the shaded bands show 95 percent confidence intervals.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{figure}
 
 \section{Inspector effort analysis}
 
@@ -678,7 +1578,7 @@ This subsection presents the baseline Table 6 replication together with variants
 
 \begin{table}[h]
     \caption{Number of executed desk audit cases by date statistics avaialability}
-    \input{Output/date_availability_stats}
+    \input{\OutPath date_availability_stats}
     \label{tab:date_stats}
 \end{table}
 
@@ -689,7 +1589,7 @@ This subsection presents the baseline Table 6 replication together with variants
 \begin{figure}
     \caption{Selection year and opening date per of audit cases}
     \centering
-    \includegraphics[scale=0.65]{Output/selection_year_opening_dates.pdf}
+    \includegraphics[scale=0.65]{\OutPath selection_year_opening_dates.pdf}
     \label{fig:placeholder}
 \end{figure}
 \begin{itemize}
@@ -698,7 +1598,7 @@ This subsection presents the baseline Table 6 replication together with variants
 \begin{table}[H]
 \centering
     \caption{Number of executed  cases by audit type and date availability}
-    \input{Output/date_avail_by_type}
+    \input{\OutPath date_avail_by_type}
     \label{tab:date_stats}
 \end{table}
 
@@ -708,7 +1608,7 @@ This subsection presents the baseline Table 6 replication together with variants
 \begin{table}[h]
     \centering
     \caption{Number of void desk audit cases}
-    \input{Output/void_audit_stats}
+    \input{\OutPath void_audit_stats}
     \label{tab:void_aud_stats}    
 \end{table}
 
@@ -718,7 +1618,7 @@ This subsection presents the baseline Table 6 replication together with variants
     \centering
     \caption{Number of null cases and their notification/confirmation status}
     \begin{adjustbox}{max width=\textwidth}
-    \input{Output/notconf_null_byaudtype}
+    \input{\OutPath notconf_null_byaudtype}
     \label{tab:nullsandconfirmation}
     \end{adjustbox}
 \end{table}
@@ -727,7 +1627,7 @@ This subsection presents the baseline Table 6 replication together with variants
     \centering
     \caption{Number of notified desk audits according to  penalty/droit simple registered.}
     \begin{adjustbox}{max width=\textwidth}
-    \input{Output/penalite_droit_check}
+    \input{\OutPath penalite_droit_check}
     \label{tab:nullsandconfirmation}
     \end{adjustbox}
 \end{table}
@@ -763,14 +1663,14 @@ However, after doing some  tabs I noticed that:
 \begin{figure}
     \caption{Distribution of evasion rates across years}
     \centering
-    \includegraphics[scale=0.65]{Output/kdensity_evasionrate_syear.pdf}
+    \includegraphics[scale=0.65]{\OutPath kdensity_evasionrate_syear.pdf}
     \label{fig:kdensity_evasionrate}
 \end{figure}
 \begin{comment}
 \begin{figure}[H]
     \centering
     \caption{Distribution of void audit cases by inspector and selection method}
-    \includegraphics[scale=0.65]{Output/kdensity_void_audit_rate.pdf}
+    \includegraphics[scale=0.65]{\OutPath kdensity_void_audit_rate.pdf}
     \label{fig:void_audit_plot}
 \end{figure}
 
@@ -778,7 +1678,7 @@ However, after doing some  tabs I noticed that:
 \begin{table}[h]
     \centering
     \caption{Inspector's share of void desk audit cases, by method}
-    \input{Output/stats_insp_vaudits}
+    \input{\OutPath stats_insp_vaudits}
     \label{tab:stats_insp_vaudits}    
 \end{table}
 
@@ -787,7 +1687,7 @@ However, after doing some  tabs I noticed that:
 \begin{table}[h]
     \centering
     \caption{Inspectors audit stats, by method}
-    \input{Output/inspector_stats}
+    \input{\OutPath inspector_stats}
     \label{tab:stats_insp_vaudits}    
 \end{table}
 
@@ -797,7 +1697,7 @@ However, after doing some  tabs I noticed that:
 \begin{table}[h]
     \centering
     \caption{Inspectors executed and void audit shares, by method}
-    \input{Output/inspector_shares_stats}
+    \input{\OutPath inspector_shares_stats}
     \label{tab:stats_insp_vaudits}    
 \end{table}
 \end{comment}
@@ -856,7 +1756,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
 \caption{Number of inspectors by period and subsample (Desk audits}
     \centering
     \resizebox{\textwidth}{!}{%
-\input{Output/inspector_sample_stats.tex}
+\input{\OutPath inspector_sample_stats.tex}
     }
 \end{table}
 
@@ -865,7 +1765,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
 \caption{Number of inspectors that registered execution and void audits by period and sub-sample (Desk audits)}
     \centering
     \resizebox{\textwidth}{!}{%
-        \input{Output/inspector_has_exec_void_t_t1.tex}
+        \input{\OutPath inspector_has_exec_void_t_t1.tex}
     }
 \end{table}
 
@@ -873,7 +1773,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
 \caption{Inspector average execution and void case rates by period and sub-sample (Desk audits)}
     \centering
     \resizebox{\textwidth}{!}{%
-        \input{Output/inspector_share_exec_void_t_t1.tex}
+        \input{\OutPath inspector_share_exec_void_t_t1.tex}
     }
 \end{table}
 
@@ -883,7 +1783,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \centering
     
     \resizebox{\textwidth}{!}{%
-\input{Output/bureau_sample_stats.tex}
+\input{\OutPath bureau_sample_stats.tex}
     }
 \end{table}
 
@@ -891,7 +1791,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
 \caption{Number of Tax offices  that registered execution and void audits by period and sub-sample (Full - Audits)}
     \centering
     \resizebox{\textwidth}{!}{%
-        \small \input{Output/bureau_has_exec_void_t_t1.tex}
+        \small \input{\OutPath bureau_has_exec_void_t_t1.tex}
     }
 \end{table}
 
@@ -901,7 +1801,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
 \caption{Tax office average execution and void case rates by period and sub-sample (Full - Audits)}
     \centering
     \resizebox{\textwidth}{!}{%
-        \input{Output/bureau_share_exec_void_t_t1.tex}
+        \input{\OutPath bureau_share_exec_void_t_t1.tex}
     }
 \end{table}
 
@@ -938,18 +1838,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of execution of all $\text{audits}_t$ vrs Share of execution of all $\text{audits}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_exec_all_2018_2019.pdf}
-      {Output/scatter_share_exec_all_2018_2019_full.pdf}
+      {\OutPath scatter_share_exec_all_2018_2019.pdf}
+      {\OutPath scatter_share_exec_all_2018_2019_full.pdf}
       {0.6em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_exec_all_2019_2020.pdf}
-      {Output/scatter_share_exec_all_2019_2020_full.pdf}
+      {\OutPath scatter_share_exec_all_2019_2020.pdf}
+      {\OutPath scatter_share_exec_all_2019_2020_full.pdf}
       {0.6em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_exec_all_2018_avg.pdf}
-      {Output/scatter_share_exec_all_2018_avg_full.pdf}
+      {\OutPath scatter_share_exec_all_2018_avg.pdf}
+      {\OutPath scatter_share_exec_all_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -959,18 +1859,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of execution of $\text{Algorithm}_t$ vrs Share of execution of $\text{Algorithm}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_exec_ALG_2018_2019.pdf}
-      {Output/scatter_share_exec_Algorithm_2018_2019_full.pdf}
+      {\OutPath scatter_share_exec_ALG_2018_2019.pdf}
+      {\OutPath scatter_share_exec_Algorithm_2018_2019_full.pdf}
       {0.35em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_exec_ALG_2019_2020.pdf}
-      {Output/scatter_share_exec_Algorithm_2019_2020_full.pdf}
+      {\OutPath scatter_share_exec_ALG_2019_2020.pdf}
+      {\OutPath scatter_share_exec_Algorithm_2019_2020_full.pdf}
       {0.35em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_exec_ALG_2018_avg.pdf}
-      {Output/scatter_share_exec_Algorithm_2018_avg_full.pdf}
+      {\OutPath scatter_share_exec_ALG_2018_avg.pdf}
+      {\OutPath scatter_share_exec_Algorithm_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -980,18 +1880,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of execution of $\text{Inspector}_t$ vrs Share of execution of $\text{Inspector}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_exec_Inspectors_2018_2019.pdf}
-      {Output/scatter_share_exec_Inspectors_2018_2019_full.pdf}
+      {\OutPath scatter_share_exec_Inspectors_2018_2019.pdf}
+      {\OutPath scatter_share_exec_Inspectors_2018_2019_full.pdf}
       {0.6em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_exec_Inspectors_2019_2020.pdf}
-      {Output/scatter_share_exec_Inspectors_2019_2020_full.pdf}
+      {\OutPath scatter_share_exec_Inspectors_2019_2020.pdf}
+      {\OutPath scatter_share_exec_Inspectors_2019_2020_full.pdf}
       {0.6em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_exec_Inspectors_2018_avg.pdf}
-      {Output/scatter_share_exec_Inspectors_2018_avg_full.pdf}
+      {\OutPath scatter_share_exec_Inspectors_2018_avg.pdf}
+      {\OutPath scatter_share_exec_Inspectors_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1002,18 +1902,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of total $\text{void}_t$ vrs Share of total execution of $\text{assigned}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_v_all_2018_2019.pdf}
-      {Output/scatter_share_v_all_2018_2019_full.pdf}
+      {\OutPath scatter_share_v_all_2018_2019.pdf}
+      {\OutPath scatter_share_v_all_2018_2019_full.pdf}
       {0.6em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_v_all_2019_2020.pdf}
-      {Output/scatter_share_v_all_2019_2020_full.pdf}
+      {\OutPath scatter_share_v_all_2019_2020.pdf}
+      {\OutPath scatter_share_v_all_2019_2020_full.pdf}
       {0.6em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_v_all_2018_avg.pdf}
-      {Output/scatter_share_v_all_2018_avg_full.pdf}
+      {\OutPath scatter_share_v_all_2018_avg.pdf}
+      {\OutPath scatter_share_v_all_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1023,18 +1923,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of void $\text{algo}_t$ vrs share of execution of $\text{algo}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_v_ALG_2018_2019.pdf}
-      {Output/scatter_share_v_Algorithm_2018_2019_full.pdf}
+      {\OutPath scatter_share_v_ALG_2018_2019.pdf}
+      {\OutPath scatter_share_v_Algorithm_2018_2019_full.pdf}
       {0.35em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_v_ALG_2019_2020.pdf}
-      {Output/scatter_share_v_Algorithm_2019_2020_full.pdf}
+      {\OutPath scatter_share_v_ALG_2019_2020.pdf}
+      {\OutPath scatter_share_v_Algorithm_2019_2020_full.pdf}
       {0.35em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_v_ALG_2018_avg.pdf}
-      {Output/scatter_share_v_Algorithm_2018_avg_full.pdf}
+      {\OutPath scatter_share_v_ALG_2018_avg.pdf}
+      {\OutPath scatter_share_v_Algorithm_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1044,18 +1944,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of void $\text{Inspector-selected}_t$ vrs share of execution of $\text{Inspector-selected}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_v_Inspectors_2018_2019.pdf}
-      {Output/scatter_share_v_Inspectors_2018_2019_full.pdf}
+      {\OutPath scatter_share_v_Inspectors_2018_2019.pdf}
+      {\OutPath scatter_share_v_Inspectors_2018_2019_full.pdf}
       {0.6em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_v_Inspectors_2019_2020.pdf}
-      {Output/scatter_share_v_Inspectors_2019_2020_full.pdf}
+      {\OutPath scatter_share_v_Inspectors_2019_2020.pdf}
+      {\OutPath scatter_share_v_Inspectors_2019_2020_full.pdf}
       {0.6em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_v_Inspectors_2018_avg.pdf}
-      {Output/scatter_share_v_Inspectors_2018_avg_full.pdf}
+      {\OutPath scatter_share_v_Inspectors_2018_avg.pdf}
+      {\OutPath scatter_share_v_Inspectors_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1067,18 +1967,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of total $\text{below median evasion rate cases}_t$ vrs Share of total execution of $\text{assigned}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_med_er_all_2018_2019.pdf}
-      {Output/scatter_share_med_er_all_2018_2019_full.pdf}
+      {\OutPath scatter_share_med_er_all_2018_2019.pdf}
+      {\OutPath scatter_share_med_er_all_2018_2019_full.pdf}
       {0.6em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_med_er_all_2019_2020.pdf}
-      {Output/scatter_share_med_er_all_2019_2020_full.pdf}
+      {\OutPath scatter_share_med_er_all_2019_2020.pdf}
+      {\OutPath scatter_share_med_er_all_2019_2020_full.pdf}
       {0.6em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_med_er_all_2018_avg.pdf}
-      {Output/scatter_share_med_er_all_2018_avg_full.pdf}
+      {\OutPath scatter_share_med_er_all_2018_avg.pdf}
+      {\OutPath scatter_share_med_er_all_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1088,18 +1988,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of below median evasion rate $\text{algo}_t$ vrs share of execution of $\text{algo}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_med_er_ALG_2018_2019.pdf}
-      {Output/scatter_share_med_er_Algorithm_2018_2019_full.pdf}
+      {\OutPath scatter_share_med_er_ALG_2018_2019.pdf}
+      {\OutPath scatter_share_med_er_Algorithm_2018_2019_full.pdf}
       {0.35em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_med_er_ALG_2019_2020.pdf}
-      {Output/scatter_share_med_er_Algorithm_2019_2020_full.pdf}
+      {\OutPath scatter_share_med_er_ALG_2019_2020.pdf}
+      {\OutPath scatter_share_med_er_Algorithm_2019_2020_full.pdf}
       {0.35em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_med_er_ALG_2018_avg.pdf}
-      {Output/scatter_share_med_er_Algorithm_2018_avg_full.pdf}
+      {\OutPath scatter_share_med_er_ALG_2018_avg.pdf}
+      {\OutPath scatter_share_med_er_Algorithm_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1109,18 +2009,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of below median evasion rate $\text{Inspector-selected}_t$ vrs share of execution of $\text{Inspector-selected}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_med_er_Inspectors_2018_2019.pdf}
-      {Output/scatter_share_med_er_Inspectors_2018_2019_full.pdf}
+      {\OutPath scatter_share_med_er_Inspectors_2018_2019.pdf}
+      {\OutPath scatter_share_med_er_Inspectors_2018_2019_full.pdf}
       {0.6em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_med_er_Inspectors_2019_2020.pdf}
-      {Output/scatter_share_med_er_Inspectors_2019_2020_full.pdf}
+      {\OutPath scatter_share_med_er_Inspectors_2019_2020.pdf}
+      {\OutPath scatter_share_med_er_Inspectors_2019_2020_full.pdf}
       {0.6em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_med_er_Inspectors_2018_avg.pdf}
-      {Output/scatter_share_med_er_Inspectors_2018_avg_full.pdf}
+      {\OutPath scatter_share_med_er_Inspectors_2018_avg.pdf}
+      {\OutPath scatter_share_med_er_Inspectors_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1132,18 +2032,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of total $\text{bottom quartile evasion rate cases}_t$ vrs Share of total execution of $\text{assigned}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_botq_er_all_2018_2019.pdf}
-      {Output/scatter_share_botq_er_all_2018_2019_full.pdf}
+      {\OutPath scatter_share_botq_er_all_2018_2019.pdf}
+      {\OutPath scatter_share_botq_er_all_2018_2019_full.pdf}
       {0.6em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_botq_er_all_2019_2020.pdf}
-      {Output/scatter_share_botq_er_all_2019_2020_full.pdf}
+      {\OutPath scatter_share_botq_er_all_2019_2020.pdf}
+      {\OutPath scatter_share_botq_er_all_2019_2020_full.pdf}
       {0.6em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_botq_er_all_2018_avg.pdf}
-      {Output/scatter_share_botq_er_all_2018_avg_full.pdf}
+      {\OutPath scatter_share_botq_er_all_2018_avg.pdf}
+      {\OutPath scatter_share_botq_er_all_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1153,18 +2053,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of bottom quartile evasion rate $\text{algo}_t$ vrs share of execution of $\text{algo}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_botq_er_ALG_2018_2019.pdf}
-      {Output/scatter_share_botq_er_Algorithm_2018_2019_full.pdf}
+      {\OutPath scatter_share_botq_er_ALG_2018_2019.pdf}
+      {\OutPath scatter_share_botq_er_Algorithm_2018_2019_full.pdf}
       {0.35em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_botq_er_ALG_2019_2020.pdf}
-      {Output/scatter_share_botq_er_Algorithm_2019_2020_full.pdf}
+      {\OutPath scatter_share_botq_er_ALG_2019_2020.pdf}
+      {\OutPath scatter_share_botq_er_Algorithm_2019_2020_full.pdf}
       {0.35em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_botq_er_ALG_2018_avg.pdf}
-      {Output/scatter_share_botq_er_Algorithm_2018_avg_full.pdf}
+      {\OutPath scatter_share_botq_er_ALG_2018_avg.pdf}
+      {\OutPath scatter_share_botq_er_Algorithm_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1174,18 +2074,18 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \caption{Share of bottom quartile evasion rate $\text{Inspector-selected}_t$ vrs share of execution of $\text{Inspector-selected}_{t+1}$}
 
     \twopanels{2018 vrs 2019}
-      {Output/scatter_share_botq_er_Inspectors_2018_2019.pdf}
-      {Output/scatter_share_botq_er_Inspectors_2018_2019_full.pdf}
+      {\OutPath scatter_share_botq_er_Inspectors_2018_2019.pdf}
+      {\OutPath scatter_share_botq_er_Inspectors_2018_2019_full.pdf}
       {0.6em}
 
     \twopanels{2019 vrs 2020}
-      {Output/scatter_share_botq_er_Inspectors_2019_2020.pdf}
-      {Output/scatter_share_botq_er_Inspectors_2019_2020_full.pdf}
+      {\OutPath scatter_share_botq_er_Inspectors_2019_2020.pdf}
+      {\OutPath scatter_share_botq_er_Inspectors_2019_2020_full.pdf}
       {0.6em}
 
     \twopanels{2018 vrs (2019--2020)}
-      {Output/scatter_share_botq_er_Inspectors_2018_avg.pdf}
-      {Output/scatter_share_botq_er_Inspectors_2018_avg_full.pdf}
+      {\OutPath scatter_share_botq_er_Inspectors_2018_avg.pdf}
+      {\OutPath scatter_share_botq_er_Inspectors_2018_avg_full.pdf}
       {0em}
 \end{figure}
 
@@ -1240,7 +2140,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \begin{subfigure}{\textwidth}
         \centering
         \caption{Full audits}
-        \includegraphics[width=\textwidth]{Output/execution_rate_boxplot_Full.pdf}
+        \includegraphics[width=\textwidth]{\OutPath execution_rate_boxplot_Full.pdf}
         \label{fig:exec_rate_boxplot_full}
     \end{subfigure}
 
@@ -1250,7 +2150,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
     \begin{subfigure}{\textwidth}
         \centering
         \caption{Desk audits}
-        \includegraphics[width=\textwidth]{Output/execution_rate_boxplot_Desk.pdf}
+        \includegraphics[width=\textwidth]{\OutPath execution_rate_boxplot_Desk.pdf}
         \label{fig:exec_rate_boxplot_desk}
     \end{subfigure}
 \end{figure}
@@ -1266,7 +2166,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
 \label{tab:exec_rate_full_panels}
 
 \footnotesize
-\input{Output/inspectors_reg_panels_Full_exec_rate.tex}
+\input{\OutPath inspectors_reg_panels_Full_exec_rate.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1283,7 +2183,7 @@ Let $N$ denote the number of cases per inspector $i$ at (selection) year $t$. Th
 \caption{Existence of High potential case vrs overall execution rate of algorithm cases [Full audits]}
 \label{tab:inspector_effort_disc_full}
 
-\input{Output/inspectors_reg_discrete_Full_exec_rate}
+\input{\OutPath inspectors_reg_discrete_Full_exec_rate}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1302,7 +2202,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Existence of High potential case vrs execution rate of bottom 20\% cases [Full audits]}
 \label{tab:inspector_effort_disc_full}
 
-\input{Output/inspectors_reg_discrete_Full_b20}
+\input{\OutPath inspectors_reg_discrete_Full_b20}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1321,7 +2221,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Existence of High potential case vrs Executed bottom-20\% \/ assigned (all)  [Full audits]}
 \label{tab:inspector_effort_disc_full}
 
-\input{Output/inspectors_reg_discrete_Full_b20t}
+\input{\OutPath inspectors_reg_discrete_Full_b20t}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1340,7 +2240,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Share of High potential case vrs overall execution rate [Full audits]}
 \label{tab:inspector_effort_disc_full}
 \footnotesize
-\input{Output/inspectors_reg_share_Full_exec_rate}
+\input{\OutPath inspectors_reg_share_Full_exec_rate}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1358,7 +2258,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Share of High potential case vrs execution rate of bottom 20\% cases [Full audits]}
 \label{tab:inspector_effort_disc_full}
 \footnotesize
-\input{Output/inspectors_reg_share_Full_b20}
+\input{\OutPath inspectors_reg_share_Full_b20}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1376,7 +2276,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Share of High potential case vrs Executed bottom-20\% \/ assigned (all) [Full audits]}
 \label{tab:inspector_effort_disc_full}
 \footnotesize
-\input{Output/inspectors_reg_share_Full_b20t}
+\input{\OutPath inspectors_reg_share_Full_b20t}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1399,7 +2299,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Existence of High potential case vrs overall execution rate [Desk audits]}
 \label{tab:inspector_effort_disc_Desk}
 \footnotesize
-\input{Output/inspectors_reg_discrete_Desk_exec_rate}
+\input{\OutPath inspectors_reg_discrete_Desk_exec_rate}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1417,7 +2317,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Existence of High potential case vrs execution rate of bottom 20\% cases [Desk audits]}
 \label{tab:inspector_effort_disc_Desk}
 \footnotesize
-\input{Output/inspectors_reg_discrete_Desk_b20}
+\input{\OutPath inspectors_reg_discrete_Desk_b20}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1436,7 +2336,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Existence of High potential case vrs Executed bottom-20\% assigned (all)  [Desk audits]}
 \label{tab:inspector_effort_disc_Desk}
 \footnotesize
-\input{Output/inspectors_reg_discrete_Desk_b20t}
+\input{\OutPath inspectors_reg_discrete_Desk_b20t}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1454,7 +2354,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Share of High potential case  vrs overall execution rate [Desk audits]}
 \label{tab:inspector_effort_share_Desk}
 \footnotesize
-\input{Output/inspectors_reg_share_Desk_exec_rate}
+\input{\OutPath inspectors_reg_share_Desk_exec_rate}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1472,7 +2372,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Share of High potential case vrs execution rate of bottom 20\% cases [Desk audits]}
 \label{tab:inspector_effort_share_Desk}
 \footnotesize
-\input{Output/inspectors_reg_share_Desk_b20}
+\input{\OutPath inspectors_reg_share_Desk_b20}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1491,7 +2391,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Share of High potential case vrs Executed bottom-20\% assigned (all)  [Desk audits]}
 \label{tab:inspector_effort_share_Desk}
 \footnotesize
-\input{Output/inspectors_reg_share_Desk_b20t}
+\input{\OutPath inspectors_reg_share_Desk_b20t}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1519,7 +2419,7 @@ $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \caption{Probability of execution according to ranking sequence}
 \label{tab:inspector_effort_disc_Desk}
 \footnotesize
-\input{Output/table_exec_seq}
+\input{\OutPath table_exec_seq}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1599,7 +2499,7 @@ The bin-plot analysis uses the Random Forest predicted evasion score \texttt{yha
 \caption{Support for whole-sample predicted-evasion decile effort plots, full audits}
 \label{tab:bin_support_yhatrf_full_decile_whole_sample}
 
-\input{Output/bin_support_yhatrf_Full_decile_whole_sample.tex}
+\input{\OutPath bin_support_yhatrf_Full_decile_whole_sample.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1708,7 +2608,7 @@ The bin-plot analysis uses the Random Forest predicted evasion score \texttt{yha
 \caption{Inspector Characteristics and firm size, Desk Audits}
 \label{tab:inspector_effort_disc_Desk}
 
-\input{Output/2 regression inspector characteristics selection desk audits.tex}
+\input{\OutPath 2 regression inspector characteristics selection desk audits.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize \item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table shows the estimation of the OLS regressions of outcomes of inspectors on inspector characteristics. The analysis is done at the list (inspector x year) level and only includes the lists of desk audits. These lists were assigned individually to inspectors. The regressors are three individual characteristics of the inspectors collected using the inspector survey (whether the inspector had a Masters/PhD and whether they had higher than median experience working at the tax authority) and administrative data (age). Column 1's outcome is the total started cases for each list, Columns 2-4 are averages within list of the main outcomes , Column 5 uses the number of started algorithm cases, Column 6 the share of started algorithm cases among algorithm-selected cases, Column 7 uses an indicator of whether the number of started algorithm cases was larger than the number of started inspector cases in the list, and Column 8 uses the response of the inspector to whether they would favor the automation of case selection using an algorithm. The regressions control for fixed effects at the tax office-year level. Robust standard errors are shown in parentheses (Huber-White formula).
@@ -1726,7 +2626,7 @@ The bin-plot analysis uses the Random Forest predicted evasion score \texttt{yha
 \caption{Inspector Characteristics and Performance, Full Audits [Executed]}
 \label{tab:inspector_effort_disc_Desk}
 
-\input{Output/2 regression inspector characteristics full audits.tex}
+\input{\OutPath 2 regression inspector characteristics full audits.tex}
 
 \begin{tablenotes}[flushleft]
 \footnotesize \item Notes: * 0.10 ** 0.05 *** 0.01 significance levels. This table shows the estimation of OLS regressions of outcomes on inspector characteristics. The analysis is done at the inspector-year level and focuses on full audits. Unlike desk audits, full audits may involve teams: for team cases, we allocate each executed case equally across participating inspectors, assigning weight $1/k$ to each inspector, where k is the number of inspectors recorded on the case. Column 1's outcome is the team-adjusted number of executed cases for the inspector-year, Column 2 is the team-adjusted number of executed algorithm cases, Column 3 is the share of executed algorithm cases among executed cases (constructed from the team-adjusted counts), Column 4 is an indicator for whether the share of executed algorithm cases exceeds 0.5, Columns 5-6 report averages among executed cases of the main outcomes (detection and log evasion), and Columns 7-10 report averages among executed cases of firm characteristics (log turnover, log number of employees, log firm age, and the risk score). The regressors are individual characteristics of inspectors collected using the inspector survey (e.g., whether the inspector had a Masters/PhD and whether they had higher than median experience working at the tax authority) and administrative data (age). The regressions control for fixed effects at the tax office-year level. Robust standard errors are shown in parentheses (Huber-White formula).
@@ -1862,7 +2762,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Informative regression-sample coverage by panel and audit type (counts and \% of base)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_main_coverage_by_method.tex}
+\input{\OutPath w_main_coverage_by_method.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1874,13 +2774,13 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.82\textwidth]{Output/w_main_scatter_notification.pdf}
+\includegraphics[width=0.82\textwidth]{\OutPath w_main_scatter_notification.pdf}
 \caption{Scatter and linear fit: \(W_{\text{main}}\) vs notification value}
 \end{figure}
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.75\textwidth]{Output/w_main_density.pdf}
+\includegraphics[width=0.75\textwidth]{\OutPath w_main_density.pdf}
 \caption{Density of \(W_{\text{main}}\)}
 \end{figure}
 
@@ -1892,7 +2792,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Selection method, capped \(W\), and survey indexes: two panels (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_main_table_indices_recent_all.tex}
+\input{\OutPath w_main_table_indices_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1909,7 +2809,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Selection method, capped \(W\), and survey-question outcomes: two panels (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
-\input{Output/w_main_table_questions_recent_all.tex}
+\input{\OutPath w_main_table_questions_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1928,7 +2828,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{\neq 0}\) and survey indexes (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_robust_nonzero_table_indices_recent_all.tex}
+\input{\OutPath w_robust_nonzero_table_indices_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1945,7 +2845,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{\neq 0}\) and survey questions (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
-\input{Output/w_robust_nonzero_table_questions_recent_all.tex}
+\input{\OutPath w_robust_nonzero_table_questions_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1962,7 +2862,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{>\mathrm{med}}\) and survey indexes (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_robust_abovemedian_table_indices_recent_all.tex}
+\input{\OutPath w_robust_abovemedian_table_indices_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1979,7 +2879,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{>\mathrm{med}}\) and survey questions (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
-\input{Output/w_robust_abovemedian_table_questions_recent_all.tex}
+\input{\OutPath w_robust_abovemedian_table_questions_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -1996,7 +2896,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{\ge q75}\) and survey indexes (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{6}{c}}
-\input{Output/w_robust_topquartile_table_indices_recent_all.tex}
+\input{\OutPath w_robust_topquartile_table_indices_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -2013,7 +2913,7 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 \begin{threeparttable}
 \caption{Robustness: \(W_{\ge q75}\) and survey questions (Recent audit / All surveyed firms)}
 \begin{tabular}{l*{12}{c}}
-\input{Output/w_robust_topquartile_table_questions_recent_all.tex}
+\input{\OutPath w_robust_topquartile_table_questions_recent_all.tex}
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
@@ -2028,10 +2928,3 @@ where \(\widetilde{W}\) is the pooled median and \(\widetilde{W}_{75}\) is the p
 
 
 \end{document}
-
-
-
-
-
-
-

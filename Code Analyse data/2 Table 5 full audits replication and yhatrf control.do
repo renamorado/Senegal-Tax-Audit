@@ -11,7 +11,7 @@
 * This do-file recreates the top panels (A1 and B1) of the full-audit
 * version of Table 5 from "2 Regressions main results.do" and then
 * re-estimates the same table adding predicted evasion (yhatrf) as a
-* control, as a quadratic robustness check, and as decile/quintile controls.
+* control, as a quadratic robustness check, and as grouped-bin controls.
 
 version 18
 set more off
@@ -53,6 +53,12 @@ local table_yhatrf "$output\table5_fullaudits_yhatrf_control.tex"
 local table_yhatrf_quadratic "$output\table5_fullaudits_yhatrf_quadratic_control.tex"
 local table_yhatrf_deciles "$output\table5_fullaudits_yhatrf_deciles_control.tex"
 local table_yhatrf_quintiles "$output\table5_fullaudits_yhatrf_quintiles_control.tex"
+local table_yhatrf_bin15 "$output\table5_fullaudits_yhatrf_15bins_control.tex"
+local table_yhatrf_bin20 "$output\table5_fullaudits_yhatrf_20bins_control.tex"
+local table_yhatrf_bin40 "$output\table5_fullaudits_yhatrf_40bins_control.tex"
+local table_yhatrf_bin50 "$output\table5_fullaudits_yhatrf_50bins_control.tex"
+local table_yhatrf_topsplit "$output\table5_fullaudits_yhatrf_topsplit_control.tex"
+local table_yhatrf_bin_support "$output\table5_fullaudits_yhatrf_bin_support.tex"
 
 local panel_a_titles `"\multicolumn{1}{l}{} & \shortstack{Number of Agents} & \shortstack{Duration in Days\\(Taxpayer Survey)} & \shortstack{Days from Start to Conf.\\(Admin Data)} & \shortstack{Days Working on Case\\(Self-Reported)} & \shortstack{Evasion/ Number of\\Agents} & \shortstack{Evasion/Duration\\(Taxpayer Survey)} & \shortstack{Evasion/Duration\\(Admin. Data)} & \shortstack{Evasion/Days Working\\(Self-Reported)} \\"'
 local panel_numbers `"\multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) \\"'
@@ -75,6 +81,38 @@ if _rc {
 	di as error "Variable yhatrf not found in $table5_inputdata."
 	exit 111
 }
+
+tempfile table5_base_sample
+save `table5_base_sample', replace
+
+foreach sample_variant in full selectionyear_2018_2019 ltu_medium {
+	use `table5_base_sample', clear
+
+	local sample_suffix ""
+	local sample_label "Full selected full-audit sample"
+
+	if "`sample_variant'" == "selectionyear_2018_2019" {
+		keep if inlist(selectionyear, 2018, 2019)
+		local sample_suffix "_selectionyear_2018_2019"
+		local sample_label "Selection years 2018 and 2019"
+	}
+	if "`sample_variant'" == "ltu_medium" {
+		keep if inlist(groupbureau, 1, 2)
+		local sample_suffix "_ltu_medium"
+		local sample_label "LTU and medium tax centers"
+	}
+
+	local table_replicated "$output\table5_fullaudits_replicated`sample_suffix'.tex"
+	local table_yhatrf "$output\table5_fullaudits_yhatrf_control`sample_suffix'.tex"
+	local table_yhatrf_quadratic "$output\table5_fullaudits_yhatrf_quadratic_control`sample_suffix'.tex"
+	local table_yhatrf_deciles "$output\table5_fullaudits_yhatrf_deciles_control`sample_suffix'.tex"
+	local table_yhatrf_quintiles "$output\table5_fullaudits_yhatrf_quintiles_control`sample_suffix'.tex"
+	local table_yhatrf_bin15 "$output\table5_fullaudits_yhatrf_15bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin20 "$output\table5_fullaudits_yhatrf_20bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin40 "$output\table5_fullaudits_yhatrf_40bins_control`sample_suffix'.tex"
+	local table_yhatrf_bin50 "$output\table5_fullaudits_yhatrf_50bins_control`sample_suffix'.tex"
+	local table_yhatrf_topsplit "$output\table5_fullaudits_yhatrf_topsplit_control`sample_suffix'.tex"
+	local table_yhatrf_bin_support "$output\table5_fullaudits_yhatrf_bin_support`sample_suffix'.tex"
 
 * Rebuild the original duration definitions and date-availability
 * controls from 2 Regressions main results.do.
@@ -154,13 +192,246 @@ foreach v in evasion_cost1 evasion_cost2 evasion_cost3 evasion_cost4 {
 
 capture drop yhatrf_decile
 capture drop yhatrf_quintile
-* Pool predicted-evasion deciles over the regression-eligible sample so
-* the grouped-control specifications preserve the intended Table 5 sample.
-xtile yhatrf_decile = yhatrf if yhatrf != . , nq(10)
-xtile yhatrf_quintile = yhatrf if yhatrf != . , nq(5)
+capture drop yhatrf_bin15
+capture drop yhatrf_bin20
+capture drop yhatrf_bin40
+capture drop yhatrf_bin50
+capture drop yhatrf_decile_topsplit
+capture drop yhatrf_decile9_half
+capture drop yhatrf_decile10_half
+capture drop table5_fe_inspector
+
+* Build grouped predicted-evasion controls within the inspector/year FE used
+* by all Table 5 full-audit regressions.
+egen table5_fe_inspector = group(inspectorclusteryear), missing
+egen yhatrf_decile = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(10)
+egen yhatrf_quintile = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(5)
+egen yhatrf_bin15 = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(15)
+egen yhatrf_bin20 = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(20)
+egen yhatrf_bin40 = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(40)
+egen yhatrf_bin50 = xtile(yhatrf) if yhatrf != ., by(table5_fe_inspector) nq(50)
+
+* Top-tail flexibility check: preserve deciles 1-8 and split deciles 9 and 10
+* within each inspector/year FE stratum.
+gen yhatrf_decile_topsplit = yhatrf_decile
+egen yhatrf_decile9_half = xtile(yhatrf) if yhatrf_decile == 9, by(table5_fe_inspector) nq(2)
+egen yhatrf_decile10_half = xtile(yhatrf) if yhatrf_decile == 10, by(table5_fe_inspector) nq(2)
+replace yhatrf_decile_topsplit = 9 if yhatrf_decile == 9 & yhatrf_decile9_half == 1
+replace yhatrf_decile_topsplit = 10 if yhatrf_decile == 9 & yhatrf_decile9_half == 2
+replace yhatrf_decile_topsplit = 11 if yhatrf_decile == 10 & yhatrf_decile10_half == 1
+replace yhatrf_decile_topsplit = 12 if yhatrf_decile == 10 & yhatrf_decile10_half == 2
+drop yhatrf_decile9_half yhatrf_decile10_half
+
+file open support using `"`table_yhatrf_bin_support'"', write replace
+file write support "\begin{tabular}{llrrrrrc}" _n
+file write support "\toprule" _n
+file write support "Specification & Sample & FE strata & Cells & Total N & Algorithm N & Inspector N & Both methods \\" _n
+file write support "\midrule" _n
+foreach spec in deciles quintiles bin15 bin20 bin40 bin50 topsplit {
+    if "`spec'" == "deciles" {
+        local binvar "yhatrf_decile"
+        local speclabel "Deciles"
+    }
+    if "`spec'" == "quintiles" {
+        local binvar "yhatrf_quintile"
+        local speclabel "Quintiles"
+    }
+    if "`spec'" == "bin15" {
+        local binvar "yhatrf_bin15"
+        local speclabel "15 bins"
+    }
+    if "`spec'" == "bin20" {
+        local binvar "yhatrf_bin20"
+        local speclabel "20 bins"
+    }
+    if "`spec'" == "bin40" {
+        local binvar "yhatrf_bin40"
+        local speclabel "40 bins"
+    }
+    if "`spec'" == "bin50" {
+        local binvar "yhatrf_bin50"
+        local speclabel "50 bins"
+    }
+    if "`spec'" == "topsplit" {
+        local binvar "yhatrf_decile_topsplit"
+        local speclabel "Top-split deciles"
+    }
+
+    capture drop support_stratum_tag support_cell
+    egen support_stratum_tag = tag(table5_fe_inspector) if `binvar' != .
+    egen support_cell = group(table5_fe_inspector `binvar') if `binvar' != .
+    quietly count if support_stratum_tag == 1
+    local strata_n = r(N)
+    quietly levelsof support_cell if support_cell != ., local(support_cells)
+    local cell_n : word count `support_cells'
+    quietly count if `binvar' != .
+    local total_n = r(N)
+    quietly count if `binvar' != . & algorithm == 1
+    local alg_n = r(N)
+    quietly count if `binvar' != . & algorithm == 0
+    local insp_n = r(N)
+    local both_methods "No"
+    if `alg_n' > 0 & `insp_n' > 0 local both_methods "Yes"
+    file write support "`speclabel' & Full, inspector-year FE & `strata_n' & `cell_n' & `total_n' & `alg_n' & `insp_n' & `both_methods' \\" _n
+    drop support_stratum_tag support_cell
+}
+file write support "\bottomrule" _n
+file write support "\end{tabular}" _n
+file close support
 
 tempfile table5_prepared
 save `table5_prepared', replace
+
+************************************************************
+* 2a. Diagnostic plot for number of agents
+************************************************************
+if "`sample_variant'" == "full" {
+	local fig_resid_orig "$output\table5_ninspectors_residual_original_controls_kdensity.pdf"
+	local figure_ninspectors_resid "$output\table5_ninspectors_residual_yhatrf_deciles_kdensity.pdf"
+	local figure_ninspectors_raw "$output\table5_ninspectors_raw_kdensity.pdf"
+
+	use `table5_prepared', clear
+	estimates drop _all
+
+	* Match the original Column 1 sample, then remove the
+	* variation explained by all non-algorithm controls.
+	quietly reghdfe y16 algorithm overlap random safeties, ///
+		a(inspectorclusteryear) vce(robust)
+	gen table5_col1_original_sample = e(sample)
+
+	capture drop y16_resid_original
+	quietly reghdfe y16 overlap random safeties ///
+		if table5_col1_original_sample == 1, ///
+		a(inspectorclusteryear) vce(robust) residuals(y16_resid_original)
+	label variable y16_resid_original "Residualized number of agents"
+
+	quietly ksmirnov y16_resid_original if table5_col1_original_sample == 1, by(algorithm)
+	local resid_original_ks_p : display %5.3f r(p)
+
+	#delim ;
+	twoway
+		(kdensity y16_resid_original
+			if table5_col1_original_sample == 1 & algorithm == 1,
+			lcolor(eltblue) lpattern(solid) lwidth(medthick))
+		(kdensity y16_resid_original
+			if table5_col1_original_sample == 1 & algorithm == 0,
+			lcolor(orange) lpattern(shortdash) lwidth(medthick)),
+		legend(order(1 "Algorithm cases" 2 "Inspector cases") cols(1) ///
+			position(1) ring(0) size(small) region(lcolor(none) fcolor(none)))
+		xtitle("Residualized number of agents")
+		ytitle("Density")
+		note("Controls: overlap, random, safeties, and inspector-year FE. KS p-value: `resid_original_ks_p'")
+		graphregion(color(white))
+	;
+	#delim cr
+	capture noisily graph export `"`fig_resid_orig'"', as(pdf) replace
+	if _rc {
+		di as error "Warning: could not export `fig_resid_orig'. Close any open PDF viewer and rerun this do-file."
+	}
+
+	* Match the Column 1 decile-control sample, then remove the
+	* variation explained by all non-algorithm controls.
+	quietly reghdfe y16 algorithm overlap random safeties ib1.yhatrf_decile, ///
+		a(inspectorclusteryear) vce(robust)
+	gen table5_col1_decile_sample = e(sample)
+
+	capture drop y16_resid_decile
+	quietly reghdfe y16 overlap random safeties ib1.yhatrf_decile ///
+		if table5_col1_decile_sample == 1, ///
+		a(inspectorclusteryear) vce(robust) residuals(y16_resid_decile)
+	label variable y16_resid_decile "Residualized number of agents"
+
+	quietly ksmirnov y16_resid_decile if table5_col1_decile_sample == 1, by(algorithm)
+	local resid_ks_p : display %5.3f r(p)
+
+	#delim ;
+	twoway
+		(kdensity y16_resid_decile
+			if table5_col1_decile_sample == 1 & algorithm == 1,
+			lcolor(eltblue) lpattern(solid) lwidth(medthick))
+		(kdensity y16_resid_decile
+			if table5_col1_decile_sample == 1 & algorithm == 0,
+			lcolor(orange) lpattern(shortdash) lwidth(medthick)),
+		legend(order(1 "Algorithm cases" 2 "Inspector cases") cols(1) ///
+			position(1) ring(0) size(small) region(lcolor(none) fcolor(none)))
+		xtitle("Residualized number of agents")
+		ytitle("Density")
+		note("Controls: overlap, random, safeties, yhatrf deciles, and inspector-year FE. KS p-value: `resid_ks_p'")
+		graphregion(color(white))
+	;
+	#delim cr
+	capture noisily graph export `"`figure_ninspectors_resid'"', as(pdf) replace
+	if _rc {
+		di as error "Warning: could not export `figure_ninspectors_resid'. Close any open PDF viewer and rerun this do-file."
+	}
+
+	quietly ksmirnov y16 if y2 == 1 & y16 != . & inlist(algorithm, 0, 1), by(algorithm)
+	local raw_ks_p : display %5.3f r(p)
+
+	#delim ;
+	twoway
+		(kdensity y16
+			if y2 == 1 & y16 != . & algorithm == 1,
+			lcolor(eltblue) lpattern(solid) lwidth(medthick))
+		(kdensity y16
+			if y2 == 1 & y16 != . & algorithm == 0,
+			lcolor(orange) lpattern(shortdash) lwidth(medthick)),
+		legend(order(1 "Algorithm cases" 2 "Inspector cases") cols(1) ///
+			position(1) ring(0) size(small) region(lcolor(none) fcolor(none)))
+		xtitle("Number of agents")
+		ytitle("Density")
+		note("Sample: executed selected full audits, no controls. KS p-value: `raw_ks_p'")
+		graphregion(color(white))
+	;
+	#delim cr
+	capture noisily graph export `"`figure_ninspectors_raw'"', as(pdf) replace
+	if _rc {
+		di as error "Warning: could not export `figure_ninspectors_raw'. Close any open PDF viewer and rerun this do-file."
+	}
+}
+
+if "`sample_variant'" == "selectionyear_2018_2019" {
+	local fig_resid_1819 "$output\table5_ninspectors_residual_yhatrf_deciles_selectionyear_2018_2019_kdensity.pdf"
+
+	use `table5_prepared', clear
+	estimates drop _all
+
+	* Match the 2018/2019 Column 1 decile-control sample, then remove
+	* the variation explained by all non-algorithm controls.
+	quietly reghdfe y16 algorithm overlap random safeties ib1.yhatrf_decile, ///
+		a(inspectorclusteryear) vce(robust)
+	gen table5_col1_1819_sample = e(sample)
+
+	capture drop y16_resid_decile_1819
+	quietly reghdfe y16 overlap random safeties ib1.yhatrf_decile ///
+		if table5_col1_1819_sample == 1, ///
+		a(inspectorclusteryear) vce(robust) residuals(y16_resid_decile_1819)
+	label variable y16_resid_decile_1819 "Residualized number of agents"
+
+	quietly ksmirnov y16_resid_decile_1819 if table5_col1_1819_sample == 1, by(algorithm)
+	local resid_1819_ks_p : display %5.3f r(p)
+
+	#delim ;
+	twoway
+		(kdensity y16_resid_decile_1819
+			if table5_col1_1819_sample == 1 & algorithm == 1,
+			lcolor(eltblue) lpattern(solid) lwidth(medthick))
+		(kdensity y16_resid_decile_1819
+			if table5_col1_1819_sample == 1 & algorithm == 0,
+			lcolor(orange) lpattern(shortdash) lwidth(medthick)),
+		legend(order(1 "Algorithm cases" 2 "Inspector cases") cols(1) ///
+			position(1) ring(0) size(small) region(lcolor(none) fcolor(none)))
+		xtitle("Residualized number of agents")
+		ytitle("Density")
+		note("Sample: selection years 2018 and 2019. Controls: overlap, random, safeties, yhatrf deciles, and inspector-year FE. KS p-value: `resid_1819_ks_p'")
+		graphregion(color(white))
+	;
+	#delim cr
+	capture noisily graph export `"`fig_resid_1819'"', as(pdf) replace
+	if _rc {
+		di as error "Warning: could not export `fig_resid_1819'. Close any open PDF viewer and rerun this do-file."
+	}
+}
 
 ************************************************************
 * 3. Export Table 5 top panels: replicated specification
@@ -222,7 +493,85 @@ esttab `main_estlist'
 #delim cr
 
 ************************************************************
-* 4. Export Table 5 top panels with yhatrf as a control
+* 4. Export Table 5 top panels with additional grouped controls
+************************************************************
+foreach spec in yhatrf_bin15 yhatrf_bin20 yhatrf_bin40 yhatrf_bin50 yhatrf_topsplit {
+	use `table5_prepared', clear
+	estimates drop _all
+
+	local version "`spec'"
+	local base_controls "ib1.yhatrf_bin15"
+	local table_out "`table_yhatrf_bin15'"
+	if "`spec'" == "yhatrf_bin20" {
+		local base_controls "ib1.yhatrf_bin20"
+		local table_out "`table_yhatrf_bin20'"
+	}
+	if "`spec'" == "yhatrf_bin40" {
+		local base_controls "ib1.yhatrf_bin40"
+		local table_out "`table_yhatrf_bin40'"
+	}
+	if "`spec'" == "yhatrf_bin50" {
+		local base_controls "ib1.yhatrf_bin50"
+		local table_out "`table_yhatrf_bin50'"
+	}
+	if "`spec'" == "yhatrf_topsplit" {
+		local base_controls "ib1.yhatrf_decile_topsplit"
+		local table_out "`table_yhatrf_topsplit'"
+	}
+	local main_estlist ""
+	local colindex = 0
+
+	foreach outcome in y16 q30 y19 y8 evasion_cost1 evasion_cost2 evasion_cost3 evasion_cost4 {
+		local ++colindex
+		local rhs_controls "`base_controls'"
+
+		if "`outcome'" != "q30" {
+			replace `outcome' = . if y2 == 0
+		}
+		if "`outcome'" == "y19" {
+			local rhs_controls "`rhs_controls' dummy1 dummy2 dummy3"
+		}
+
+		eststo m`colindex'_`version': reghdfe `outcome' algorithm overlap random safeties `rhs_controls', ///
+			a(inspectorclusteryear) vce(robust)
+		local main_estlist "`main_estlist' m`colindex'_`version'"
+
+		quietly summarize `outcome' if e(sample) == 1
+		estadd local meanoutcome = int(100 * `r(mean)') / 100
+		local meanoutcome = int(100 * `r(mean)') / 100
+		local meanoutcome : display %5.2f `meanoutcome'
+		estadd local pp `meanoutcome'
+		test algorithm == safeties
+		local pvalue : display %5.2f `r(p)'
+		estadd local pvalue = round(`pvalue', 0.01)
+		estadd local N = e(N), replace
+	}
+
+	#delim ;
+	esttab `main_estlist'
+		using `"`table_out'"',
+		replace fragment booktabs
+		prehead("\begin{tabular}{lcccc|cccc} \toprule")
+		posthead("`panel_a_titles' `panel_numbers' \midrule")
+		postfoot("\bottomrule \end{tabular}")
+		order(algorithm overlap)
+		keep(algorithm overlap)
+		coeflabels(overlap "Inspectors x Overlap" algorithm "Algorithm")
+		mgroups("A1: Resource Outcomes" "B1: Productivity Outcomes",
+			pattern(1 0 0 0 1 0 0 0)
+			span prefix(\multicolumn{@span}{c}{\textbf{) suffix(}})
+			erepeat(\cmidrule(lr){@span}))
+		b(%5.2f) se(%5.2f)
+		stats(N r2 pp, labels("N" "R2" "Mean outcome"))
+		star(* 0.10 ** 0.05 *** 0.01) noomitted noconstant
+		nomtitles nonumbers collabels(none) nonotes
+		substitute(\_ _)
+	;
+	#delim cr
+}
+
+************************************************************
+* 5. Export Table 5 top panels with yhatrf as a control
 ************************************************************
 use `table5_prepared', clear
 estimates drop _all
@@ -281,7 +630,7 @@ esttab `main_estlist'
 #delim cr
 
 ************************************************************
-* 5. Export Table 5 top panels with yhatrf and yhatrf^2
+* 6. Export Table 5 top panels with yhatrf and yhatrf^2
 ************************************************************
 use `table5_prepared', clear
 estimates drop _all
@@ -340,7 +689,7 @@ esttab `main_estlist'
 #delim cr
 
 ************************************************************
-* 6. Export Table 5 top panels with yhatrf decile controls
+* 7. Export Table 5 top panels with yhatrf decile controls
 ************************************************************
 use `table5_prepared', clear
 estimates drop _all
@@ -402,7 +751,7 @@ esttab `main_estlist'
 
 
 ************************************************************
-* 7. Export Table 5 top panels with yhatrf quintile controls
+* 8. Export Table 5 top panels with yhatrf quintile controls
 ************************************************************
 use `table5_prepared', clear
 estimates drop _all
@@ -459,4 +808,6 @@ esttab `main_estlist'
 	substitute(\_ _)
 ;
 #delim cr
+
+}
 

@@ -1,0 +1,30 @@
+\begin{tabular}{lcccccc} \toprule
+\multicolumn{7}{l}{\textbf{A: Outcome P(Execution)}} \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule
+Algorithm   &      -0.164\sym{***}&      -0.126\sym{***}&      -0.119\sym{***}&      -0.116\sym{***}&      -0.111\sym{***}&      -0.052         \\
+            &     (0.037)         &     (0.036)         &     (0.036)         &     (0.036)         &     (0.036)         &     (0.036)         \\
+\midrule
+N           &         646         &         646         &         646         &         646         &         646         &         646         \\
+R2          &       0.167         &       0.272         &       0.276         &       0.279         &       0.287         &       0.414         \\
+Mean outcome&        0.63         &        0.63         &        0.63         &        0.63         &        0.63         &        0.63         \\
+
+\midrule \multicolumn{7}{l}{\textbf{B: Outcome P(Detection|Execution)}} \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule
+Algorithm   &       0.014         &       0.019         &       0.021         &       0.021         &       0.020         &       0.040\sym{**} \\
+            &     (0.034)         &     (0.035)         &     (0.035)         &     (0.035)         &     (0.035)         &     (0.019)         \\
+\midrule
+N           &         407         &         407         &         407         &         407         &         407         &         407         \\
+R2          &       0.095         &       0.107         &       0.114         &       0.115         &       0.123         &       0.823         \\
+Mean outcome&        0.88         &        0.88         &        0.88         &        0.88         &        0.88         &        0.88         \\
+
+\midrule \multicolumn{7}{l}{\textbf{C: Outcome log(evasion)|Detection}} \\ \multicolumn{1}{l}{} & (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule
+Algorithm   &      -0.764\sym{***}&      -0.663\sym{***}&      -0.737\sym{***}&      -0.704\sym{***}&      -0.702\sym{***}&      -0.022         \\
+            &     (0.213)         &     (0.216)         &     (0.219)         &     (0.218)         &     (0.219)         &     (0.137)         \\
+\midrule
+Turnover    &          No         &         Yes         &         Yes         &         Yes         &         Yes         &         Yes         \\
+Profit rate &          No         &          No         &         Yes         &         Yes         &         Yes         &         Yes         \\
+Productivity&          No         &          No         &          No         &         Yes         &         Yes         &         Yes         \\
+Firm char.  &          No         &          No         &          No         &          No         &         Yes         &         Yes         \\
+Predicted evasion&          No         &          No         &          No         &          No         &          No         &         Yes         \\
+N           &         359         &         359         &         359         &         359         &         359         &         359         \\
+R2          &       0.298         &       0.339         &       0.362         &       0.384         &       0.387         &       0.828         \\
+Mean outcome&       19.41         &       19.41         &       19.41         &       19.41         &       19.41         &       19.41         \\
+\bottomrule \end{tabular}
